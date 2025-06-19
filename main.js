@@ -1,4 +1,4 @@
-const { app, BrowserWindow, globalShortcut, ipcMain, clipboard, shell } = require("electron")
+const { app, BrowserWindow, globalShortcut, ipcMain, clipboard, shell, screen } = require("electron")
 const path = require("path")
 const { spawn } = require("child_process")
 require('dotenv').config() // Load .env
@@ -6,12 +6,18 @@ require('dotenv').config() // Load .env
 let mainWindow
 
 function createWindow() {
-  // Check if we're in development mode
-  const isDev = process.argv.includes('--dev') || process.env.NODE_ENV === 'development'
-  
+  // Always show window by default
+  const display = screen.getPrimaryDisplay();
+  const width = 80;
+  const height = 20;
+  const x = display.bounds.x + Math.round((display.workArea.width - width) / 2);
+  const y = display.bounds.y + display.workArea.height; // 2px margin from bottom
+
   mainWindow = new BrowserWindow({
-    width: 400,
-    height: 300,
+    width,
+    height,
+    x,
+    y,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
@@ -22,8 +28,9 @@ function createWindow() {
     resizable: false,
     skipTaskbar: true,
     transparent: true,
-    show: isDev, // Show window by default in development mode
+    show: true, // Always show
   })
+  
 
   mainWindow.loadFile("index.html")
 
@@ -35,38 +42,31 @@ function createWindow() {
     `);
   });
 
-  // Register global shortcut for activation - using F13 (Fn key on Mac)
-  globalShortcut.register("F13", () => {
-    console.log("Global shortcut activated!")
-    if (mainWindow.isVisible()) {
-      mainWindow.hide()
-      console.log("Window hidden")
-    } else {
-      mainWindow.show()
-      mainWindow.focus()
-      console.log("Window shown")
-    }
-  })
+  // Remove all previous shortcuts
+  globalShortcut.unregisterAll();
 
-  // Alternative: Use Cmd+` (backtick) which is easier to reach
-  globalShortcut.register("CommandOrControl+`", () => {
-    console.log("Alternative shortcut activated!")
-    if (mainWindow.isVisible()) {
-      mainWindow.hide()
-    } else {
-      mainWindow.show()
-      mainWindow.focus()
+  // Register global shortcut for backtick (`) key to toggle dictation
+  globalShortcut.register('`', () => {
+    if (!mainWindow.isVisible()) {
+      mainWindow.show();
     }
-  })
+    mainWindow.webContents.send('toggle-dictation');
+  });
+
+  // Ensure window is always on top, even above fullscreen apps
+  mainWindow.setAlwaysOnTop(true, 'screen-saver');
+  mainWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
+  mainWindow.on('show', () => {
+    mainWindow.setAlwaysOnTop(true, 'screen-saver');
+    mainWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
+  });
 }
 
 app.whenReady().then(() => {
   createWindow()
   console.log("🎤 Open Scribe started!")
   console.log("📋 Shortcuts:")
-  console.log("   - Fn key (F13) to toggle window")
-  console.log("   - Cmd+` (backtick) to toggle window")
-  console.log("   - Space to start/stop recording")
+  console.log("   - Press ` (backtick) to start/stop dictation and auto-paste")
   console.log("   - ESC to close window")
 })
 
@@ -89,11 +89,6 @@ app.on("will-quit", () => {
 // IPC handlers
 ipcMain.handle("paste-text", async (event, text) => {
   console.log("Pasting text:", text)
-  // Hide the window first
-  mainWindow.hide()
-
-  // Wait a bit for the window to hide
-  await new Promise((resolve) => setTimeout(resolve, 100))
 
   // Copy text to clipboard and simulate paste
   clipboard.writeText(text)

@@ -72,6 +72,37 @@
             </div>
         );
 
+        // Voice bar animation component (smaller bars)
+        const VoiceBar = ({ active }) => {
+            const [tick, setTick] = React.useState(0);
+            React.useEffect(() => {
+                if (!active) return;
+                const interval = setInterval(() => setTick(t => t + 1), 40);
+                return () => clearInterval(interval);
+            }, [active]);
+            return (
+                <div style={{ display: 'flex', alignItems: 'flex-end', height: 10, gap: 1 }}>
+                    {[...Array(10)].map((_, i) => {
+                        const phase = (tick + i * 2) / 4;
+                        const height = active ? (4 + 4 * (0.5 + 0.5 * Math.sin(phase))) : 4;
+                        return (
+                            <div
+                                key={i}
+                                style={{
+                                    width: 2,
+                                    height,
+                                    background: 'white',
+                                    borderRadius: 1,
+                                    transition: 'height 0.15s',
+                                    opacity: 0.95
+                                }}
+                            />
+                        );
+                    })}
+                </div>
+            );
+        };
+
         // Main App Component
         const App = () => {
             const [isRecording, setIsRecording] = useState(false);
@@ -175,86 +206,64 @@
                 ipcRenderer.invoke('hide-window');
             };
 
+            useEffect(() => {
+                let recording = false;
+                const handleToggle = () => {
+                    if (!recording && !isRecording && !isProcessing) {
+                        startRecording();
+                        recording = true;
+                    } else if (isRecording) {
+                        stopRecording();
+                        recording = false;
+                    }
+                };
+                ipcRenderer.on('toggle-dictation', handleToggle);
+                return () => {
+                    ipcRenderer.removeListener('toggle-dictation', handleToggle);
+                };
+            }, [isRecording, isProcessing]);
+
+            // Remove spacebar logic for recording
             const handleKeyPress = (e) => {
                 if (e.key === 'Escape') {
                     handleClose();
-                } else if (e.key === ' ' && !isRecording && !isProcessing) {
-                    e.preventDefault();
-                    startRecording();
-                } else if (e.key === ' ' && isRecording) {
-                    e.preventDefault();
-                    stopRecording();
                 }
             };
-
             useEffect(() => {
                 document.addEventListener('keydown', handleKeyPress);
                 return () => document.removeEventListener('keydown', handleKeyPress);
-            }, [isRecording, isProcessing]);
+            }, []);
 
+            // Minimal always-visible tab UI (no bars when idle)
             return (
-                <div className="p-4">
-                    <Card className="glass-effect border-white/20 bg-white/10 backdrop-blur-xl">
-                        <CardContent className="p-6">
-                            <div className="flex flex-col items-center space-y-4">
-                                <div className="flex items-center justify-between w-full">
-                                    <h2 className="text-lg font-semibold text-white">Whisper Dictation</h2>
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={handleClose}
-                                        className="text-white hover:bg-white/20"
-                                    >
-                                        ✕
-                                    </Button>
-                                </div>
-                                
-                                <div className="flex flex-col items-center space-y-3">
-                                    {isProcessing ? (
-                                        <div className="flex flex-col items-center space-y-2">
-                                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
-                                            <p className="text-sm text-white/80">Processing...</p>
-                                        </div>
-                                    ) : (
-                                        <Button
-                                            onClick={isRecording ? stopRecording : startRecording}
-                                            className={`w-16 h-16 rounded-full ${
-                                                isRecording 
-                                                    ? 'bg-red-500 hover:bg-red-600 animate-pulse' 
-                                                    : 'bg-blue-500 hover:bg-blue-600'
-                                            }`}
-                                            disabled={isProcessing}
-                                        >
-                                            {isRecording ? '⏹️' : '🎤'}
-                                        </Button>
-                                    )}
-                                    
-                                    <p className="text-xs text-white/70 text-center">
-                                        {isRecording 
-                                            ? 'Recording... Press space or click to stop' 
-                                            : 'Press space or click to start recording'
-                                        }
-                                    </p>
-                                </div>
-
-                                {transcript && (
-                                    <div className="w-full p-3 bg-white/20 rounded-md">
-                                        <p className="text-sm text-white">{transcript}</p>
-                                    </div>
-                                )}
-
-                                {error && (
-                                    <div className="w-full p-3 bg-red-500/20 rounded-md">
-                                        <p className="text-sm text-red-200">{error}</p>
-                                    </div>
-                                )}
-
-                                <p className="text-xs text-white/50 text-center">
-                                    Press Fn key or Cmd+` to toggle • ESC to close
-                                </p>
-                            </div>
-                        </CardContent>
-                    </Card>
+                <div style={{
+                    width: '100%',
+                    height: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    pointerEvents: 'none',
+                }}>
+                    <div
+                        className="glass-effect"
+                        style={{
+                            minWidth: 40,
+                            minHeight: 8,
+                            maxWidth: 40,
+                            maxHeight: 8,
+                            background: 'rgba(30,30,30,0.85)',
+                            border: '1px solid #ccc',
+                            borderRadius: 10,
+                            boxShadow: '0 1px 6px rgba(0,0,0,0.10)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            padding: '1px 6px',
+                            pointerEvents: 'auto',
+                        }}
+                    >
+                        {(isRecording || isProcessing) ? <VoiceBar active={true} /> : null}
+                    </div>
                 </div>
             );
         };
