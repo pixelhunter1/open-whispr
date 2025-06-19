@@ -22,11 +22,11 @@
     </style>
 </head>
 <body>
+    <script src="assets/request-audio-permission.js"></script>
     <div id="root"></div>
     
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
-        const { ipcRenderer } = require('electron');
 
         // Button Component
         const Button = ({ children, onClick, disabled, variant = "default", size = "default", className = "" }) => {
@@ -225,7 +225,7 @@
 
             const safePaste = async (text) => {
                 try {
-                    await ipcRenderer.invoke('paste-text', text);
+                    await window.electronAPI.pasteText(text);
                 } catch (err) {
                     setError('Failed to paste text. Please check accessibility permissions.');
                 }
@@ -285,7 +285,7 @@
             };
 
             const handleClose = () => {
-                ipcRenderer.invoke('hide-window');
+                window.electronAPI.hideWindow();
             };
 
             useEffect(() => {
@@ -299,9 +299,9 @@
                         recording = false;
                     }
                 };
-                ipcRenderer.on('toggle-dictation', handleToggle);
+                window.electronAPI.onToggleDictation(handleToggle);
                 return () => {
-                    ipcRenderer.removeListener('toggle-dictation', handleToggle);
+                    // No need to remove listener, as it's handled in preload
                 };
             }, [isRecording, isProcessing]);
 

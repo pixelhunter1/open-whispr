@@ -1,9 +1,23 @@
-const { app, BrowserWindow, globalShortcut, ipcMain, clipboard, shell, screen, Menu } = require("electron")
+const { app, BrowserWindow, globalShortcut, ipcMain, clipboard, shell, screen, Menu, Tray } = require("electron")
 const path = require("path")
 const { spawn } = require("child_process")
 require('dotenv').config() // Load .env
 
 let mainWindow
+let tray = null
+let controlPanelWindow = null
+
+function getAppUrl(filename = 'index.html') {
+  if (process.env.NODE_ENV === 'development') {
+    // Vite dev server
+    return filename === 'index.html'
+      ? 'http://localhost:5173/'
+      : `http://localhost:5173/${filename}`;
+  } else {
+    // Production build
+    return `file://${path.join(__dirname, 'src', 'dist', filename)}`;
+  }
+}
 
 function createWindow() {
   // Always show window by default
@@ -19,9 +33,11 @@ function createWindow() {
     x,
     y,
     webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false,
-      enableRemoteModule: true,
+      preload: path.join(__dirname, 'preload.js'),
+      nodeIntegration: false,
+      contextIsolation: true,
+      enableRemoteModule: false,
+      sandbox: true,
     },
     frame: false,
     alwaysOnTop: true,
@@ -31,7 +47,7 @@ function createWindow() {
   })
   
 
-  mainWindow.loadFile("index.html")
+  mainWindow.loadURL(getAppUrl('index.html'));
 
   // Pass environment variables to renderer process
   mainWindow.webContents.on('did-finish-load', () => {
@@ -77,8 +93,52 @@ function createWindow() {
   }
 }
 
+function createControlPanelWindow() {
+  if (controlPanelWindow) {
+    controlPanelWindow.focus();
+    return;
+  }
+  controlPanelWindow = new BrowserWindow({
+    width: 400,
+    height: 600,
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js'),
+      nodeIntegration: false,
+      contextIsolation: true,
+      enableRemoteModule: false,
+      sandbox: true,
+    },
+    title: 'OpenScribe Control Panel',
+    resizable: true,
+    show: true,
+  });
+  controlPanelWindow.loadURL(getAppUrl('control.html'));
+  controlPanelWindow.on('closed', () => {
+    controlPanelWindow = null;
+  });
+}
+
 app.whenReady().then(() => {
   createWindow()
+
+  // Create tray icon on macOS
+  if (process.platform === 'darwin') {
+    tray = new Tray(path.join(__dirname, 'assets/iconTemplate.png'));
+    const contextMenu = Menu.buildFromTemplate([
+      { label: 'Show', click: () => { mainWindow.show(); } },
+      { label: 'Open Control Panel', click: () => { createControlPanelWindow(); } },
+      { label: 'Quit', click: () => { app.quit(); } }
+    ]);
+    tray.setToolTip('OpenScribe');
+    tray.setContextMenu(contextMenu);
+    tray.on('click', () => {
+      if (mainWindow.isVisible()) {
+        mainWindow.hide();
+      } else {
+        mainWindow.show();
+      }
+    });
+  }
 })
 
 app.on("window-all-closed", () => {
@@ -119,5 +179,10 @@ ipcMain.handle("paste-text", async (event, text) => {
 })
 
 ipcMain.handle("hide-window", () => {
-  mainWindow.hide()
+  if (process.platform === "darwin") {
+    mainWindow.minimize();
+    if (app.dock) app.dock.show();
+  } else {
+    mainWindow.hide();
+  }
 })

@@ -1,92 +1,101 @@
-# Open Scribe
+# OpenScribe
 
-A desktop dictation application that uses OpenAI's Whisper model to transcribe speech and automatically paste it at your cursor location, similar to Wispr Flow.
+OpenScribe is a modern, open-source desktop dictation app that uses OpenAI Whisper to transcribe your speech and instantly paste it anywhere. Designed for speed, privacy, and productivity, OpenScribe floats above your workflow and works everywhere you type.
 
-## Features
-
-- 🎤 **Voice Recording**: Click or press space to start/stop recording
+## ✨ Features
+- 🎤 **Voice Recording**: Start/stop recording with a click or shortcut
 - 🤖 **AI Transcription**: Uses OpenAI Whisper for accurate speech-to-text
-- ⌨️ **Auto Paste**: Automatically pastes transcribed text at cursor location
-- 🔥 **Global Shortcut**: Fn key (Mac) or Cmd+` to toggle the app from anywhere
-- 🪟 **Floating Window**: Always-on-top transparent window with glass effect
-- ⚡ **Fast & Lightweight**: Built with Electron for cross-platform support
+- ⌨️ **Auto Paste**: Instantly pastes transcribed text at your cursor
+- ⚡ **Global Shortcut**: Toggle the app from anywhere
+- 🪟 **Floating Window**: Always-on-top, minimal, and transparent
+- 🖥️ **Menu Bar & Dock**: Quick access from the macOS menu bar and dock, with tray menu (Show/Hide, Control Panel, Quit)
+- 🛠️ **Control Panel**: Configure dictation key, permissions, and view/copy transcription history
+- 💾 **Local Storage**: Transcription history stored locally with better-sqlite3
+- 🧩 **Modern Stack**: Electron + Vite + React + Tailwind v4 (no config) + shadcn/ui
+- 🔒 **Secure**: Electron security best practices (preload script, context isolation, no node integration)
 
-## Installation
+## 🚀 Getting Started
 
-1. Clone or download this project
-2. Run the setup script:
-   ```bash
-   npm run setup
-   ```
-3. Install dependencies:
-   ```bash
-   npm install
-   ```
-4. Set up your OpenAI API key:
-   - Get your API key from [OpenAI Platform](https://platform.openai.com/api-keys)
-   - Edit the `.env` file and add your API key
-5. Run the app:
-   ```bash
-   npm start
-   ```
-
-## Usage
-
-1. **Activate**: Press `Fn key` (Mac) or `Cmd+`` (alternative)
-2. **Record**: Click the microphone button or press `Space`
-3. **Stop**: Click again or press `Space` to stop recording
-4. **Auto-paste**: The transcribed text will automatically be pasted at your cursor
-5. **Close**: Press `ESC` or click the X button
-
-## System Requirements
-
-- **macOS**: Requires accessibility permissions for text pasting
-- **Windows**: May require PowerShell execution policy adjustment
-- **Linux**: Requires `xdotool` for text pasting (`sudo apt install xdotool`)
-
-## Building
-
-To create a distributable app:
-
+### 1. Clone the repository
 ```bash
-# Build for current platform
-npm run build
+git clone https://github.com/yourusername/open-scribe.git
+cd open-scribe
+```
 
-# Build for specific platform
+### 2. Setup environment variables
+Run the setup script to create a `.env` file:
+```bash
+npm run setup
+```
+Or manually copy `env.example` to `.env` and add your [OpenAI API key](https://platform.openai.com/api-keys).
+
+### 3. Install dependencies (Electron + React/Vite)
+Just run:
+```bash
+npm install
+```
+This will install all dependencies for both the Electron main process and the React/Vite frontend (`src/`).
+
+### 4. Start the app (development)
+```bash
+npm run dev
+```
+This will start both the Vite dev server (for React) and Electron together. Hot reload is supported for the frontend.
+
+## 🛠 Usage
+- **Toggle**: Use the global shortcut (`Fn` key on Mac, or `Cmd+\`` as an alternative)
+- **Record**: Click the microphone or press `Space`
+- **Stop**: Click again or press `Space`
+- **Paste**: The transcribed text is automatically pasted at your cursor
+- **Control Panel**: Access from the tray menu to configure settings and view history
+- **Close**: Press `ESC` or use the tray/dock menu
+
+## 🖥️ System Requirements
+- **macOS**: Requires microphone and accessibility permissions
+- **Windows**: May require PowerShell execution policy adjustment
+- **Linux**: Needs `xdotool` for pasting (`sudo apt install xdotool`)
+
+## 🏗️ Building for Distribution
+To create a distributable app:
+```bash
+npm run build
+# or for a specific platform:
 npm run build:mac
 npm run build:win
 npm run build:linux
 ```
+Installers will be in the `dist/` folder.
 
-This will create platform-specific installers in the `dist` folder.
+## 🧹 Project Structure
+- `main.js` — Electron main process
+- `preload.js` — Secure bridge for renderer/main communication
+- `assets/` — Icons and static assets
+- `src/` — All React (Vite) code, UI components, and frontend logic
+  - `src/components/ui/` — shadcn/ui components
+  - `src/index.css` — Tailwind v4 (no config files needed)
+  - `src/package.json` — Vite/React dependencies
+- `src/control.html` — Control panel window
 
-## Permissions
+## 🧩 Tech Stack & Security
+- **Electron 36+** with context isolation, sandbox, and preload script
+- **Vite** for fast React development
+- **Tailwind v4** (no config, CSS-first)
+- **shadcn/ui** for modern UI components
+- **better-sqlite3** for local transcription history
+- **Tray menu** and **Control Panel** for quick access and configuration
 
-The app requires:
-- **Microphone access**: For voice recording
-- **Accessibility permissions**: For automatic text pasting (macOS)
-- **Input simulation**: For keyboard shortcuts (Windows/Linux)
+## 🧩 Contributing
+We welcome contributions! To get started:
+1. Fork the repo
+2. Create a new branch (`git checkout -b feature/your-feature`)
+3. Commit your changes
+4. Push to your fork and open a Pull Request
 
-## Troubleshooting
+For larger changes, please open an issue to discuss your idea first.
 
-- **No microphone access**: Check system permissions
-- **Text not pasting**: Ensure accessibility permissions are granted
-- **API errors**: Verify your OpenAI API key is correct and has credits
-- **Key binding not working**: Try the alternative Cmd+` shortcut
+## 📄 License
+MIT — free for personal and commercial use. See [LICENSE](LICENSE) for details.
 
-## Development
+---
 
-```bash
-# Start in development mode
-npm run dev
-
-# Test setup
-npm run test
-
-# Package without distribution
-npm run pack
-```
-
-## License
-
-MIT License - feel free to modify and distribute!
+**OpenScribe** is built for creators, writers, and anyone who wants to move faster with their voice. Enjoy!
