@@ -8,10 +8,10 @@ let mainWindow
 function createWindow() {
   // Always show window by default
   const display = screen.getPrimaryDisplay();
-  const width = 80;
-  const height = 20;
+  const width = 90;
+  const height = 60;
   const x = display.bounds.x + Math.round((display.workArea.width - width) / 2);
-  const y = display.bounds.y + display.workArea.height; // 2px margin from bottom
+  const y = display.workArea.height; 
 
   mainWindow = new BrowserWindow({
     width,
@@ -64,10 +64,6 @@ function createWindow() {
 
 app.whenReady().then(() => {
   createWindow()
-  console.log("🎤 Open Scribe started!")
-  console.log("📋 Shortcuts:")
-  console.log("   - Press ` (backtick) to start/stop dictation and auto-paste")
-  console.log("   - ESC to close window")
 })
 
 app.on("window-all-closed", () => {
@@ -88,16 +84,12 @@ app.on("will-quit", () => {
 
 // IPC handlers
 ipcMain.handle("paste-text", async (event, text) => {
-  console.log("Pasting text:", text)
-
   // Copy text to clipboard and simulate paste
   clipboard.writeText(text)
-  console.log("Text copied to clipboard")
 
   // Simulate Ctrl+V (or Cmd+V on Mac)
   const { spawn } = require("child_process")
   if (process.platform === "darwin") {
-    console.log("Simulating Cmd+V on macOS")
     spawn("osascript", ["-e", 'tell application "System Events" to keystroke "v" using command down'])
   } else if (process.platform === "win32") {
     console.log("Simulating Ctrl+V on Windows")
@@ -106,7 +98,6 @@ ipcMain.handle("paste-text", async (event, text) => {
       'Add-Type -AssemblyName System.Windows.Forms; [System.Windows.Forms.SendKeys]::SendWait("^v")',
     ])
   } else {
-    console.log("Simulating Ctrl+V on Linux")
     // Linux
     spawn("xdotool", ["key", "ctrl+v"])
   }

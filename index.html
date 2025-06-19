@@ -103,6 +103,55 @@
             );
         };
 
+        // Dot-flashing animation for loading/transcribing
+        const DotFlashing = () => (
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 16 }}>
+                <div className="dot-flashing"></div>
+                <style>{`
+                .dot-flashing {
+                  position: relative;
+                  width: 5px;
+                  height: 5px;
+                  border-radius: 5px;
+                  background-color: #ccc;
+                  color: #ccc;
+                  animation: dot-flashing 1s infinite linear alternate;
+                  animation-delay: 0.5s;
+                }
+                .dot-flashing::before, .dot-flashing::after {
+                  content: "";
+                  display: inline-block;
+                  position: absolute;
+                  top: 0;
+                }
+                .dot-flashing::before {
+                  left: -8px;
+                  width: 5px;
+                  height: 5px;
+                  border-radius: 5px;
+                  background-color: #787777;
+                  color: #787777;
+                  animation: dot-flashing 1s infinite alternate;
+                  animation-delay: 0s;
+                }
+                .dot-flashing::after {
+                  left: 8px;
+                  width: 5px;
+                  height: 5px;
+                  border-radius: 5px;
+                  background-color: #787777;
+                  color: #787777;
+                  animation: dot-flashing 1s infinite alternate;
+                  animation-delay: 1s;
+                }
+                @keyframes dot-flashing {
+                  0% { background-color: #787777; }
+                  50%, 100% { background-color: rgba(152, 128, 255, 0.2); }
+                }
+                `}</style>
+            </div>
+        );
+
         // Main App Component
         const App = () => {
             const [isRecording, setIsRecording] = useState(false);
@@ -234,35 +283,50 @@
                 return () => document.removeEventListener('keydown', handleKeyPress);
             }, []);
 
+            // Animated size for tab
+            let tabWidth = 40, tabHeight = 8, content = null;
+            if (isRecording) {
+                tabWidth = 70; tabHeight = 32;
+                content = <VoiceBar active={true} />;
+            } else if (isProcessing) {
+                tabWidth = 90; tabHeight = 24;
+                content = <DotFlashing />;
+            }
+            const transition = 'all 0.25s cubic-bezier(0.4,0.2,0.2,1)';
+
             // Minimal always-visible tab UI (no bars when idle)
             return (
                 <div style={{
+                    position: 'absolute',
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
                     width: '100%',
                     height: '100%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
                     pointerEvents: 'none',
                 }}>
                     <div
                         className="glass-effect"
                         style={{
-                            minWidth: 40,
-                            minHeight: 8,
-                            maxWidth: 40,
-                            maxHeight: 8,
+                            position: 'absolute',
+                            left: '50%',
+                            bottom: 8,
+                            transform: 'translateX(-50%)',
+                            width: tabWidth,
+                            height: tabHeight,
                             background: 'rgba(30,30,30,0.85)',
                             border: '1px solid #ccc',
-                            borderRadius: 10,
+                            borderRadius: 20,
                             boxShadow: '0 1px 6px rgba(0,0,0,0.10)',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            padding: '1px 6px',
+                            padding: 0,
                             pointerEvents: 'auto',
+                            transition,
                         }}
                     >
-                        {(isRecording || isProcessing) ? <VoiceBar active={true} /> : null}
+                        {content}
                     </div>
                 </div>
             );
