@@ -1,17 +1,22 @@
 const fs = require("fs")
 const path = require("path")
 
-console.log("Setting up Whisper Dictation App...")
+console.log("Setting up Open Scribe...")
 
-// Create .env file template
-const envTemplate = `# OpenAI API Key for Whisper
+const envTemplate = `# OpenAI API Configuration
+# Get your API key from: https://platform.openai.com/api-keys
 OPENAI_API_KEY=your_openai_api_key_here
 
-# Instructions:
-# 1. Get your OpenAI API key from https://platform.openai.com/api-keys
-# 2. Replace 'your_openai_api_key_here' with your actual API key
-# 3. Save this file
-`
+# Optional: Customize the Whisper model
+# Available models: whisper-1 (default), whisper-1-large, whisper-1-large-v2
+WHISPER_MODEL=whisper-1
+
+# Optional: Set language for better transcription accuracy
+# Leave empty for auto-detection, or use language codes like 'en', 'es', 'fr', etc.
+LANGUAGE=
+
+# Optional: Debug mode (set to 'true' to enable verbose logging)
+DEBUG=false`
 
 if (!fs.existsSync(".env")) {
   fs.writeFileSync(".env", envTemplate)
@@ -29,7 +34,7 @@ Next steps:
 3. Run the app: npm start
 
 Features:
-- Global shortcut: Cmd+Shift+Space (Mac) or Ctrl+Shift+Space (Windows/Linux)
+- Global shortcut: Fn key (Mac) or Cmd+\` (alternative)
 - Space bar to start/stop recording
 - ESC to close the app
 - Automatic text pasting at cursor location

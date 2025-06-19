@@ -1,10 +1,14 @@
 const { app, BrowserWindow, globalShortcut, ipcMain, clipboard, shell } = require("electron")
 const path = require("path")
 const { spawn } = require("child_process")
+require('dotenv').config() // Load .env
 
 let mainWindow
 
 function createWindow() {
+  // Check if we're in development mode
+  const isDev = process.argv.includes('--dev') || process.env.NODE_ENV === 'development'
+  
   mainWindow = new BrowserWindow({
     width: 400,
     height: 300,
@@ -18,13 +22,21 @@ function createWindow() {
     resizable: false,
     skipTaskbar: true,
     transparent: true,
-    show: false,
+    show: isDev, // Show window by default in development mode
   })
 
   mainWindow.loadFile("index.html")
 
-  // Register global shortcut for activation - using Fn+Space equivalent
-  globalShortcut.register("Fn", () => {
+  // Pass environment variables to renderer process
+  mainWindow.webContents.on('did-finish-load', () => {
+    mainWindow.webContents.executeJavaScript(`
+      window.OPENAI_API_KEY = '${process.env.OPENAI_API_KEY || ''}';
+      console.log('API Key loaded:', window.OPENAI_API_KEY ? 'Present' : 'Missing');
+    `);
+  });
+
+  // Register global shortcut for activation - using F13 (Fn key on Mac)
+  globalShortcut.register("F13", () => {
     console.log("Global shortcut activated!")
     if (mainWindow.isVisible()) {
       mainWindow.hide()
@@ -50,9 +62,9 @@ function createWindow() {
 
 app.whenReady().then(() => {
   createWindow()
-  console.log("🎤 Whisper Dictation App started!")
+  console.log("🎤 Open Scribe started!")
   console.log("📋 Shortcuts:")
-  console.log("   - F13 key to toggle window")
+  console.log("   - Fn key (F13) to toggle window")
   console.log("   - Cmd+` (backtick) to toggle window")
   console.log("   - Space to start/stop recording")
   console.log("   - ESC to close window")
