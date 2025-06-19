@@ -35,7 +35,7 @@
   },
   "build": {
     "appId": "com.openscribe.app",
-    "productName": "Open Scribe",
+    "productName": "OpenScribe",
     "directories": {
       "output": "dist"
     },

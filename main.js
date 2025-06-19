@@ -1,4 +1,4 @@
-const { app, BrowserWindow, globalShortcut, ipcMain, clipboard, shell, screen } = require("electron")
+const { app, BrowserWindow, globalShortcut, ipcMain, clipboard, shell, screen, Menu } = require("electron")
 const path = require("path")
 const { spawn } = require("child_process")
 require('dotenv').config() // Load .env
@@ -60,6 +60,22 @@ function createWindow() {
     mainWindow.setAlwaysOnTop(true, 'screen-saver');
     mainWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
   });
+
+  // Add a working Quit menu item for macOS
+  if (process.platform === 'darwin') {
+    const template = [
+      {
+        label: 'OpenScribe',
+        submenu: [
+          { role: 'about' },
+          { type: 'separator' },
+          { role: 'quit', label: 'Quit OpenScribe' }
+        ]
+      }
+    ];
+    const menu = Menu.buildFromTemplate(template);
+    Menu.setApplicationMenu(menu);
+  }
 }
 
 app.whenReady().then(() => {
