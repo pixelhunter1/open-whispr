@@ -1,30 +1,68 @@
-# OpenScribe
+# Whisper Dictation App
 
-*Automatically synced with your [v0.dev](https://v0.dev) deployments*
+A desktop dictation application that uses OpenAI's Whisper model to transcribe speech and automatically paste it at your cursor location, similar to Wispr Flow.
 
-[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/gabriel-steins-projects/v0-open-scribe)
-[![Built with v0](https://img.shields.io/badge/Built%20with-v0.dev-black?style=for-the-badge)](https://v0.dev/chat/projects/EdmcpQs4VcT)
+## Features
 
-## Overview
+- 🎤 **Voice Recording**: Click or press space to start/stop recording
+- 🤖 **AI Transcription**: Uses OpenAI Whisper for accurate speech-to-text
+- ⌨️ **Auto Paste**: Automatically pastes transcribed text at cursor location
+- 🔥 **Global Shortcut**: Cmd+Shift+Space to toggle the app from anywhere
+- 🪟 **Floating Window**: Always-on-top transparent window
+- ⚡ **Fast & Lightweight**: Built with Electron for cross-platform support
 
-This repository will stay in sync with your deployed chats on [v0.dev](https://v0.dev).
-Any changes you make to your deployed app will be automatically pushed to this repository from [v0.dev](https://v0.dev).
+## Installation
 
-## Deployment
+1. Clone or download this project
+2. Install dependencies:
+   \`\`\`bash
+   npm install
+   \`\`\`
+3. Set up your OpenAI API key:
+   - Get your API key from [OpenAI Platform](https://platform.openai.com/api-keys)
+   - Add it to the `.env` file or directly in the code
+4. Run the app:
+   \`\`\`bash
+   npm start
+   \`\`\`
 
-Your project is live at:
+## Usage
 
-**[https://vercel.com/gabriel-steins-projects/v0-open-scribe](https://vercel.com/gabriel-steins-projects/v0-open-scribe)**
+1. **Activate**: Press `Cmd+Shift+Space` (Mac) or `Ctrl+Shift+Space` (Windows/Linux)
+2. **Record**: Click the microphone button or press `Space`
+3. **Stop**: Click again or press `Space` to stop recording
+4. **Auto-paste**: The transcribed text will automatically be pasted at your cursor
+5. **Close**: Press `ESC` or click the X button
 
-## Build your app
+## System Requirements
 
-Continue building your app on:
+- **macOS**: Requires accessibility permissions for text pasting
+- **Windows**: May require PowerShell execution policy adjustment
+- **Linux**: Requires `xdotool` for text pasting (`sudo apt install xdotool`)
 
-**[https://v0.dev/chat/projects/EdmcpQs4VcT](https://v0.dev/chat/projects/EdmcpQs4VcT)**
+## Building
 
-## How It Works
+To create a distributable app:
 
-1. Create and modify your project using [v0.dev](https://v0.dev)
-2. Deploy your chats from the v0 interface
-3. Changes are automatically pushed to this repository
-4. Vercel deploys the latest version from this repository
+\`\`\`bash
+npm run build
+\`\`\`
+
+This will create platform-specific installers in the `dist` folder.
+
+## Permissions
+
+The app requires:
+- **Microphone access**: For voice recording
+- **Accessibility permissions**: For automatic text pasting (macOS)
+- **Input simulation**: For keyboard shortcuts (Windows/Linux)
+
+## Troubleshooting
+
+- **No microphone access**: Check system permissions
+- **Text not pasting**: Ensure accessibility permissions are granted
+- **API errors**: Verify your OpenAI API key is correct and has credits
+
+## License
+
+MIT License - feel free to modify and distribute!
