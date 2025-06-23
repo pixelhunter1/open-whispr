@@ -1,101 +1,163 @@
 # OpenScribe
 
-OpenScribe is a modern, open-source desktop dictation app that uses OpenAI Whisper to transcribe your speech and instantly paste it anywhere. Designed for speed, privacy, and productivity, OpenScribe floats above your workflow and works everywhere you type.
+A desktop dictation application using OpenAI Whisper for speech-to-text transcription.
 
-## ✨ Features
-- 🎤 **Voice Recording**: Start/stop recording with a click or shortcut
-- 🤖 **AI Transcription**: Uses OpenAI Whisper for accurate speech-to-text
-- ⌨️ **Auto Paste**: Instantly pastes transcribed text at your cursor
-- ⚡ **Global Shortcut**: Toggle the app from anywhere
-- 🪟 **Floating Window**: Always-on-top, minimal, and transparent
-- 🖥️ **Menu Bar & Dock**: Quick access from the macOS menu bar and dock, with tray menu (Show/Hide, Control Panel, Quit)
-- 🛠️ **Control Panel**: Configure dictation key, permissions, and view/copy transcription history
-- 💾 **Local Storage**: Transcription history stored locally with better-sqlite3
-- 🧩 **Modern Stack**: Electron + Vite + React + Tailwind v4 (no config) + shadcn/ui
-- 🔒 **Secure**: Electron security best practices (preload script, context isolation, no node integration)
+## Features
 
-## 🚀 Getting Started
+- 🎤 **Global Hotkey**: Press ` (backtick) to start/stop dictation from anywhere
+- 🤖 **AI-Powered**: Uses OpenAI Whisper for accurate transcription
+- 🎨 **Modern UI**: Built with React, TypeScript, and Tailwind CSS v4
+- 🚀 **Fast**: Optimized with Vite and modern tooling
+- 📱 **Control Panel**: Manage settings, view history, and configure API keys
+- 🔒 **Privacy**: All processing happens locally through OpenAI's API
 
-### 1. Clone the repository
-```bash
-git clone https://github.com/yourusername/open-scribe.git
-cd open-scribe
+## Quick Start
+
+1. **Install dependencies**:
+   ```bash
+   npm install
+   ```
+
+2. **Set up your OpenAI API key**:
+   ```bash
+   cp env.example .env
+   # Edit .env and add your OpenAI API key
+   ```
+
+3. **Run in development**:
+   ```bash
+   npm run dev
+   ```
+
+4. **Build for production**:
+   ```bash
+   # Build for your platform
+   npm run build:mac    # macOS
+   npm run build:win    # Windows  
+   npm run build:linux  # Linux
+   ```
+
+## Usage
+
+1. **Start the app** - A small transparent overlay appears on your screen
+2. **Press ` (backtick)** - Start dictating
+3. **Press ` again** - Stop dictation and paste the transcribed text
+4. **Open Control Panel** - Right-click the tray icon (macOS) or use the overlay
+
+## Project Structure
+
+```
+open-scribe/
+├── main.js              # Electron main process
+├── preload.js           # Electron preload script
+├── package.json         # Dependencies and scripts
+├── src/
+│   ├── App.jsx          # Main dictation interface
+│   ├── main.jsx         # React entry point
+│   ├── index.html       # Vite HTML template
+│   ├── index.css        # Tailwind CSS v4 configuration
+│   ├── vite.config.js   # Vite configuration
+│   ├── components/
+│   │   ├── ControlPanel.tsx     # Settings and history UI
+│   │   ├── ui/                  # shadcn/ui components
+│   │   │   ├── button.tsx
+│   │   │   ├── card.tsx
+│   │   │   ├── input.tsx
+│   │   │   ├── LoadingDots.tsx
+│   │   │   ├── DotFlashing.tsx
+│   │   │   └── Toast.tsx
+│   │   └── lib/
+│   │       └── utils.ts         # Utility functions
+│   └── components.json          # shadcn/ui configuration
+└── assets/                      # App icons and resources
 ```
 
-### 2. Setup environment variables
-Run the setup script to create a `.env` file:
+## Technology Stack
+
+- **Frontend**: React 19, TypeScript, Tailwind CSS v4
+- **Build Tool**: Vite with optimized Tailwind plugin
+- **Desktop**: Electron
+- **UI Components**: shadcn/ui with Radix primitives
+- **Speech-to-Text**: OpenAI Whisper API
+
+## Development
+
+### Scripts
+
+- `npm run dev` - Start development with hot reload
+- `npm run build:renderer` - Build the React app only
+- `npm run lint` - Run ESLint
+- `npm run preview` - Preview production build
+
+### Architecture
+
+The app consists of two main windows:
+1. **Main Window**: Minimal overlay for dictation controls
+2. **Control Panel**: Full settings and history interface
+
+Both use the same React codebase but render different components based on URL parameters.
+
+### Tailwind CSS v4 Setup
+
+This project uses the latest Tailwind CSS v4 with:
+- CSS-first configuration using `@theme` directive
+- Vite plugin for optimal performance
+- Custom design tokens for consistent theming
+- Dark mode support with `@variant`
+
+## Building
+
+The build process creates a single executable for your platform:
+
 ```bash
-npm run setup
+# Development build
+npm run pack
+
+# Production builds
+npm run dist           # Current platform
+npm run build:mac      # macOS DMG + ZIP
+npm run build:win      # Windows NSIS + Portable
+npm run build:linux    # AppImage + DEB
 ```
-Or manually copy `env.example` to `.env` and add your [OpenAI API key](https://platform.openai.com/api-keys).
 
-### 3. Install dependencies (Electron + React/Vite)
-Just run:
-```bash
-npm install
+## Configuration
+
+### Environment Variables
+
+Create a `.env` file in the root directory:
+
+```env
+OPENAI_API_KEY=your_api_key_here
 ```
-This will install all dependencies for both the Electron main process and the React/Vite frontend (`src/`).
 
-### 4. Start the app (development)
-```bash
-npm run dev
-```
-This will start both the Vite dev server (for React) and Electron together. Hot reload is supported for the frontend.
+### Customization
 
-## 🛠 Usage
-- **Toggle**: Use the global shortcut (`Fn` key on Mac, or `Cmd+\`` as an alternative)
-- **Record**: Click the microphone or press `Space`
-- **Stop**: Click again or press `Space`
-- **Paste**: The transcribed text is automatically pasted at your cursor
-- **Control Panel**: Access from the tray menu to configure settings and view history
-- **Close**: Press `ESC` or use the tray/dock menu
+- **Hotkey**: Change in the Control Panel or modify `main.js`
+- **UI Theme**: Edit CSS variables in `src/index.css`
+- **Window Size**: Adjust dimensions in `main.js`
 
-## 🖥️ System Requirements
-- **macOS**: Requires microphone and accessibility permissions
-- **Windows**: May require PowerShell execution policy adjustment
-- **Linux**: Needs `xdotool` for pasting (`sudo apt install xdotool`)
+## Contributing
 
-## 🏗️ Building for Distribution
-To create a distributable app:
-```bash
-npm run build
-# or for a specific platform:
-npm run build:mac
-npm run build:win
-npm run build:linux
-```
-Installers will be in the `dist/` folder.
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Run tests and lint
+5. Submit a pull request
 
-## 🧹 Project Structure
-- `main.js` — Electron main process
-- `preload.js` — Secure bridge for renderer/main communication
-- `assets/` — Icons and static assets
-- `src/` — All React (Vite) code, UI components, and frontend logic
-  - `src/components/ui/` — shadcn/ui components
-  - `src/index.css` — Tailwind v4 (no config files needed)
-  - `src/package.json` — Vite/React dependencies
-- `src/control.html` — Control panel window
+## License
 
-## 🧩 Tech Stack & Security
-- **Electron 36+** with context isolation, sandbox, and preload script
-- **Vite** for fast React development
-- **Tailwind v4** (no config, CSS-first)
-- **shadcn/ui** for modern UI components
-- **better-sqlite3** for local transcription history
-- **Tray menu** and **Control Panel** for quick access and configuration
+MIT License - see [LICENSE](LICENSE) for details.
 
-## 🧩 Contributing
-We welcome contributions! To get started:
-1. Fork the repo
-2. Create a new branch (`git checkout -b feature/your-feature`)
-3. Commit your changes
-4. Push to your fork and open a Pull Request
+## Troubleshooting
 
-For larger changes, please open an issue to discuss your idea first.
+### Common Issues
 
-## 📄 License
-MIT — free for personal and commercial use. See [LICENSE](LICENSE) for details.
+1. **Microphone permissions**: Grant permissions in System Preferences/Settings
+2. **API key errors**: Ensure your OpenAI API key is valid and has credits
+3. **Global hotkey conflicts**: Change the hotkey in the Control Panel
 
----
+### Getting Help
 
-**OpenScribe** is built for creators, writers, and anyone who wants to move faster with their voice. Enjoy!
+- Check the [Issues](https://github.com/your-repo/open-scribe/issues) page
+- Review the console logs in the Control Panel
+- Verify your OpenAI API key and billing status

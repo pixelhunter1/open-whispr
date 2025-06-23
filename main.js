@@ -7,25 +7,27 @@ let mainWindow
 let tray = null
 let controlPanelWindow = null
 
-function getAppUrl(filename = 'index.html') {
+function getAppUrl(isControlPanel = false) {
   if (process.env.NODE_ENV === 'development') {
     // Vite dev server
-    return filename === 'index.html'
-      ? 'http://localhost:5173/'
-      : `http://localhost:5173/${filename}`;
+    return isControlPanel 
+      ? 'http://localhost:5174/?panel=true'
+      : 'http://localhost:5174/';
   } else {
     // Production build
-    return `file://${path.join(__dirname, 'src', 'dist', filename)}`;
+    return isControlPanel
+      ? `file://${path.join(__dirname, 'src', 'dist', 'index.html')}?panel=true`
+      : `file://${path.join(__dirname, 'src', 'dist', 'index.html')}`;
   }
 }
 
 function createWindow() {
   // Always show window by default
   const display = screen.getPrimaryDisplay();
-  const width = 90;
-  const height = 60;
+  const width = 120;
+  const height = 80;
   const x = display.bounds.x + Math.round((display.workArea.width - width) / 2);
-  const y = display.workArea.height; 
+  const y = display.workArea.height; // Position above the dock/menu bar
 
   mainWindow = new BrowserWindow({
     width,
@@ -47,7 +49,7 @@ function createWindow() {
   })
   
 
-  mainWindow.loadURL(getAppUrl('index.html'));
+  mainWindow.loadURL(getAppUrl(false));
 
   // Pass environment variables to renderer process
   mainWindow.webContents.on('did-finish-load', () => {
@@ -99,8 +101,8 @@ function createControlPanelWindow() {
     return;
   }
   controlPanelWindow = new BrowserWindow({
-    width: 400,
-    height: 600,
+    width: 800,
+    height: 700,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: false,
@@ -112,7 +114,7 @@ function createControlPanelWindow() {
     resizable: true,
     show: true,
   });
-  controlPanelWindow.loadURL(getAppUrl('control.html'));
+  controlPanelWindow.loadURL(getAppUrl(true));
   controlPanelWindow.on('closed', () => {
     controlPanelWindow = null;
   });
