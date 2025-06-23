@@ -6,9 +6,10 @@
   },
   "files": [
     "main.js",
-    "index.html",
+    "preload.js",
     "package.json",
     "node_modules/**/*",
+    "src/dist/**/*",
     "!node_modules/.cache/**/*"
   ],
   "mac": {
