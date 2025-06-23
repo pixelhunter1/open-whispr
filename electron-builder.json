@@ -1,6 +1,6 @@
 {
   "appId": "com.openscribe.app",
-  "productName": "Open Scribe",
+  "productName": "OpenScribe",
   "directories": {
     "output": "dist"
   },
@@ -10,7 +10,14 @@
     "package.json",
     "node_modules/**/*",
     "src/dist/**/*",
-    "!node_modules/.cache/**/*"
+    "!node_modules/.cache/**/*",
+    "!src/node_modules/**/*"
+  ],
+  "asarUnpack": [
+    "assets/**/*"
+  ],
+  "extraResources": [
+    "assets/**/*"
   ],
   "mac": {
     "category": "public.app-category.productivity",
@@ -46,7 +53,7 @@
     "createStartMenuShortcut": true
   },
   "dmg": {
-    "title": "Open Scribe",
+    "title": "OpenScribe",
     "icon": "assets/icon.icns",
     "background": "assets/dmg-background.png",
     "window": {

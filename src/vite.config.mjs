@@ -10,6 +10,7 @@ const __dirname = path.dirname(__filename)
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  base: './', // Use relative paths for file:// protocol in Electron
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "."),

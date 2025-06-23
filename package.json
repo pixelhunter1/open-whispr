@@ -28,7 +28,7 @@
     "electron",
     "desktop-app"
   ],
-  "author": "Open Scribe Team",
+  "author": "OpenScribe Team",
   "license": "MIT",
   "devDependencies": {
     "@eslint/js": "^9.25.0",
