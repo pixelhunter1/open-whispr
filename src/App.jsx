@@ -68,10 +68,16 @@ export default function App() {
       formData.append('file', audioBlob, 'audio.wav');
       formData.append('model', 'whisper-1');
 
-      // Get API key from window object (passed from main process)
-      const apiKey = window.OPENAI_API_KEY;
-      if (!apiKey) {
-        setError('OpenAI API key not found. Please check your .env file.');
+      // Get API key from main process via IPC (will check .env and in-memory storage)
+      let apiKey = await window.electronAPI.getOpenAIKey();
+      
+      // Fallback to localStorage if no key from main process
+      if (!apiKey || apiKey.trim() === '' || apiKey === 'your_openai_api_key_here') {
+        apiKey = localStorage.getItem('openaiApiKey');
+      }
+      
+      if (!apiKey || apiKey.trim() === '' || apiKey === 'your_openai_api_key_here') {
+        setError('OpenAI API key not found. Please set your API key in the .env file or Control Panel.');
         setIsProcessing(false);
         return;
       }
@@ -100,6 +106,15 @@ export default function App() {
       if (text) {
         setTranscript(text);
         console.log("Transcribed text:", text)
+        
+        // Save transcription to database
+        try {
+          await window.electronAPI.saveTranscription(text);
+          console.log("✅ Transcription saved to database");
+        } catch (err) {
+          console.error("Failed to save transcription:", err);
+        }
+        
         // Automatically paste the text
         await safePaste(text);
       } else {

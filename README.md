@@ -18,10 +18,17 @@ A desktop dictation application using OpenAI Whisper for speech-to-text transcri
    npm install
    ```
 
-2. **Set up your OpenAI API key**:
+2. **Set up your OpenAI API key** (choose one method):
+   
+   **Method A - .env file (recommended)**:
    ```bash
    cp env.example .env
    # Edit .env and add your OpenAI API key
+   ```
+   
+   **Method B - Control Panel**:
+   ```bash
+   # Skip .env setup and configure the API key through the app's Control Panel
    ```
 
 3. **Run in development**:
@@ -154,7 +161,11 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 1. **Microphone permissions**: Grant permissions in System Preferences/Settings
 2. **API key errors**: Ensure your OpenAI API key is valid and has credits
+   - Try setting the key through the Control Panel if .env file isn't working
+   - Check console logs for "OpenAI API Key present: Yes/No"
 3. **Global hotkey conflicts**: Change the hotkey in the Control Panel
+4. **Input paste issues**: The Control Panel now has improved paste support
+5. **Production API key issues**: Use either .env file or Control Panel to set your key
 
 ### Getting Help
 

@@ -1,48 +1,53 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Italiana&display=swap');
 
 @theme {
-  --color-primary: oklch(0.205 0 0);
-  --color-primary-foreground: oklch(0.985 0 0);
-  --color-secondary: oklch(0.97 0 0);
-  --color-secondary-foreground: oklch(0.205 0 0);
-  --color-muted: oklch(0.97 0 0);
-  --color-muted-foreground: oklch(0.556 0 0);
-  --color-accent: oklch(0.97 0 0);
-  --color-accent-foreground: oklch(0.205 0 0);
-  --color-destructive: oklch(0.577 0.245 27.325);
-  --color-border: oklch(0.922 0 0);
-  --color-input: oklch(0.922 0 0);
-  --color-ring: oklch(0.708 0 0);
-  --color-background: oklch(1 0 0);
-  --color-foreground: oklch(0.145 0 0);
-  --color-card: oklch(1 0 0);
-  --color-card-foreground: oklch(0.145 0 0);
-  --color-popover: oklch(1 0 0);
-  --color-popover-foreground: oklch(0.145 0 0);
-  --radius: 0.625rem;
+  /* OpenScribe Brand Theme - Parchment & Ink */
+  --color-primary: #4B2E2B;
+  --color-primary-foreground: #F5F0E6;
+  --color-secondary: #F5F0E6;
+  --color-secondary-foreground: #2B1F14;
+  --color-muted: #EDE7DC;
+  --color-muted-foreground: #6B5D52;
+  --color-accent: #C0A77D;
+  --color-accent-foreground: #2B1F14;
+  --color-destructive: #874F3E;
+  --color-destructive-foreground: #F5F0E6;
+  --color-border: #DDD4C7;
+  --color-input: #F9F6F1;
+  --color-ring: #C0A77D;
+  --color-background: #F5F0E6;
+  --color-foreground: #2B1F14;
+  --color-card: #FFFFFF;
+  --color-card-foreground: #2B1F14;
+  --color-popover: #FFFFFF;
+  --color-popover-foreground: #2B1F14;
+  --color-link: #2E3659;
+  --radius: 0.5rem;
 }
 
 @custom-variant dark (&:is(.dark *));
 
 @variant dark {
-  --color-background: oklch(0.145 0 0);
-  --color-foreground: oklch(0.985 0 0);
-  --color-card: oklch(0.205 0 0);
-  --color-card-foreground: oklch(0.985 0 0);
-  --color-popover: oklch(0.205 0 0);
-  --color-popover-foreground: oklch(0.985 0 0);
-  --color-primary: oklch(0.922 0 0);
-  --color-primary-foreground: oklch(0.205 0 0);
-  --color-secondary: oklch(0.269 0 0);
-  --color-secondary-foreground: oklch(0.985 0 0);
-  --color-muted: oklch(0.269 0 0);
-  --color-muted-foreground: oklch(0.708 0 0);
-  --color-accent: oklch(0.269 0 0);
+  /* Dark mode - sophisticated and rich */
+  --color-background: oklch(0.08 0 0);
+  --color-foreground: oklch(0.95 0 0);
+  --color-card: oklch(0.12 0 0);
+  --color-card-foreground: oklch(0.95 0 0);
+  --color-popover: oklch(0.12 0 0);
+  --color-popover-foreground: oklch(0.95 0 0);
+  --color-primary: oklch(0.6 0.22 245);
+  --color-primary-foreground: oklch(0.985 0 0);
+  --color-secondary: oklch(0.18 0 0);
+  --color-secondary-foreground: oklch(0.9 0 0);
+  --color-muted: oklch(0.15 0 0);
+  --color-muted-foreground: oklch(0.6 0 0);
+  --color-accent: oklch(0.6 0.22 245);
   --color-accent-foreground: oklch(0.985 0 0);
-  --color-destructive: oklch(0.704 0.191 22.216);
-  --color-border: oklch(1 0 0 / 10%);
-  --color-input: oklch(1 0 0 / 15%);
-  --color-ring: oklch(0.556 0 0);
+  --color-destructive: oklch(0.7 0.22 25);
+  --color-border: oklch(0.22 0 0);
+  --color-input: oklch(0.18 0 0);
+  --color-ring: oklch(0.6 0.22 245);
 }
 
 @layer base {
@@ -51,10 +56,12 @@
   }
   
   body {
-    @apply bg-background text-foreground font-sans;
+    @apply bg-background text-foreground;
     margin: 0;
     padding: 0;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+    font-family: 'Lora', 'Libre Baskerville', Georgia, serif;
+    font-feature-settings: "liga" 1, "kern" 1;
+    text-rendering: optimizeLegibility;
   }
   
   /* Electron specific styles */
@@ -63,16 +70,56 @@
   }
 }
 
-/* Custom glass effect for the main app window */
+/* OpenScribe Brand Typography */
+.brand-heading {
+  font-family: 'Cormorant Garamond', 'Crimson Pro', serif;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.brand-body {
+  font-family: 'Lora', 'Libre Baskerville', Georgia, serif;
+  line-height: 1.6;
+}
+
+.brand-script {
+  font-family: 'Italiana', cursive;
+  font-style: italic;
+}
+
+/* Elegant parchment-inspired glass effect */
 .glass-effect {
-  backdrop-filter: blur(20px);
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(20px) saturate(1.1);
+  box-shadow: 0 8px 32px rgba(43, 31, 20, 0.08), 
+              0 1px 0 rgba(255, 255, 255, 0.2) inset;
+}
+
+/* Light mode glass effect */
+:root .glass-effect {
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(43, 31, 20, 0.1);
+  box-shadow: 0 8px 32px rgba(43, 31, 20, 0.05), 
+              0 1px 0 rgba(255, 255, 255, 0.5) inset;
+}
+
+/* Dark mode glass effect */
+.dark .glass-effect {
+  background: rgba(15, 15, 25, 0.85);
+  border: 1px solid rgba(100, 150, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 
+              0 0 0 1px rgba(100, 150, 255, 0.1) inset;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Cormorant Garamond', 'Crimson Pro', serif;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
 }
 
 h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+  font-size: 2.5rem;
+  font-weight: 700;
 }
 
 button {
@@ -81,30 +128,176 @@ button {
   padding: 0.6em 1.2em;
   font-size: 1em;
   font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
+  font-family: 'Lora', Georgia, serif;
   cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(43, 31, 20, 0.1);
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+/* OpenScribe Brand Button Styling */
+:root button {
+  background-color: #FFFFFF;
+  color: #2B1F14;
+  border-color: #DDD4C7;
+}
+
+:root button:hover {
+  border-color: #C0A77D;
+  background-color: #F9F6F1;
+  box-shadow: 0 4px 8px rgba(43, 31, 20, 0.1);
+  transform: translateY(-1px);
+}
+
+/* Primary CTA buttons - Deep oxblood with bronze hover */
+button[class*="bg-primary"] {
+  background-color: #4B2E2B;
+  color: #F5F0E6;
+  border-color: #4B2E2B;
+  font-weight: 600;
+}
+
+button[class*="bg-primary"]:hover {
+  background-color: #C0A77D;
+  color: #2B1F14;
+  border-color: #C0A77D;
+  box-shadow: 0 6px 12px rgba(75, 46, 43, 0.2);
+}
+
+/* Secondary buttons - Parchment with ink accents */
+:root button[class*="variant-secondary"] {
+  background-color: #F5F0E6;
+  border-color: #C0A77D;
+  color: #2B1F14;
+}
+
+:root button[class*="variant-secondary"]:hover {
+  background-color: #EDE7DC;
+  border-color: #4B2E2B;
+  color: #4B2E2B;
+}
+
+/* Outline buttons */
+:root button[class*="variant-outline"] {
+  background-color: transparent;
+  border-color: #C0A77D;
+  color: #4B2E2B;
+}
+
+:root button[class*="variant-outline"]:hover {
+  background-color: #F9F6F1;
+  border-color: #4B2E2B;
+  color: #2B1F14;
+}
+
+/* Destructive buttons - Dried blood red */
+button[class*="variant-destructive"] {
+  background-color: #874F3E;
+  color: #F5F0E6;
+  border-color: #874F3E;
+}
+
+button[class*="variant-destructive"]:hover {
+  background-color: #6B3D32;
+  border-color: #6B3D32;
+}
+
+/* Dark mode button styling */
+.dark button {
+  background-color: oklch(0.12 0 0);
+  color: oklch(0.9 0 0);
+  border-color: oklch(0.22 0 0);
+}
+
+.dark button:hover {
+  border-color: oklch(0.55 0.25 250);
+  background-color: oklch(0.15 0 0);
+}
+
+button:focus,
+button:focus-visible {
+  outline: 2px solid #C0A77D;
+  outline-offset: 2px;
+}
+
+/* Embossed paper-like input styling */
+input, textarea {
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  font-family: 'Lora', Georgia, serif;
+  box-shadow: inset 0 1px 3px rgba(43, 31, 20, 0.1);
+}
+
+/* Light mode inputs - embossed parchment */
+:root input, :root textarea {
+  background-color: #F9F6F1;
+  border: 1px solid #DDD4C7;
+  color: #2B1F14;
+}
+
+:root input:focus, :root textarea:focus {
+  border-color: #C0A77D;
+  box-shadow: 0 0 0 2px rgba(192, 167, 125, 0.2), inset 0 1px 3px rgba(43, 31, 20, 0.1);
+  background-color: #FFFFFF;
+}
+
+/* Dark mode inputs */
+.dark input, .dark textarea {
+  background-color: oklch(0.15 0 0);
+  border: 1px solid oklch(0.25 0 0);
+  color: oklch(0.9 0 0);
+}
+
+.dark input:focus, .dark textarea:focus {
+  border-color: oklch(0.55 0.25 250);
+  box-shadow: 0 0 0 2px oklch(0.55 0.25 250 / 0.2);
+}
+
+/* Card styling - elevated parchment */
+.card {
+  background-color: #FFFFFF;
+  border: 1px solid #DDD4C7;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(43, 31, 20, 0.08), 0 1px 0 rgba(255, 255, 255, 0.5) inset;
+  transition: all 0.2s ease;
+}
+
+.card:hover {
+  box-shadow: 0 8px 16px rgba(43, 31, 20, 0.1), 0 1px 0 rgba(255, 255, 255, 0.5) inset;
+  transform: translateY(-1px);
+}
+
+/* Link styling */
+a {
+  color: #2E3659;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: #4B2E2B;
+  text-decoration: underline;
+}
+
+/* Status indicators */
+.status-active {
+  color: #4B2E2B;
+  font-weight: 600;
+}
+
+.text-brand-primary {
+  color: #2B1F14;
+}
+
+.text-brand-accent {
+  color: #4B2E2B;
+}
+
+.text-brand-highlight {
+  color: #C0A77D;
+}
+
+.text-brand-link {
+  color: #2E3659;
 }
 
 @theme inline {
