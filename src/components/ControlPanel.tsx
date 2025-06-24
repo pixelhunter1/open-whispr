@@ -18,6 +18,13 @@ declare global {
       saveOpenAIKey: (key: string) => Promise<{ success: boolean }>;
       readClipboard: () => Promise<string>;
       createProductionEnvFile: (key: string) => Promise<void>;
+      transcribeLocalWhisper: (audioBlob: Blob, options?: any) => Promise<any>;
+      checkWhisperInstallation: () => Promise<{ installed: boolean; working: boolean; error?: string }>;
+      installWhisper: () => Promise<{ success: boolean; message: string; output: string }>;
+      onWhisperInstallProgress: (callback: (event: any, data: { type: string; message: string; output?: string }) => void) => void;
+      downloadWhisperModel: (modelName: string) => Promise<{ success: boolean; model: string; downloaded: boolean; size_mb?: number; error?: string }>;
+      checkModelStatus: (modelName: string) => Promise<{ success: boolean; model: string; downloaded: boolean; size_mb?: number; error?: string }>;
+      listWhisperModels: () => Promise<{ success: boolean; models: Array<{ model: string; downloaded: boolean; size_mb?: number }>; cache_dir: string }>;
     };
   }
 }
@@ -34,11 +41,26 @@ export default function ControlPanel() {
   const [history, setHistory] = useState<TranscriptionItem[]>([]);
   const [apiKey, setApiKey] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [useLocalWhisper, setUseLocalWhisper] = useState(false);
+  const [whisperModel, setWhisperModel] = useState("base");
+  const [whisperInstalled, setWhisperInstalled] = useState(false);
+  const [checkingWhisper, setCheckingWhisper] = useState(false);
+  const [modelList, setModelList] = useState<Array<{ model: string; downloaded: boolean; size_mb?: number }>>([]);
+  const [downloadingModel, setDownloadingModel] = useState<string | null>(null);
+  const [loadingModels, setLoadingModels] = useState(false);
+  const [installingWhisper, setInstallingWhisper] = useState(false);
+  const [installProgress, setInstallProgress] = useState<string>('');
 
   useEffect(() => {
     // Load saved settings
     const savedKey = localStorage.getItem('dictationKey');
     if (savedKey) setKey(savedKey);
+    
+    // Load Whisper settings
+    const savedUseLocal = localStorage.getItem('useLocalWhisper') === 'true';
+    const savedModel = localStorage.getItem('whisperModel') || 'base';
+    setUseLocalWhisper(savedUseLocal);
+    setWhisperModel(savedModel);
     
     // Load API key from main process first, then fallback to localStorage
     const loadApiKey = async () => {
@@ -61,6 +83,14 @@ export default function ControlPanel() {
     
     // Load transcription history from database
     loadTranscriptions();
+    
+    // Check Whisper installation
+    checkWhisperInstallation();
+    
+    // Set up progress listener for Whisper installation
+    window.electronAPI.onWhisperInstallProgress((event, data) => {
+      setInstallProgress(data.message);
+    });
   }, []);
 
   const loadTranscriptions = async () => {
@@ -73,6 +103,86 @@ export default function ControlPanel() {
       console.error('❌ Failed to load transcriptions:', error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const checkWhisperInstallation = async () => {
+    try {
+      setCheckingWhisper(true);
+      const result = await window.electronAPI.checkWhisperInstallation();
+      setWhisperInstalled(result.installed && result.working);
+      console.log('🔍 Whisper installation check:', result);
+      
+      // If Whisper is installed, also load model list
+      if (result.installed && result.working) {
+        loadModelList();
+      }
+    } catch (error) {
+      console.error('❌ Failed to check Whisper installation:', error);
+      setWhisperInstalled(false);
+    } finally {
+      setCheckingWhisper(false);
+    }
+  };
+
+  const loadModelList = async () => {
+    try {
+      setLoadingModels(true);
+      const result = await window.electronAPI.listWhisperModels();
+      if (result.success) {
+        setModelList(result.models);
+        console.log('📋 Model list loaded:', result.models);
+      }
+    } catch (error) {
+      console.error('❌ Failed to load model list:', error);
+    } finally {
+      setLoadingModels(false);
+    }
+  };
+
+  const installWhisper = async () => {
+    try {
+      setInstallingWhisper(true);
+      setInstallProgress('Starting Whisper installation...');
+      console.log('🔧 Installing Whisper automatically...');
+      
+      const result = await window.electronAPI.installWhisper();
+      
+      if (result.success) {
+        alert('✅ Whisper installed successfully! You can now download and use local models.');
+        // Recheck installation status
+        checkWhisperInstallation();
+      } else {
+        alert(`❌ Failed to install Whisper: ${result.message}`);
+      }
+    } catch (error) {
+      console.error('❌ Whisper installation error:', error);
+      alert(`❌ Failed to install Whisper: ${error}`);
+    } finally {
+      setInstallingWhisper(false);
+      setInstallProgress('');
+    }
+  };
+
+  const downloadModel = async (modelName: string) => {
+    try {
+      setDownloadingModel(modelName);
+      console.log(`📥 Downloading model: ${modelName}`);
+      
+      const result = await window.electronAPI.downloadWhisperModel(modelName);
+      
+      if (result.success) {
+        alert(`✅ Model "${modelName}" downloaded successfully! (${result.size_mb}MB)`);
+        // Refresh model list
+        loadModelList();
+      } else {
+        alert(`❌ Failed to download model "${modelName}": ${result.error}`);
+      }
+    } catch (error) {
+      console.error('❌ Model download error:', error);
+      alert(`❌ Failed to download model "${modelName}": ${error}`);
+    } finally {
+      setDownloadingModel(null);
     }
   };
 
@@ -102,6 +212,12 @@ export default function ControlPanel() {
       localStorage.setItem('openaiApiKey', apiKey);
       alert('OpenAI API key saved to localStorage (fallback mode)');
     }
+  };
+
+  const saveWhisperSettings = () => {
+    localStorage.setItem('useLocalWhisper', useLocalWhisper.toString());
+    localStorage.setItem('whisperModel', whisperModel);
+    alert(`Whisper settings saved! ${useLocalWhisper ? `Using local model: ${whisperModel}` : 'Using OpenAI API'}`);
   };
 
   const copyToClipboard = async (text: string) => {
@@ -330,6 +446,214 @@ Click OK when you're ready to open System Settings.`;
                 className="w-full bg-[#4B2E2B] hover:bg-[#C0A77D] text-[#F5F0E6] hover:text-[#2B1F14] font-semibold py-3"
               >
                 Save API Credentials
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Whisper Engine Settings Card */}
+        <Card className="card">
+          <CardHeader className="border-b border-[#DDD4C7] bg-gradient-to-r from-[#FFFFFF] to-[#F9F6F1]">
+            <CardTitle className="brand-heading text-2xl text-[#2B1F14] flex items-center gap-3">
+              <span className="text-[#C0A77D]">🤖</span>
+              Whisper Engine Settings
+            </CardTitle>
+            <p className="text-sm text-[#6B5D52] mt-2">
+              Configure your speech recognition engine: local processing or cloud API.
+            </p>
+          </CardHeader>
+          <CardContent className="space-y-6 p-8">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between p-4 border border-[#DDD4C7] rounded-lg bg-gradient-to-r from-[#FFFFFF] to-[#F9F6F1]">
+                <div className="flex items-center space-x-3">
+                  <input
+                    type="checkbox"
+                    id="useLocalWhisper"
+                    checked={useLocalWhisper}
+                    onChange={(e) => setUseLocalWhisper(e.target.checked)}
+                    className="w-5 h-5"
+                  />
+                  <label htmlFor="useLocalWhisper" className="text-base font-semibold text-[#2B1F14] brand-body">
+                    Use Local Whisper (Privacy Mode)
+                  </label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  {checkingWhisper ? (
+                    <span className="text-[#C0A77D] text-sm">Checking...</span>
+                  ) : whisperInstalled ? (
+                    <span className="text-green-600 text-sm">✅ Installed</span>
+                  ) : (
+                    <span className="text-red-600 text-sm">❌ Not Found</span>
+                  )}
+                </div>
+              </div>
+
+              {useLocalWhisper && (
+                <div className="pl-8 space-y-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-[#2B1F14] mb-3 brand-body">
+                      Whisper Model
+                    </label>
+                    <select
+                      value={whisperModel}
+                      onChange={(e) => setWhisperModel(e.target.value)}
+                      className="w-full p-3 border border-[#DDD4C7] rounded-lg bg-white text-[#2B1F14] focus:outline-none focus:ring-2 focus:ring-[#C0A77D]"
+                    >
+                      <option value="tiny">Tiny (39M params - Fastest)</option>
+                      <option value="base">Base (74M params - Balanced)</option>
+                      <option value="small">Small (244M params - Better quality)</option>
+                      <option value="medium">Medium (769M params - High quality)</option>
+                      <option value="large">Large (1550M params - Best quality)</option>
+                      <option value="turbo">Turbo (809M params - Fast + quality)</option>
+                    </select>
+                    <p className="text-xs text-[#6B5D52] mt-2 italic">
+                      Larger models provide better accuracy but use more memory and are slower.
+                    </p>
+                  </div>
+
+                  {/* Model Management Section */}
+                  {whisperInstalled && (
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                      <div className="flex items-center justify-between mb-3">
+                        <h4 className="font-semibold text-green-800">Model Management</h4>
+                        <Button 
+                          onClick={loadModelList}
+                          variant="outline"
+                          size="sm"
+                          disabled={loadingModels}
+                        >
+                          {loadingModels ? "Loading..." : "Refresh Models"}
+                        </Button>
+                      </div>
+                      
+                      <div className="space-y-3">
+                        {modelList.length > 0 ? (
+                          modelList.map((model) => (
+                            <div key={model.model} className="flex items-center justify-between p-3 bg-white rounded border">
+                              <div className="flex items-center space-x-3">
+                                <span className="font-medium text-green-900 capitalize">
+                                  {model.model}
+                                </span>
+                                {model.downloaded ? (
+                                  <span className="text-xs text-green-600 bg-green-100 px-2 py-1 rounded">
+                                    ✅ Downloaded ({model.size_mb}MB)
+                                  </span>
+                                ) : (
+                                  <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                                    Not downloaded
+                                  </span>
+                                )}
+                              </div>
+                              
+                              {!model.downloaded && (
+                                <Button
+                                  onClick={() => downloadModel(model.model)}
+                                  disabled={downloadingModel === model.model}
+                                  size="sm"
+                                  className="bg-green-600 hover:bg-green-700 text-white"
+                                >
+                                  {downloadingModel === model.model ? (
+                                    <>📥 Downloading...</>
+                                  ) : (
+                                    <>📥 Download</>
+                                  )}
+                                </Button>
+                              )}
+                            </div>
+                          ))
+                        ) : (
+                          <div className="text-center py-4">
+                            <p className="text-sm text-green-700">
+                              {loadingModels ? "Loading model information..." : "Click 'Refresh Models' to check available models"}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                      
+                      <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded text-sm text-blue-700">
+                        <p><strong>💡 Tip:</strong> Download models you plan to use for faster transcription. The first time you use a model, it will be downloaded automatically, but pre-downloading prevents delays during dictation.</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {!whisperInstalled && (
+                    <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-6">
+                      <div className="text-center">
+                        <div className="text-4xl mb-4">🚀</div>
+                        <h4 className="font-bold text-blue-900 text-lg mb-2">
+                          Ready to Enable Local Processing?
+                        </h4>
+                        <p className="text-sm text-blue-700 mb-4 max-w-md mx-auto">
+                          We'll automatically install Whisper for you! No terminal commands needed - just click the button below.
+                        </p>
+                        
+                        {installingWhisper ? (
+                          <div className="space-y-4">
+                            <div className="bg-white rounded-lg p-4 border">
+                              <div className="flex items-center justify-center space-x-3 mb-3">
+                                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                                <span className="font-semibold text-blue-900">Installing Whisper...</span>
+                              </div>
+                              {installProgress && (
+                                <div className="text-xs text-blue-600 bg-blue-50 p-2 rounded font-mono">
+                                  {installProgress}
+                                </div>
+                              )}
+                            </div>
+                            <p className="text-xs text-blue-600 italic">
+                              This may take a few minutes. Please don't close the app.
+                            </p>
+                          </div>
+                        ) : (
+                          <div className="space-y-4">
+                            <Button 
+                              onClick={installWhisper}
+                              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg transform hover:scale-105 transition-all"
+                              size="lg"
+                            >
+                              🔧 Install Whisper Automatically
+                            </Button>
+                            
+                            <div className="flex items-center justify-center space-x-4 text-xs text-blue-600">
+                              <Button 
+                                onClick={checkWhisperInstallation}
+                                variant="outline"
+                                size="sm"
+                                className="text-blue-600 border-blue-300 hover:bg-blue-50"
+                              >
+                                🔄 Check Again
+                              </Button>
+                            </div>
+                            
+                            <div className="bg-white rounded-lg p-3 text-xs text-blue-700 border border-blue-200">
+                              <p className="font-semibold mb-1">✨ What we'll install:</p>
+                              <ul className="space-y-1 text-left">
+                                <li>• OpenAI Whisper package (speech recognition)</li>
+                                <li>• Required dependencies (torch, numpy, etc.)</li>
+                                <li>• Everything needed for local AI transcription</li>
+                              </ul>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <h4 className="font-semibold text-blue-800 mb-2">Privacy Information</h4>
+                <div className="text-sm text-blue-700 space-y-2">
+                  <p><strong>Local Whisper:</strong> Audio processed on your device, complete privacy, no internet required (after initial model download).</p>
+                  <p><strong>OpenAI API:</strong> Audio sent to OpenAI servers, requires API key and internet connection.</p>
+                </div>
+              </div>
+
+              <Button 
+                onClick={saveWhisperSettings} 
+                className="w-full bg-[#4B2E2B] hover:bg-[#C0A77D] text-[#F5F0E6] hover:text-[#2B1F14] font-semibold py-3"
+              >
+                Save Whisper Settings
               </Button>
             </div>
           </CardContent>

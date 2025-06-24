@@ -18,4 +18,13 @@ contextBridge.exposeInMainWorld('electronAPI', {
   
   // Clipboard functions
   readClipboard: () => ipcRenderer.invoke('read-clipboard'),
+  
+  // Local Whisper functions
+  transcribeLocalWhisper: (audioBlob, options) => ipcRenderer.invoke('transcribe-local-whisper', audioBlob, options),
+  checkWhisperInstallation: () => ipcRenderer.invoke('check-whisper-installation'),
+  installWhisper: () => ipcRenderer.invoke('install-whisper'),
+  onWhisperInstallProgress: (callback) => ipcRenderer.on('whisper-install-progress', callback),
+  downloadWhisperModel: (modelName) => ipcRenderer.invoke('download-whisper-model', modelName),
+  checkModelStatus: (modelName) => ipcRenderer.invoke('check-model-status', modelName),
+  listWhisperModels: () => ipcRenderer.invoke('list-whisper-models'),
 }); 

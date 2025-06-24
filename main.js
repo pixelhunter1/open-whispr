@@ -101,7 +101,7 @@ async function createWindow() {
   // Always show window by default
   const display = screen.getPrimaryDisplay();
   const width = 90;
-  const height = 32;
+  const height = 40;
   const x = display.bounds.x + Math.round((display.workArea.width - width) / 2);
   const y = Math.max(0, display.workArea.height); // Position above the dock/menu bar with padding
   
@@ -800,6 +800,433 @@ OPENAI_API_KEY=${apiKey}
     return { success: true, path: envPath };
   } catch (error) {
     console.error('❌ Error creating production .env file:', error);
+    throw error;
+  }
+});
+
+// Local Whisper transcription handler
+ipcMain.handle('transcribe-local-whisper', async (event, audioBlob, options = {}) => {
+  try {
+    console.log('🎤 Starting local Whisper transcription...');
+    
+    // Create temporary file for audio
+    const fs = require('fs');
+    const os = require('os');
+    const crypto = require('crypto');
+    
+    const tempDir = os.tmpdir();
+    const filename = `whisper_audio_${crypto.randomUUID()}.wav`;
+    const tempAudioPath = path.join(tempDir, filename);
+    
+    // Convert Blob to Buffer and write to temp file
+    console.log('💾 Writing audio to temp file:', tempAudioPath);
+    const buffer = Buffer.from(await audioBlob.arrayBuffer());
+    fs.writeFileSync(tempAudioPath, buffer);
+    
+    // Prepare Whisper command
+    const model = options.model || 'base';
+    const language = options.language || null;
+    
+    // Find Python executable
+    const pythonCmd = await findPythonExecutable();
+    const whisperScriptPath = path.join(__dirname, 'whisper_bridge.py');
+    
+    const args = [whisperScriptPath, tempAudioPath, '--model', model];
+    if (language) {
+      args.push('--language', language);
+    }
+    args.push('--output-format', 'json');
+    
+    console.log('🔧 Running Whisper command:', pythonCmd, args.join(' '));
+    
+    // Execute Whisper transcription
+    return new Promise((resolve, reject) => {
+      const whisperProcess = spawn(pythonCmd, args);
+      
+      let stdout = '';
+      let stderr = '';
+      
+      whisperProcess.stdout.on('data', (data) => {
+        stdout += data.toString();
+      });
+      
+      whisperProcess.stderr.on('data', (data) => {
+        stderr += data.toString();
+        console.log('Whisper log:', data.toString());
+      });
+      
+      whisperProcess.on('close', (code) => {
+        // Clean up temp file
+        try {
+          fs.unlinkSync(tempAudioPath);
+          console.log('🗑️ Cleaned up temp audio file');
+        } catch (cleanupError) {
+          console.warn('⚠️ Could not clean up temp file:', cleanupError.message);
+        }
+        
+        if (code === 0) {
+          try {
+            const result = JSON.parse(stdout);
+            console.log('✅ Whisper transcription successful:', result.text?.substring(0, 50) + '...');
+            resolve(result);
+          } catch (parseError) {
+            console.error('❌ Failed to parse Whisper output:', parseError);
+            reject(new Error(`Failed to parse Whisper output: ${parseError.message}`));
+          }
+        } else {
+          console.error('❌ Whisper process failed with code:', code);
+          console.error('Stderr:', stderr);
+          reject(new Error(`Whisper transcription failed (code ${code}): ${stderr}`));
+        }
+      });
+      
+      whisperProcess.on('error', (error) => {
+        // Clean up temp file
+        try {
+          fs.unlinkSync(tempAudioPath);
+        } catch (cleanupError) {
+          console.warn('⚠️ Could not clean up temp file:', cleanupError.message);
+        }
+        
+        console.error('❌ Whisper process error:', error);
+        reject(new Error(`Whisper process error: ${error.message}`));
+      });
+      
+      // Add timeout (30 seconds for transcription)
+      setTimeout(() => {
+        whisperProcess.kill('SIGTERM');
+        try {
+          fs.unlinkSync(tempAudioPath);
+        } catch (cleanupError) {
+          console.warn('⚠️ Could not clean up temp file:', cleanupError.message);
+        }
+        reject(new Error('Whisper transcription timed out (30 seconds)'));
+      }, 30000);
+    });
+    
+  } catch (error) {
+    console.error('❌ Local Whisper transcription error:', error);
+    throw error;
+  }
+});
+
+// Helper function to find Python executable
+async function findPythonExecutable() {
+  const possiblePaths = [
+    'python3',
+    'python',
+    '/usr/bin/python3',
+    '/usr/local/bin/python3',
+    '/opt/homebrew/bin/python3',
+    '/usr/bin/python',
+    '/usr/local/bin/python'
+  ];
+  
+  for (const pythonPath of possiblePaths) {
+    try {
+      const result = await new Promise((resolve, reject) => {
+        const testProcess = spawn(pythonPath, ['--version']);
+        testProcess.on('close', (code) => {
+          resolve(code === 0);
+        });
+        testProcess.on('error', () => {
+          resolve(false);
+        });
+      });
+      
+      if (result) {
+        console.log('🐍 Found Python at:', pythonPath);
+        return pythonPath;
+      }
+    } catch (error) {
+      continue;
+    }
+  }
+  
+  throw new Error('Python executable not found. Please ensure Python 3 is installed.');
+}
+
+// Check Whisper installation
+ipcMain.handle('check-whisper-installation', async (event) => {
+  try {
+    const pythonCmd = await findPythonExecutable();
+    
+    return new Promise((resolve) => {
+      const checkProcess = spawn(pythonCmd, ['-c', 'import whisper; print("OK")']);
+      
+      let output = '';
+      checkProcess.stdout.on('data', (data) => {
+        output += data.toString();
+      });
+      
+      checkProcess.on('close', (code) => {
+        if (code === 0 && output.includes('OK')) {
+          console.log('✅ Whisper is installed and working');
+          resolve({ installed: true, working: true });
+        } else {
+          console.log('❌ Whisper is not properly installed');
+          resolve({ installed: false, working: false });
+        }
+      });
+      
+      checkProcess.on('error', (error) => {
+        console.log('❌ Error checking Whisper:', error.message);
+        resolve({ installed: false, working: false, error: error.message });
+      });
+    });
+    
+  } catch (error) {
+    console.log('❌ Error finding Python:', error.message);
+    return { installed: false, working: false, error: error.message };
+  }
+});
+
+// Install Whisper automatically
+ipcMain.handle('install-whisper', async (event) => {
+  try {
+    console.log('🔧 Starting automatic Whisper installation...');
+    
+    const pythonCmd = await findPythonExecutable();
+    console.log('🐍 Using Python:', pythonCmd);
+    
+    // Install Whisper using pip
+    const args = ['-m', 'pip', 'install', '-U', 'openai-whisper'];
+    
+    console.log('📦 Running installation command:', pythonCmd, args.join(' '));
+    
+    return new Promise((resolve, reject) => {
+      const installProcess = spawn(pythonCmd, args);
+      
+      let stdout = '';
+      let stderr = '';
+      
+      installProcess.stdout.on('data', (data) => {
+        const output = data.toString();
+        stdout += output;
+        console.log('Install output:', output);
+        
+        // Send progress updates to the renderer
+        if (output.includes('Downloading') || output.includes('Installing')) {
+          // Extract package name if possible
+          const match = output.match(/(\w+[-\w]*)/);
+          const packageName = match ? match[1] : 'package';
+          event.sender.send('whisper-install-progress', {
+            type: 'progress',
+            message: `Installing ${packageName}...`,
+            output: output.trim()
+          });
+        }
+      });
+      
+      installProcess.stderr.on('data', (data) => {
+        const output = data.toString();
+        stderr += output;
+        console.log('Install stderr:', output);
+        
+        // Send progress updates for stderr too (pip sometimes uses stderr for progress)
+        if (output.includes('Downloading') || output.includes('Installing') || output.includes('Collecting')) {
+          event.sender.send('whisper-install-progress', {
+            type: 'progress',
+            message: output.trim()
+          });
+        }
+      });
+      
+      installProcess.on('close', (code) => {
+        if (code === 0) {
+          console.log('✅ Whisper installation completed successfully');
+          resolve({ 
+            success: true, 
+            message: 'Whisper installed successfully!',
+            output: stdout 
+          });
+        } else {
+          console.error('❌ Whisper installation failed with code:', code);
+          console.error('Installation stderr:', stderr);
+          reject(new Error(`Whisper installation failed (code ${code}): ${stderr}`));
+        }
+      });
+      
+      installProcess.on('error', (error) => {
+        console.error('❌ Whisper installation process error:', error);
+        reject(new Error(`Whisper installation process error: ${error.message}`));
+      });
+      
+      // 10 minute timeout for installation
+      setTimeout(() => {
+        installProcess.kill('SIGTERM');
+        reject(new Error('Whisper installation timed out (10 minutes)'));
+      }, 600000);
+    });
+    
+  } catch (error) {
+    console.error('❌ Whisper installation error:', error);
+    throw error;
+  }
+});
+
+// Download Whisper model
+ipcMain.handle('download-whisper-model', async (event, modelName) => {
+  try {
+    console.log(`📥 Starting download of Whisper model: ${modelName}`);
+    
+    const pythonCmd = await findPythonExecutable();
+    const whisperScriptPath = path.join(__dirname, 'whisper_bridge.py');
+    
+    const args = [whisperScriptPath, '--mode', 'download', '--model', modelName];
+    
+    console.log('🔧 Running model download command:', pythonCmd, args.join(' '));
+    
+    return new Promise((resolve, reject) => {
+      const downloadProcess = spawn(pythonCmd, args);
+      
+      let stdout = '';
+      let stderr = '';
+      
+      downloadProcess.stdout.on('data', (data) => {
+        stdout += data.toString();
+      });
+      
+      downloadProcess.stderr.on('data', (data) => {
+        stderr += data.toString();
+        console.log('Model download log:', data.toString());
+      });
+      
+      downloadProcess.on('close', (code) => {
+        if (code === 0) {
+          try {
+            const result = JSON.parse(stdout);
+            console.log(`✅ Model ${modelName} download completed:`, result);
+            resolve(result);
+          } catch (parseError) {
+            console.error('❌ Failed to parse download result:', parseError);
+            reject(new Error(`Failed to parse download result: ${parseError.message}`));
+          }
+        } else {
+          console.error('❌ Model download failed with code:', code);
+          console.error('Stderr:', stderr);
+          reject(new Error(`Model download failed (code ${code}): ${stderr}`));
+        }
+      });
+      
+      downloadProcess.on('error', (error) => {
+        console.error('❌ Model download process error:', error);
+        reject(new Error(`Model download process error: ${error.message}`));
+      });
+      
+      // Add longer timeout for model downloads (10 minutes)
+      setTimeout(() => {
+        downloadProcess.kill('SIGTERM');
+        reject(new Error('Model download timed out (10 minutes)'));
+      }, 600000);
+    });
+    
+  } catch (error) {
+    console.error('❌ Model download error:', error);
+    throw error;
+  }
+});
+
+// Check model status
+ipcMain.handle('check-model-status', async (event, modelName) => {
+  try {
+    console.log(`🔍 Checking status of Whisper model: ${modelName}`);
+    
+    const pythonCmd = await findPythonExecutable();
+    const whisperScriptPath = path.join(__dirname, 'whisper_bridge.py');
+    
+    const args = [whisperScriptPath, '--mode', 'check', '--model', modelName];
+    
+    return new Promise((resolve, reject) => {
+      const checkProcess = spawn(pythonCmd, args);
+      
+      let stdout = '';
+      let stderr = '';
+      
+      checkProcess.stdout.on('data', (data) => {
+        stdout += data.toString();
+      });
+      
+      checkProcess.stderr.on('data', (data) => {
+        stderr += data.toString();
+      });
+      
+      checkProcess.on('close', (code) => {
+        if (code === 0) {
+          try {
+            const result = JSON.parse(stdout);
+            console.log(`📊 Model ${modelName} status:`, result);
+            resolve(result);
+          } catch (parseError) {
+            console.error('❌ Failed to parse model status:', parseError);
+            reject(new Error(`Failed to parse model status: ${parseError.message}`));
+          }
+        } else {
+          console.error('❌ Model status check failed with code:', code);
+          reject(new Error(`Model status check failed (code ${code}): ${stderr}`));
+        }
+      });
+      
+      checkProcess.on('error', (error) => {
+        console.error('❌ Model status check error:', error);
+        reject(new Error(`Model status check error: ${error.message}`));
+      });
+    });
+    
+  } catch (error) {
+    console.error('❌ Model status check error:', error);
+    throw error;
+  }
+});
+
+// List all models and their status
+ipcMain.handle('list-whisper-models', async (event) => {
+  try {
+    console.log('📋 Listing all Whisper models...');
+    
+    const pythonCmd = await findPythonExecutable();
+    const whisperScriptPath = path.join(__dirname, 'whisper_bridge.py');
+    
+    const args = [whisperScriptPath, '--mode', 'list'];
+    
+    return new Promise((resolve, reject) => {
+      const listProcess = spawn(pythonCmd, args);
+      
+      let stdout = '';
+      let stderr = '';
+      
+      listProcess.stdout.on('data', (data) => {
+        stdout += data.toString();
+      });
+      
+      listProcess.stderr.on('data', (data) => {
+        stderr += data.toString();
+      });
+      
+      listProcess.on('close', (code) => {
+        if (code === 0) {
+          try {
+            const result = JSON.parse(stdout);
+            console.log('📋 Model list retrieved:', result);
+            resolve(result);
+          } catch (parseError) {
+            console.error('❌ Failed to parse model list:', parseError);
+            reject(new Error(`Failed to parse model list: ${parseError.message}`));
+          }
+        } else {
+          console.error('❌ Model list failed with code:', code);
+          reject(new Error(`Model list failed (code ${code}): ${stderr}`));
+        }
+      });
+      
+      listProcess.on('error', (error) => {
+        console.error('❌ Model list error:', error);
+        reject(new Error(`Model list error: ${error.message}`));
+      });
+    });
+    
+  } catch (error) {
+    console.error('❌ Model list error:', error);
     throw error;
   }
 });

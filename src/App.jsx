@@ -64,6 +64,75 @@ export default function App() {
   const processAudio = async (audioBlob) => {
     try {
       console.log("Processing audio blob, size:", audioBlob.size)
+      
+      // Check if local Whisper is available and user preference
+      const useLocalWhisper = localStorage.getItem('useLocalWhisper') === 'true';
+      const whisperModel = localStorage.getItem('whisperModel') || 'base';
+      
+      if (useLocalWhisper) {
+        console.log("Using local Whisper model:", whisperModel);
+        await processWithLocalWhisper(audioBlob, whisperModel);
+      } else {
+        console.log("Using OpenAI Whisper API");
+        await processWithOpenAIAPI(audioBlob);
+      }
+      
+    } catch (err) {
+      console.error("Transcription error:", err)
+      setError('Transcription failed: ' + err.message);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const processWithLocalWhisper = async (audioBlob, model = 'base') => {
+    try {
+      console.log("Starting local Whisper transcription...");
+      
+      // Check Whisper installation first
+      const installCheck = await window.electronAPI.checkWhisperInstallation();
+      if (!installCheck.installed || !installCheck.working) {
+        throw new Error(`Local Whisper not available: ${installCheck.error || 'Installation check failed'}`);
+      }
+
+      const options = { model };
+      const result = await window.electronAPI.transcribeLocalWhisper(audioBlob, options);
+      
+      if (result.success && result.text) {
+        const text = result.text.trim();
+        console.log("Local Whisper transcription result:", text)
+        
+        if (text) {
+          setTranscript(text);
+          
+          // Save transcription to database
+          try {
+            await window.electronAPI.saveTranscription(text);
+            console.log("✅ Transcription saved to database");
+          } catch (err) {
+            console.error("Failed to save transcription:", err);
+          }
+          
+          // Automatically paste the text
+          await safePaste(text);
+        } else {
+          setError('No text transcribed. Try again.');
+        }
+      } else {
+        throw new Error(result.error || 'Local Whisper transcription failed');
+      }
+      
+    } catch (err) {
+      console.error("Local Whisper error:", err);
+      // Fallback to OpenAI API if local fails
+      console.log("Falling back to OpenAI API...");
+      setError('Local Whisper failed, trying OpenAI API...');
+      await processWithOpenAIAPI(audioBlob);
+    }
+  };
+
+  const processWithOpenAIAPI = async (audioBlob) => {
+    try {
       const formData = new FormData();
       formData.append('file', audioBlob, 'audio.wav');
       formData.append('model', 'whisper-1');
@@ -78,7 +147,6 @@ export default function App() {
       
       if (!apiKey || apiKey.trim() === '' || apiKey === 'your_openai_api_key_here') {
         setError('OpenAI API key not found. Please set your API key in the .env file or Control Panel.');
-        setIsProcessing(false);
         return;
       }
 
@@ -122,10 +190,8 @@ export default function App() {
         console.log("No text transcribed")
       }
     } catch (err) {
-      console.error("Transcription error:", err)
-      setError('Transcription failed: ' + err.message);
-    } finally {
-      setIsProcessing(false);
+      console.error("OpenAI API error:", err)
+      throw err;
     }
   };
 
