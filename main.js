@@ -100,8 +100,8 @@ function getAppUrl(isControlPanel = false) {
 async function createWindow() {
   // Always show window by default
   const display = screen.getPrimaryDisplay();
-  const width = 400;
-  const height = 400;
+  const width = 90;
+  const height = 32;
   const x = display.bounds.x + Math.round((display.workArea.width - width) / 2);
   const y = Math.max(0, display.workArea.height); // Position above the dock/menu bar with padding
   
