@@ -1,4 +1,4 @@
-const { app, globalShortcut, BrowserWindow, dialog } = require("electron");
+const { app, globalShortcut, BrowserWindow, dialog, protocol } = require("electron");
 
 // Ensure macOS menus use the proper casing for the app name
 if (process.platform === "darwin" && app.getName() !== "OpenWhispr") {
@@ -106,6 +106,62 @@ const ipcHandlers = new IPCHandlers({
   whisperManager,
   windowManager,
 });
+
+// Register custom protocol for OAuth callbacks
+// This must be done before app is ready
+if (process.defaultApp) {
+  if (process.argv.length >= 2) {
+    app.setAsDefaultProtocolClient('openwhispr', process.execPath, [process.argv[1]]);
+  }
+} else {
+  app.setAsDefaultProtocolClient('openwhispr');
+}
+
+// Handle OAuth callback URLs
+let oauthCallbackUrl = null;
+
+// Handle the protocol on macOS
+app.on('open-url', (event, url) => {
+  event.preventDefault();
+  console.log('Protocol URL opened:', url);
+
+  if (url.startsWith('openwhispr://')) {
+    oauthCallbackUrl = url;
+
+    // Send the callback URL to the renderer if control panel window exists
+    if (windowManager && windowManager.controlPanelWindow && !windowManager.controlPanelWindow.isDestroyed()) {
+      windowManager.controlPanelWindow.webContents.send('oauth-callback', url);
+      windowManager.controlPanelWindow.show();
+      windowManager.controlPanelWindow.focus();
+    }
+  }
+});
+
+// Handle the protocol on Windows/Linux (via command line)
+const gotTheLock = app.requestSingleInstanceLock();
+
+if (!gotTheLock) {
+  app.quit();
+} else {
+  app.on('second-instance', (event, commandLine, workingDirectory) => {
+    // Someone tried to run a second instance, we should focus our window.
+    if (windowManager && windowManager.controlPanelWindow) {
+      if (windowManager.controlPanelWindow.isMinimized()) {
+        windowManager.controlPanelWindow.restore();
+      }
+      windowManager.controlPanelWindow.focus();
+    }
+
+    // Check for protocol URL in command line arguments
+    const url = commandLine.find(arg => arg.startsWith('openwhispr://'));
+    if (url) {
+      oauthCallbackUrl = url;
+      if (windowManager && windowManager.controlPanelWindow && !windowManager.controlPanelWindow.isDestroyed()) {
+        windowManager.controlPanelWindow.webContents.send('oauth-callback', url);
+      }
+    }
+  });
+}
 
 // Main application startup
 async function startApp() {

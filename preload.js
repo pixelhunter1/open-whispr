@@ -94,6 +94,9 @@ contextBridge.exposeInMainWorld("electronAPI", {
 
   // External link opener
   openExternal: (url) => ipcRenderer.invoke("open-external", url),
+
+  // OAuth callback listener
+  onOAuthCallback: (callback) => ipcRenderer.on("oauth-callback", callback),
   
   // Model management functions
   modelGetAll: () => ipcRenderer.invoke("model-get-all"),

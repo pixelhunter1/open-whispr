@@ -1,4 +1,4 @@
-const { app, screen, BrowserWindow } = require("electron");
+const { app, screen, BrowserWindow, shell } = require("electron");
 const HotkeyManager = require("./hotkeyManager");
 const DragManager = require("./dragManager");
 const MenuManager = require("./menuManager");
@@ -146,6 +146,40 @@ class WindowManager {
     }
 
     this.controlPanelWindow = new BrowserWindow(CONTROL_PANEL_CONFIG);
+
+    // Intercept navigation attempts (for OAuth redirects)
+    // This prevents Clerk OAuth from navigating the window and instead opens in system browser
+    this.controlPanelWindow.webContents.on('will-navigate', (event, url) => {
+      const appUrl = DevServerManager.getAppUrl(true);
+      const controlPanelUrl = appUrl.startsWith('http') ? appUrl : `file://${appUrl}`;
+
+      // Allow navigation to our own app URLs
+      if (url.startsWith(controlPanelUrl) || url.startsWith('file://') || url.startsWith('devtools://')) {
+        return;
+      }
+
+      // Check if this is a Clerk OAuth URL or other external URL
+      if (url.includes('clerk.accounts') || url.includes('google.com/') || url.includes('github.com/')) {
+        console.log('Intercepting navigation to OAuth provider:', url);
+        event.preventDefault();
+        shell.openExternal(url);
+      }
+    });
+
+    // Also intercept new window requests
+    this.controlPanelWindow.webContents.setWindowOpenHandler(({ url }) => {
+      console.log('Intercepting window.open:', url);
+
+      // If it's an OAuth-related URL, open in external browser
+      if (url.includes('clerk.accounts') || url.includes('google.com/') || url.includes('github.com/') || url.includes('oauth')) {
+        shell.openExternal(url);
+        return { action: 'deny' };
+      }
+
+      // For other URLs, open in external browser too (safer default)
+      shell.openExternal(url);
+      return { action: 'deny' };
+    });
 
     this.controlPanelWindow.once("ready-to-show", () => {
       this.controlPanelWindow.show();

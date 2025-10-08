@@ -18,6 +18,7 @@ import {
   Lock,
   X,
   User,
+  UserCircle,
 } from "lucide-react";
 import TitleBar from "./TitleBar";
 import WhisperModelPicker from "./WhisperModelPicker";
@@ -36,8 +37,10 @@ import { useSettings } from "../hooks/useSettings";
 import { getLanguageLabel, getReasoningModelLabel } from "../utils/languages";
 import LanguageSelector from "./ui/LanguageSelector";
 const InteractiveKeyboard = React.lazy(() => import("./ui/Keyboard"));
+import AuthenticationStep from "./AuthenticationStep";
 import { setAgentName as saveAgentName } from "../utils/agentName";
 import { formatHotkeyLabel } from "../utils/hotkeys";
+import { useAuth } from "../hooks/useClerkAuth";
 
 interface OnboardingFlowProps {
   onComplete: () => void;
@@ -74,7 +77,9 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
   const [apiKey, setApiKey] = useState(openaiApiKey);
   const [hotkey, setHotkey] = useState(dictationKey || "`");
   const [agentName, setAgentName] = useState("Agent");
+  const [skipAuth, setSkipAuth] = useState(false);
   const readableHotkey = formatHotkeyLabel(hotkey);
+  const { isSignedIn } = useAuth();
   const { alertDialog, showAlertDialog, hideAlertDialog } = useDialogs();
   const practiceTextareaRef = useRef<HTMLInputElement>(null);
 
@@ -84,7 +89,7 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
   const { pasteFromClipboard } = useClipboard(showAlertDialog);
 
   const steps = [
-    { title: "Welcome", icon: Sparkles },
+    { title: "Account", icon: UserCircle },
     { title: "Privacy", icon: Lock },
     { title: "Setup", icon: Settings },
     { title: "Permissions", icon: Shield },
@@ -107,7 +112,7 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
   };
 
   useEffect(() => {
-    if (currentStep === 5) {
+    if (currentStep === 4) {
       if (practiceTextareaRef.current) {
         practiceTextareaRef.current.focus();
       }
@@ -144,6 +149,7 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
       "accessibilityPermissionGranted",
       permissionsHook.accessibilityPermissionGranted.toString()
     );
+    localStorage.setItem("authenticationSkipped", skipAuth.toString());
     localStorage.setItem("onboardingCompleted", "true");
 
     if (!useLocalWhisper && apiKey.trim()) {
@@ -194,42 +200,17 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
 
   const renderStep = () => {
     switch (currentStep) {
-      case 0: // Welcome
+      case 0: // Authentication (with Welcome)
         return (
-          <div
-            className="text-center space-y-6"
-            style={{ fontFamily: "Noto Sans, sans-serif" }}
-          >
-            <div className="w-16 h-16 mx-auto bg-blue-100 rounded-full flex items-center justify-center">
-              <Sparkles className="w-8 h-8 text-blue-600" />
-            </div>
-            <div>
-              <h2
-                className="text-2xl font-bold text-stone-900 mb-2"
-                style={{ fontFamily: "Noto Sans, sans-serif" }}
-              >
-                Welcome to OpenWhispr
-              </h2>
-              <p
-                className="text-stone-600"
-                style={{ fontFamily: "Noto Sans, sans-serif" }}
-              >
-                Let's set up your voice dictation in just a few simple steps.
-              </p>
-            </div>
-            <div className="bg-blue-50/50 p-4 rounded-lg border border-blue-200/60">
-              <p
-                className="text-sm text-blue-800"
-                style={{ fontFamily: "Noto Sans, sans-serif" }}
-              >
-                🎤 Turn your voice into text instantly
-                <br />
-                ⚡ Works anywhere on your computer
-                <br />
-                🔒 Your privacy is protected
-              </p>
-            </div>
-          </div>
+          <AuthenticationStep
+            onContinueWithoutAccount={() => {
+              setSkipAuth(true);
+              nextStep();
+            }}
+            onAuthComplete={() => {
+              nextStep();
+            }}
+          />
         );
 
       case 1: // Choose Mode
@@ -740,6 +721,12 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                   <span className="font-medium">{agentName}</span>
                 </div>
                 <div className="flex justify-between">
+                  <span>Account:</span>
+                  <span className="font-medium">
+                    {isSignedIn ? "Signed In" : skipAuth ? "Guest" : "Not Set"}
+                  </span>
+                </div>
+                <div className="flex justify-between">
                   <span>Permissions:</span>
                   <span className="font-medium text-green-600">
                     {permissionsHook.micPermissionGranted &&
@@ -768,7 +755,7 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
   const canProceed = () => {
     switch (currentStep) {
       case 0:
-        return true;
+        return isSignedIn || skipAuth; // Authentication step
       case 1:
         return true; // Mode selection
       case 2:
