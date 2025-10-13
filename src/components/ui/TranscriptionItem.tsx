@@ -32,7 +32,7 @@ export default function TranscriptionItem({
               </span>
               <div className="w-px h-3 bg-neutral-300" />
               <span className="text-xs text-neutral-500">
-                {new Date(item.timestamp).toLocaleString("en-US", {
+                {new Date(item.timestamp + "Z").toLocaleString("en-US", {
                   month: "short",
                   day: "numeric",
                   hour: "2-digit",

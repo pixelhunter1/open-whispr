@@ -385,7 +385,19 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                   apiKey={apiKey}
                   setApiKey={setApiKey}
                   label="OpenAI API Key"
-                  helpText="Get your API key from platform.openai.com"
+                  helpText={
+                    <>
+                      Get your API key from{" "}
+                      <a
+                        href="https://platform.openai.com"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:text-blue-700 underline"
+                      >
+                        platform.openai.com
+                      </a>
+                    </>
+                  }
                 />
 
                 <div className="bg-blue-50 p-4 rounded-lg">
@@ -393,7 +405,17 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                     How to get your API key:
                   </h4>
                   <ol className="text-sm text-blue-800 space-y-1">
-                    <li>1. Go to platform.openai.com</li>
+                    <li>
+                      1. Go to{" "}
+                      <a
+                        href="https://platform.openai.com"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:text-blue-700 underline font-medium"
+                      >
+                        platform.openai.com
+                      </a>
+                    </li>
                     <li>2. Sign in to your account</li>
                     <li>3. Navigate to API Keys</li>
                     <li>4. Create a new secret key</li>

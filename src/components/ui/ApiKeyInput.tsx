@@ -9,7 +9,7 @@ interface ApiKeyInputProps {
   className?: string;
   placeholder?: string;
   label?: string;
-  helpText?: string;
+  helpText?: React.ReactNode;
   variant?: "default" | "purple";
 }
 
