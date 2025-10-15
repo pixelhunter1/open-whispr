@@ -170,9 +170,34 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
     setDictationKey,
   ]);
 
-  const nextStep = useCallback(() => {
+  const nextStep = useCallback(async () => {
     if (currentStep < steps.length - 1) {
       const newStep = currentStep + 1;
+
+      // Save hotkey when moving from hotkey step (4) to test step (5)
+      if (currentStep === 4 && newStep === 5) {
+        setDictationKey(hotkey);
+        try {
+          const result = await window.electronAPI?.updateHotkey?.(hotkey);
+          if (result && !result.success) {
+            showAlertDialog({
+              title: "Hotkey Not Registered",
+              description:
+                result.message ||
+                "We couldn't register that key. Please choose another hotkey.",
+            });
+            return; // Don't proceed to next step if hotkey registration failed
+          }
+        } catch (error) {
+          console.error("Failed to register hotkey during onboarding", error);
+          showAlertDialog({
+            title: "Hotkey Error",
+            description: "We couldn't register that key. Please choose another hotkey.",
+          });
+          return; // Don't proceed to next step if hotkey registration failed
+        }
+      }
+
       setCurrentStep(newStep);
 
       // Show dictation panel when moving from permissions step (3) to hotkey step (4)
@@ -182,7 +207,7 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
         }
       }
     }
-  }, [currentStep, setCurrentStep, steps.length]);
+  }, [currentStep, setCurrentStep, steps.length, hotkey, setDictationKey, showAlertDialog]);
 
   const prevStep = useCallback(() => {
     if (currentStep > 0) {
