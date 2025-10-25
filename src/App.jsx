@@ -92,6 +92,7 @@ export default function App() {
     targetLanguage,
     preferredLanguage,
     reasoningModel,
+    translationModel,
     openaiApiKey,
     anthropicApiKey,
     geminiApiKey,
@@ -199,7 +200,7 @@ export default function App() {
               enableTranslation,
               targetLanguage,
               preferredLanguage,
-              reasoningModel,
+              translationModel,
               hasOpenAI: !!openaiApiKey,
               hasAnthropic: !!anthropicApiKey,
               hasGemini: !!geminiApiKey,
@@ -213,9 +214,10 @@ export default function App() {
             // Translate if enabled and target language is different
             if ((enableTranslation && targetLanguage && targetLanguage !== preferredLanguage) || forceTranslationTest) {
               console.log("[Translation] Starting translation...");
+              console.log("[Translation] Using dedicated translation model:", translationModel);
               try {
-                // Determine which provider and API key to use
-                const provider = getModelProvider(reasoningModel);
+                // Determine which provider and API key to use (based on TRANSLATION model, not reasoning)
+                const provider = getModelProvider(translationModel);
                 let apiKey = "";
 
                 console.log("[Translation] Provider detected:", provider);
@@ -238,7 +240,7 @@ export default function App() {
                     targetLanguage: targetLanguage,
                     provider: provider,
                     apiKey: apiKey,
-                    model: reasoningModel,
+                    model: translationModel, // Use dedicated translation model
                   });
 
                   console.log("[Translation] Result:", translationResult);
@@ -267,7 +269,8 @@ export default function App() {
                 console.error("Translation error details:", {
                   error: error.message,
                   stack: error.stack,
-                  provider: getModelProvider(reasoningModel),
+                  provider: getModelProvider(translationModel),
+                  translationModel,
                   hasApiKey: !!(provider === "openai" ? openaiApiKey : provider === "anthropic" ? anthropicApiKey : geminiApiKey)
                 });
 

@@ -442,6 +442,23 @@ class AudioManager {
       timestamp: new Date().toISOString(),
     });
 
+    // Check if translation is enabled - if yes, skip reasoning to save time
+    const enableTranslation = localStorage.getItem("enableTranslation") === "true";
+    const targetLanguage = localStorage.getItem("targetLanguage");
+    const preferredLanguage = localStorage.getItem("preferredLanguage");
+    const willTranslate = enableTranslation && targetLanguage && targetLanguage !== preferredLanguage;
+
+    // Skip reasoning if translation is active (translation will handle cleanup)
+    if (willTranslate) {
+      debugLogger.logReasoning("SKIPPING_REASONING_FOR_TRANSLATION", {
+        reason: "Translation is enabled - reasoning would be redundant",
+        enableTranslation,
+        targetLanguage,
+        preferredLanguage,
+      });
+      return text; // Return original text, translation will clean it up
+    }
+
     // Check if reasoning should handle cleanup
     const useReasoning = await this.isReasoningAvailable();
 

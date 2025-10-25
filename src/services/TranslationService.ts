@@ -16,6 +16,49 @@ export interface TranslationResult {
 }
 
 class TranslationService {
+  private translationCache: Map<string, { translatedText: string; timestamp: number }>;
+  private readonly CACHE_TTL = 60 * 60 * 1000; // 1 hour
+  private readonly MAX_CACHE_SIZE = 100;
+
+  constructor() {
+    this.translationCache = new Map();
+  }
+
+  private getCacheKey(text: string, sourceLanguage: string, targetLanguage: string): string {
+    // Create a unique cache key based on text content and languages
+    return `${sourceLanguage}->${targetLanguage}:${text.substring(0, 200)}`;
+  }
+
+  private getFromCache(cacheKey: string): string | null {
+    const cached = this.translationCache.get(cacheKey);
+    if (!cached) return null;
+
+    // Check if cache entry is still valid
+    const now = Date.now();
+    if (now - cached.timestamp > this.CACHE_TTL) {
+      this.translationCache.delete(cacheKey);
+      return null;
+    }
+
+    console.log("[TranslationService] Cache HIT - returning cached translation");
+    return cached.translatedText;
+  }
+
+  private saveToCache(cacheKey: string, translatedText: string): void {
+    // Limit cache size
+    if (this.translationCache.size >= this.MAX_CACHE_SIZE) {
+      // Remove oldest entry
+      const firstKey = this.translationCache.keys().next().value;
+      this.translationCache.delete(firstKey);
+    }
+
+    this.translationCache.set(cacheKey, {
+      translatedText,
+      timestamp: Date.now(),
+    });
+    console.log("[TranslationService] Saved to cache. Cache size:", this.translationCache.size);
+  }
+
   async translate(config: TranslationConfig): Promise<TranslationResult> {
     const { text, sourceLanguage, targetLanguage, provider, apiKey, model } = config;
 
@@ -35,30 +78,52 @@ class TranslationService {
       };
     }
 
+    // Check cache first
+    const cacheKey = this.getCacheKey(text, sourceLanguage, targetLanguage);
+    const cachedTranslation = this.getFromCache(cacheKey);
+    if (cachedTranslation) {
+      return {
+        translatedText: cachedTranslation,
+        success: true,
+      };
+    }
+
     const sourceLang = getLanguageLabel(sourceLanguage);
     const targetLang = getLanguageLabel(targetLanguage);
 
     const prompt = `Translate the following text from ${sourceLang} to ${targetLang}. Only output the translation, nothing else:\n\n${text}`;
 
     try {
+      let result: TranslationResult;
+
       switch (provider) {
         case "openai":
-          return await this.translateWithOpenAI(prompt, apiKey, model || "gpt-4o-mini");
+          result = await this.translateWithOpenAI(prompt, apiKey, model || "gpt-4o-mini");
+          break;
         case "anthropic":
-          return await this.translateWithAnthropic(
+          result = await this.translateWithAnthropic(
             prompt,
             apiKey,
             model || "claude-3-5-haiku-20241022"
           );
+          break;
         case "gemini":
-          return await this.translateWithGemini(prompt, apiKey, model || "gemini-2.5-flash");
+          result = await this.translateWithGemini(prompt, apiKey, model || "gemini-2.5-flash");
+          break;
         default:
-          return {
+          result = {
             translatedText: text,
             success: false,
             error: `Unknown provider: ${provider}`,
           };
       }
+
+      // Save successful translations to cache
+      if (result.success && result.translatedText) {
+        this.saveToCache(cacheKey, result.translatedText);
+      }
+
+      return result;
     } catch (error) {
       console.error("Translation error:", error);
       return {

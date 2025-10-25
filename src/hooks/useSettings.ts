@@ -110,6 +110,12 @@ export function useSettings() {
     deserialize: String,
   });
 
+  // Translation model (separate from reasoning model for performance)
+  const [translationModel, setTranslationModel] = useLocalStorage("translationModel", "gpt-4o-mini", {
+    serialize: String,
+    deserialize: String,
+  });
+
   // API keys
   const [openaiApiKey, setOpenaiApiKey] = useLocalStorage("openaiApiKey", "", {
     serialize: String,
@@ -201,6 +207,7 @@ export function useSettings() {
     cloudReasoningBaseUrl,
     useReasoningModel,
     reasoningModel,
+    translationModel,
     reasoningProvider,
     openaiApiKey,
     anthropicApiKey,
@@ -218,6 +225,7 @@ export function useSettings() {
     setCloudReasoningBaseUrl,
     setUseReasoningModel,
     setReasoningModel,
+    setTranslationModel,
     setReasoningProvider: (provider: string) => {
       if (provider === "custom") {
         return;
