@@ -184,6 +184,13 @@ export default function App() {
           });
         },
         onTranscriptionComplete: async (result) => {
+          console.log("[App] Transcription complete:", {
+            success: result.success,
+            hasText: !!result.text,
+            textLength: result.text?.length,
+            source: result.source
+          });
+
           if (result.success && result.text) {
             let finalText = result.text;
 
@@ -196,10 +203,15 @@ export default function App() {
               hasOpenAI: !!openaiApiKey,
               hasAnthropic: !!anthropicApiKey,
               hasGemini: !!geminiApiKey,
+              transcribedText: result.text.substring(0, 100),
+              willTranslate: enableTranslation && targetLanguage && targetLanguage !== preferredLanguage
             });
 
+            // TESTE TEMPORÁRIO: Forçar tradução para debug
+            const forceTranslationTest = false; // Muda para true para testar
+
             // Translate if enabled and target language is different
-            if (enableTranslation && targetLanguage && targetLanguage !== preferredLanguage) {
+            if ((enableTranslation && targetLanguage && targetLanguage !== preferredLanguage) || forceTranslationTest) {
               console.log("[Translation] Starting translation...");
               try {
                 // Determine which provider and API key to use
@@ -245,9 +257,25 @@ export default function App() {
                   }
                 } else {
                   console.log("[Translation] No API key found, skipping translation");
+                  toast({
+                    title: "Translation Skipped",
+                    description: `No API key found for ${provider}. Using original text.`,
+                    variant: "default",
+                  });
                 }
               } catch (error) {
-                console.error("Translation error:", error);
+                console.error("Translation error details:", {
+                  error: error.message,
+                  stack: error.stack,
+                  provider: getModelProvider(reasoningModel),
+                  hasApiKey: !!(provider === "openai" ? openaiApiKey : provider === "anthropic" ? anthropicApiKey : geminiApiKey)
+                });
+
+                toast({
+                  title: "Translation Error",
+                  description: `Failed to translate: ${error.message}`,
+                  variant: "destructive",
+                });
                 // Continue with original text if translation fails
               }
             } else {
@@ -534,6 +562,16 @@ export default function App() {
                 }}
               >
                 Hide this for now
+              </button>
+              <div className="h-px bg-white/10" />
+              <button
+                className="w-full px-3 py-2 text-left text-sm hover:bg-white/10 focus:bg-white/10 focus:outline-none"
+                onClick={() => {
+                  window.electronAPI?.openDevTools?.();
+                  setIsCommandMenuOpen(false);
+                }}
+              >
+                Open DevTools (Debug)
               </button>
             </div>
           )}

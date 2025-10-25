@@ -519,11 +519,17 @@ class AudioManager {
 
       // Add language hint if set (improves processing speed)
       const language = localStorage.getItem("preferredLanguage");
+      console.log("[OpenAI Whisper] Preferred language:", language);
       if (language && language !== "auto") {
         formData.append("language", language);
+        console.log("[OpenAI Whisper] Setting language hint:", language);
       }
 
-      const response = await fetch(this.getTranscriptionEndpoint(), {
+      const endpoint = this.getTranscriptionEndpoint();
+      console.log("[OpenAI Whisper] Endpoint:", endpoint);
+      console.log("[OpenAI Whisper] Has API key:", !!apiKey);
+
+      const response = await fetch(endpoint, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${apiKey}`,
@@ -531,12 +537,20 @@ class AudioManager {
         body: formData,
       });
 
+      console.log("[OpenAI Whisper] Response status:", response.status);
+
       if (!response.ok) {
         const errorText = await response.text();
+        console.error("[OpenAI Whisper] API Error:", response.status, errorText);
         throw new Error(`API Error: ${response.status} ${errorText}`);
       }
 
       const result = await response.json();
+      console.log("[OpenAI Whisper] Transcription result:", {
+        hasText: !!result.text,
+        textLength: result.text?.length,
+        textPreview: result.text?.substring(0, 100)
+      });
 
       if (result.text) {
         const text = await this.processTranscription(result.text, "openai");
