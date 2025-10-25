@@ -45,7 +45,11 @@ class TranslationService {
         case "openai":
           return await this.translateWithOpenAI(prompt, apiKey, model || "gpt-4o-mini");
         case "anthropic":
-          return await this.translateWithAnthropic(prompt, apiKey, model || "claude-3-5-haiku-20241022");
+          return await this.translateWithAnthropic(
+            prompt,
+            apiKey,
+            model || "claude-3-5-haiku-20241022"
+          );
         case "gemini":
           return await this.translateWithGemini(prompt, apiKey, model || "gemini-2.5-flash");
         default:
@@ -75,7 +79,8 @@ class TranslationService {
       const baseUrl = localStorage.getItem("cloudReasoningBaseUrl") || "https://api.openai.com/v1";
 
       // Check if model requires Responses API
-      const requiresResponsesApi = model.startsWith("gpt-5") || model.startsWith("o3") || model.startsWith("o4");
+      const requiresResponsesApi =
+        model.startsWith("gpt-5") || model.startsWith("o3") || model.startsWith("o4");
 
       if (requiresResponsesApi) {
         const response = await fetch(`${baseUrl}/responses`, {

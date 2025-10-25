@@ -6,9 +6,9 @@
   --text-xs: 11px;
   --text-sm: 12px;
   --text-base: 13px;
-  --text-md: 14px;     /* Maximum for body text */
-  --text-lg: 15px;     /* Maximum for headings */
-  --text-xl: 16px;     /* Maximum for page titles */
+  --text-md: 14px; /* Maximum for body text */
+  --text-lg: 15px; /* Maximum for headings */
+  --text-xl: 16px; /* Maximum for page titles */
 
   /* Neutral Color Palette */
   --gray-50: #fafafa;
@@ -56,7 +56,9 @@
 }
 
 /* Remove all animations by default */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   animation-duration: 0s !important;
   animation-delay: 0s !important;
   transition-duration: 150ms !important; /* Keep minimal transitions for smoothness */
@@ -70,14 +72,33 @@ body {
 }
 
 /* Heading styles */
-h1 { font-size: var(--text-xl); font-weight: 600; color: var(--gray-900); }
-h2 { font-size: var(--text-lg); font-weight: 600; color: var(--gray-900); }
-h3 { font-size: var(--text-md); font-weight: 600; color: var(--gray-900); }
-h4 { font-size: var(--text-md); font-weight: 500; color: var(--gray-800); }
+h1 {
+  font-size: var(--text-xl);
+  font-weight: 600;
+  color: var(--gray-900);
+}
+h2 {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  color: var(--gray-900);
+}
+h3 {
+  font-size: var(--text-md);
+  font-weight: 600;
+  color: var(--gray-900);
+}
+h4 {
+  font-size: var(--text-md);
+  font-weight: 500;
+  color: var(--gray-800);
+}
 
 /* Remove default button animations */
 button {
-  transition: background-color 150ms, border-color 150ms, color 150ms;
+  transition:
+    background-color 150ms,
+    border-color 150ms,
+    color 150ms;
 }
 
 /* Disable pulse animations */

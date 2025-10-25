@@ -155,47 +155,32 @@ export default function HotkeyCapture({
         onKeyUp={handleKeyUp}
         onFocus={handleFocus}
         onBlur={handleBlur}
-        className={`
-          w-full px-4 py-3 rounded-lg border-2
-          transition-all duration-200
-          cursor-text flex items-center justify-between
-          ${
-            isCapturing
-              ? "border-indigo-500 bg-indigo-50 ring-2 ring-indigo-200"
-              : "border-gray-300 bg-white hover:border-gray-400"
-          }
-          focus:outline-none
-        `}
+        className={`flex w-full cursor-text items-center justify-between rounded-lg border-2 px-4 py-3 transition-all duration-200 ${
+          isCapturing
+            ? "border-indigo-500 bg-indigo-50 ring-2 ring-indigo-200"
+            : "border-gray-300 bg-white hover:border-gray-400"
+        } focus:outline-none`}
       >
         <div className="flex items-center gap-2">
-          <Keyboard className="w-4 h-4 text-gray-500" />
+          <Keyboard className="h-4 w-4 text-gray-500" />
           <kbd
-            className={`
-            font-mono text-sm font-medium
-            ${isCapturing ? "text-indigo-700" : "text-gray-700"}
-          `}
+            className={`font-mono text-sm font-medium ${isCapturing ? "text-indigo-700" : "text-gray-700"} `}
           >
-            {isCapturing
-              ? formatHotkey(capturedKeys) || "Press keys..."
-              : getDisplayLabel(value)}
+            {isCapturing ? formatHotkey(capturedKeys) || "Press keys..." : getDisplayLabel(value)}
           </kbd>
         </div>
-        {isCapturing && (
-          <span className="text-xs text-indigo-600 animate-pulse">Recording...</span>
-        )}
+        {isCapturing && <span className="animate-pulse text-xs text-indigo-600">Recording...</span>}
       </div>
 
       <p className="mt-2 text-xs text-gray-500">
-        {isMac
-          ? "Examples: ⌘+K, ⌥+Space, ⌘+⇧+A"
-          : "Examples: Ctrl+K, Alt+Space, Ctrl+Shift+A"}
+        {isMac ? "Examples: ⌘+K, ⌥+Space, ⌘+⇧+A" : "Examples: Ctrl+K, Alt+Space, Ctrl+Shift+A"}
       </p>
 
       {/* Clear button */}
       {value && !isCapturing && (
         <button
           onClick={() => onChange("")}
-          className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-xs"
+          className="absolute top-1/2 right-2 -translate-y-1/2 text-xs text-gray-400 hover:text-gray-600"
         >
           Clear
         </button>

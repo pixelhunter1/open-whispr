@@ -23,7 +23,8 @@ export default function ControlPanel() {
     updateDownloaded: false,
     isDevelopment: false,
   });
-  const isWindows = typeof window !== "undefined" && window.electronAPI?.getPlatform?.() === "win32";
+  const isWindows =
+    typeof window !== "undefined" && window.electronAPI?.getPlatform?.() === "win32";
 
   const {
     confirmDialog,
@@ -135,8 +136,7 @@ export default function ControlPanel() {
   const deleteTranscription = async (id: number) => {
     showConfirmDialog({
       title: "Delete Transcription",
-      description:
-        "Are you certain you wish to remove this inscription from your records?",
+      description: "Are you certain you wish to remove this inscription from your records?",
       onConfirm: async () => {
         try {
           const result = await window.electronAPI.deleteTranscription(id);
@@ -146,8 +146,7 @@ export default function ControlPanel() {
           } else {
             showAlertDialog({
               title: "Delete Failed",
-              description:
-                "Failed to delete transcription. It may have already been removed.",
+              description: "Failed to delete transcription. It may have already been removed.",
             });
           }
         } catch (error) {
@@ -189,26 +188,21 @@ export default function ControlPanel() {
           <>
             {/* Update notification badge */}
             {!updateStatus.isDevelopment &&
-              (updateStatus.updateAvailable ||
-                updateStatus.updateDownloaded) && (
+              (updateStatus.updateAvailable || updateStatus.updateDownloaded) && (
                 <div className="relative">
-                  <div className="absolute -top-1 -right-1 w-2 h-2 bg-blue-500 rounded-full"></div>
+                  <div className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-blue-500"></div>
                 </div>
               )}
             <SupportDropdown />
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setShowSettings(!showSettings)}
-            >
+            <Button variant="ghost" size="icon" onClick={() => setShowSettings(!showSettings)}>
               <Settings size={16} />
             </Button>
             {isWindows && (
-              <div className="flex items-center gap-1 ml-2">
+              <div className="ml-2 flex items-center gap-1">
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                  className="text-red-600 hover:bg-red-50 hover:text-red-700"
                   onClick={handleClose}
                   aria-label="Close window"
                 >
@@ -224,7 +218,7 @@ export default function ControlPanel() {
 
       {/* Main content */}
       <div className="p-6">
-        <div className="space-y-6 max-w-4xl mx-auto">
+        <div className="mx-auto max-w-4xl space-y-6">
           {/* Transcriptions - Minimal Professional Design */}
           <Card>
             <CardHeader>
@@ -233,7 +227,12 @@ export default function ControlPanel() {
                   Recent Transcriptions
                 </CardTitle>
                 <div className="flex gap-1">
-                  <Button onClick={refreshHistory} variant="ghost" size="sm" className="h-8 w-8 p-0">
+                  <Button
+                    onClick={refreshHistory}
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 w-8 p-0"
+                  >
                     <RefreshCw size={14} className="text-gray-600" />
                   </Button>
                   {history.length > 0 && (
@@ -241,7 +240,7 @@ export default function ControlPanel() {
                       onClick={clearHistory}
                       variant="ghost"
                       size="sm"
-                      className="h-8 w-8 p-0 text-gray-600 hover:text-red-600 hover:bg-red-50"
+                      className="h-8 w-8 p-0 text-gray-600 hover:bg-red-50 hover:text-red-600"
                     >
                       <Trash2 size={14} />
                     </Button>
@@ -251,29 +250,27 @@ export default function ControlPanel() {
             </CardHeader>
             <CardContent>
               {isLoading ? (
-                <div className="text-center py-8">
-                  <div className="w-6 h-6 mx-auto mb-2 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin loader" />
+                <div className="py-8 text-center">
+                  <div className="loader mx-auto mb-2 h-6 w-6 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600" />
                   <p className="text-[12px] text-gray-500">Loading...</p>
                 </div>
               ) : history.length === 0 ? (
-                <div className="text-center py-10">
-                  <p className="text-[14px] font-medium text-gray-900 mb-1">
+                <div className="py-10 text-center">
+                  <p className="mb-1 text-[14px] font-medium text-gray-900">
                     No transcriptions yet
                   </p>
-                  <p className="text-[12px] text-gray-500 mb-6">
+                  <p className="mb-6 text-[12px] text-gray-500">
                     Press your hotkey to start recording
                   </p>
 
                   {/* Quick Start Guide - Minimal */}
-                  <div className="bg-gray-50 border border-gray-200 rounded p-4 max-w-sm mx-auto text-left">
-                    <p className="text-[13px] font-medium text-gray-900 mb-3">
-                      Quick Start
-                    </p>
-                    <ol className="text-[12px] text-gray-600 space-y-1.5">
+                  <div className="mx-auto max-w-sm rounded border border-gray-200 bg-gray-50 p-4 text-left">
+                    <p className="mb-3 text-[13px] font-medium text-gray-900">Quick Start</p>
+                    <ol className="space-y-1.5 text-[12px] text-gray-600">
                       <li>1. Click in any text field</li>
                       <li>
                         2. Press{" "}
-                        <kbd className="px-1.5 py-0.5 bg-white border border-gray-300 rounded text-[11px] font-mono">
+                        <kbd className="rounded border border-gray-300 bg-white px-1.5 py-0.5 font-mono text-[11px]">
                           {hotkey}
                         </kbd>{" "}
                         to start
@@ -281,7 +278,7 @@ export default function ControlPanel() {
                       <li>3. Speak your text</li>
                       <li>
                         4. Press{" "}
-                        <kbd className="px-1.5 py-0.5 bg-white border border-gray-300 rounded text-[11px] font-mono">
+                        <kbd className="rounded border border-gray-300 bg-white px-1.5 py-0.5 font-mono text-[11px]">
                           {hotkey}
                         </kbd>{" "}
                         to stop
@@ -291,7 +288,7 @@ export default function ControlPanel() {
                   </div>
                 </div>
               ) : (
-                <div className="space-y-2 max-h-96 overflow-y-auto">
+                <div className="max-h-96 space-y-2 overflow-y-auto">
                   {history.map((item, index) => (
                     <TranscriptionItem
                       key={item.id}

@@ -19,18 +19,16 @@ export default function TranscriptionItem({
   onDelete,
 }: TranscriptionItemProps) {
   return (
-    <div className="relative bg-gradient-to-b from-blue-50/30 to-white rounded-xl shadow-sm hover:shadow-md transition-shadow">
+    <div className="relative rounded-xl bg-gradient-to-b from-blue-50/30 to-white shadow-sm transition-shadow hover:shadow-md">
       <div className="p-6 pl-16" style={{ paddingTop: "8px" }}>
         <div className="flex items-start justify-between">
-          <div className="flex-1 mr-3">
+          <div className="mr-3 flex-1">
             <div
-              className="flex items-center gap-2 mb-1"
+              className="mb-1 flex items-center gap-2"
               style={{ marginTop: "2px", lineHeight: "24px" }}
             >
-              <span className="text-indigo-600 text-xs font-medium">
-                #{total - index}
-              </span>
-              <div className="w-px h-3 bg-neutral-300" />
+              <span className="text-xs font-medium text-indigo-600">#{total - index}</span>
+              <div className="h-3 w-px bg-neutral-300" />
               <span className="text-xs text-neutral-500">
                 {new Date(item.timestamp).toLocaleString("en-US", {
                   month: "short",
@@ -41,7 +39,7 @@ export default function TranscriptionItem({
               </span>
             </div>
             <p
-              className="text-neutral-800 text-sm"
+              className="text-sm text-neutral-800"
               style={{
                 fontFamily:
                   'Noto Sans, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
@@ -54,10 +52,7 @@ export default function TranscriptionItem({
               {item.text}
             </p>
           </div>
-          <div
-            className="flex gap-1 flex-shrink-0"
-            style={{ marginTop: "2px" }}
-          >
+          <div className="flex flex-shrink-0 gap-1" style={{ marginTop: "2px" }}>
             <Button
               size="icon"
               variant="ghost"
@@ -70,7 +65,7 @@ export default function TranscriptionItem({
               size="icon"
               variant="ghost"
               onClick={() => onDelete(item.id)}
-              className="h-7 w-7 text-red-600 hover:text-red-700 hover:bg-red-50"
+              className="h-7 w-7 text-red-600 hover:bg-red-50 hover:text-red-700"
             >
               <Trash2 size={12} />
             </Button>

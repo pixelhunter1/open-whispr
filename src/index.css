@@ -2,27 +2,27 @@
 @import "./styles/design-system.css";
 
 :root {
-  /* Apple macOS Design System */
-  --color-primary: #007AFF;
+  /* Turquoise Design System */
+  --color-primary: #32cda6;
   --color-primary-foreground: #ffffff;
-  --color-secondary: #f5f5f7;
-  --color-secondary-foreground: #1d1d1f;
-  --color-muted: #f5f5f7;
-  --color-muted-foreground: #86868b;
-  --color-accent: #007AFF;
+  --color-secondary: #ecf9f5;
+  --color-secondary-foreground: #1d4942;
+  --color-muted: #d9f2ec;
+  --color-muted-foreground: #3a9283;
+  --color-accent: #1de2b1;
   --color-accent-foreground: #ffffff;
   --color-destructive: #ff3b30;
   --color-destructive-foreground: #ffffff;
-  --color-border: #d2d2d7;
+  --color-border: #b3e6d9;
   --color-input: #ffffff;
-  --color-ring: #007AFF;
+  --color-ring: #32cda6;
   --color-background: #ffffff;
-  --color-foreground: #1d1d1f;
+  --color-foreground: #0f2421;
   --color-card: #ffffff;
-  --color-card-foreground: #1d1d1f;
+  --color-card-foreground: #0f2421;
   --color-popover: #ffffff;
-  --color-popover-foreground: #1d1d1f;
-  --color-link: #007AFF;
+  --color-popover-foreground: #0f2421;
+  --color-link: #32cda6;
   --radius: 0.5rem;
 
   /* Apple Typography Scale */
@@ -32,68 +32,206 @@
 }
 
 .dark {
-  /* Dark mode - sophisticated and rich */
-  --color-background: oklch(0.08 0 0);
-  --color-foreground: oklch(0.95 0 0);
-  --color-card: oklch(0.12 0 0);
-  --color-card-foreground: oklch(0.95 0 0);
-  --color-popover: oklch(0.12 0 0);
-  --color-popover-foreground: oklch(0.95 0 0);
-  --color-primary: oklch(0.6 0.22 245);
-  --color-primary-foreground: oklch(0.985 0 0);
-  --color-secondary: oklch(0.18 0 0);
-  --color-secondary-foreground: oklch(0.9 0 0);
-  --color-muted: oklch(0.15 0 0);
-  --color-muted-foreground: oklch(0.6 0 0);
-  --color-accent: oklch(0.6 0.22 245);
-  --color-accent-foreground: oklch(0.985 0 0);
-  --color-destructive: oklch(0.7 0.22 25);
-  --color-border: oklch(0.22 0 0);
-  --color-input: oklch(0.18 0 0);
-  --color-ring: oklch(0.6 0.22 245);
+  /* Dark mode - turquoise theme */
+  --color-background: #07120e;
+  --color-foreground: #daf1ee;
+  --color-card: #0e251c;
+  --color-card-foreground: #daf1ee;
+  --color-popover: #0e251c;
+  --color-popover-foreground: #daf1ee;
+  --color-primary: #32cda6;
+  --color-primary-foreground: #051511;
+  --color-secondary: #1c4a38;
+  --color-secondary-foreground: #daf1ee;
+  --color-muted: #1c4a38;
+  --color-muted-foreground: #8fd6cc;
+  --color-accent: #1de2b1;
+  --color-accent-foreground: #031712;
+  --color-destructive: #ff3b30;
+  --color-border: #2a6f53;
+  --color-input: #1c4a38;
+  --color-ring: #32cda6;
 }
 
 @layer base {
+  :root {
+    --text-50: #edf8f6;
+    --text-100: #dbf0ed;
+    --text-200: #b6e2db;
+    --text-300: #92d3c8;
+    --text-400: #6dc5b6;
+    --text-500: #49b6a4;
+    --text-600: #3a9283;
+    --text-700: #2c6d62;
+    --text-800: #1d4942;
+    --text-900: #0f2421;
+    --text-950: #071210;
+
+    --background-50: #ecf9f5;
+    --background-100: #d9f2ec;
+    --background-200: #b3e6d9;
+    --background-300: #8cd9c6;
+    --background-400: #66ccb3;
+    --background-500: #40bf9f;
+    --background-600: #339980;
+    --background-700: #267360;
+    --background-800: #194d40;
+    --background-900: #0d2620;
+    --background-950: #061310;
+
+    --primary-50: #eafaf6;
+    --primary-100: #d6f5ed;
+    --primary-200: #adebdc;
+    --primary-300: #84e1ca;
+    --primary-400: #5bd7b8;
+    --primary-500: #32cda6;
+    --primary-600: #28a485;
+    --primary-700: #1e7b64;
+    --primary-800: #145243;
+    --primary-900: #0a2921;
+    --primary-950: #051511;
+
+    --secondary-50: #eafbf7;
+    --secondary-100: #d4f7ee;
+    --secondary-200: #a9efdd;
+    --secondary-300: #7ee7cd;
+    --secondary-400: #54debc;
+    --secondary-500: #29d6ab;
+    --secondary-600: #21ab89;
+    --secondary-700: #188167;
+    --secondary-800: #105644;
+    --secondary-900: #082b22;
+    --secondary-950: #041511;
+
+    --accent-50: #e8fcf7;
+    --accent-100: #d2f9ef;
+    --accent-200: #a5f3e0;
+    --accent-300: #78edd0;
+    --accent-400: #4ae8c0;
+    --accent-500: #1de2b1;
+    --accent-600: #17b58d;
+    --accent-700: #12876a;
+    --accent-800: #0c5a47;
+    --accent-900: #062d23;
+    --accent-950: #031712;
+  }
+
+  .dark {
+    --text-50: #071311;
+    --text-100: #0e2522;
+    --text-200: #1b4b44;
+    --text-300: #297066;
+    --text-400: #369688;
+    --text-500: #44bba9;
+    --text-600: #69c9bb;
+    --text-700: #8fd6cc;
+    --text-800: #b4e4dd;
+    --text-900: #daf1ee;
+    --text-950: #ecf8f6;
+
+    --background-50: #07120e;
+    --background-100: #0e251c;
+    --background-200: #1c4a38;
+    --background-300: #2a6f53;
+    --background-400: #38946f;
+    --background-500: #46b98b;
+    --background-600: #6bc7a2;
+    --background-700: #90d5b9;
+    --background-800: #b5e3d1;
+    --background-900: #daf1e8;
+    --background-950: #edf8f3;
+
+    --primary-50: #051511;
+    --primary-100: #0a2921;
+    --primary-200: #145243;
+    --primary-300: #1e7b64;
+    --primary-400: #28a485;
+    --primary-500: #32cda6;
+    --primary-600: #5bd7b8;
+    --primary-700: #84e1ca;
+    --primary-800: #adebdc;
+    --primary-900: #d6f5ed;
+    --primary-950: #eafaf6;
+
+    --secondary-50: #041511;
+    --secondary-100: #082b22;
+    --secondary-200: #105644;
+    --secondary-300: #188167;
+    --secondary-400: #21ab89;
+    --secondary-500: #29d6ab;
+    --secondary-600: #54debc;
+    --secondary-700: #7ee7cd;
+    --secondary-800: #a9efdd;
+    --secondary-900: #d4f7ee;
+    --secondary-950: #eafbf7;
+
+    --accent-50: #031712;
+    --accent-100: #062d23;
+    --accent-200: #0c5a47;
+    --accent-300: #12876a;
+    --accent-400: #17b58d;
+    --accent-500: #1de2b1;
+    --accent-600: #4ae8c0;
+    --accent-700: #78edd0;
+    --accent-800: #a5f3e0;
+    --accent-900: #d2f9ef;
+    --accent-950: #e8fcf7;
+  }
+
   * {
-    @apply border-[#d2d2d7] outline-[#007AFF]/50;
+    @apply border-[#b3e6d9] outline-[#32cda6]/50;
   }
 
   body {
-    @apply bg-white text-[#1d1d1f];
+    @apply bg-white text-[#0f2421];
     margin: 0;
     padding: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
-    font-feature-settings: "liga" 1, "kern" 1;
+    font-family:
+      -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Arial,
+      sans-serif;
+    font-feature-settings:
+      "liga" 1,
+      "kern" 1;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
   /* Electron specific styles */
-  html, body, #root {
+  html,
+  body,
+  #root {
     background: transparent;
   }
 }
 
 /* Apple Typography System */
 .brand-heading {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
   font-weight: 600;
   letter-spacing: -0.03em;
 }
 
 .brand-body {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
   line-height: 1.47059;
   letter-spacing: -0.08px;
 }
 
-h1, h2, h3, h4, h5, h6 {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family:
+    -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
   font-weight: 600;
   letter-spacing: -0.03em;
   line-height: 1.1;
-  color: #1d1d1f;
+  color: #0f2421;
 }
 
 h1 {
@@ -110,7 +248,8 @@ h3 {
 
 /* Apple Button Styling */
 button {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
   cursor: pointer;
   font-weight: 400;
   letter-spacing: -0.08px;
@@ -127,9 +266,9 @@ svg:hover,
   cursor: pointer;
 }
 
-/* Apple-style button variants */
+/* Turquoise-style button variants */
 .btn-filled {
-  background: #007AFF;
+  background: #32cda6;
   color: white;
   border: none;
   border-radius: 8px;
@@ -138,17 +277,17 @@ svg:hover,
 }
 
 .btn-filled:hover:not(:disabled) {
-  background: #0051D5;
+  background: #28a485;
 }
 
 .btn-filled:active:not(:disabled) {
-  background: #004BB8;
+  background: #1e7b64;
   transform: scale(0.98);
 }
 
 .btn-tinted {
-  background: rgba(0, 122, 255, 0.1);
-  color: #007AFF;
+  background: rgba(50, 205, 166, 0.1);
+  color: #32cda6;
   border: none;
   border-radius: 8px;
   padding: 8px 16px;
@@ -156,21 +295,21 @@ svg:hover,
 }
 
 .btn-tinted:hover:not(:disabled) {
-  background: rgba(0, 122, 255, 0.15);
+  background: rgba(50, 205, 166, 0.15);
 }
 
 .btn-outline {
   background: white;
-  color: #1d1d1f;
-  border: 1px solid #d2d2d7;
+  color: #0f2421;
+  border: 1px solid #b3e6d9;
   border-radius: 8px;
   padding: 8px 16px;
   font-weight: 400;
 }
 
 .btn-outline:hover:not(:disabled) {
-  background: #f5f5f7;
-  border-color: #b8b8bd;
+  background: #ecf9f5;
+  border-color: #8cd9c6;
 }
 
 .btn-destructive {
@@ -187,49 +326,56 @@ svg:hover,
 }
 
 /* Apple-style input fields */
-input, textarea {
+input,
+textarea {
   border-radius: 8px;
   transition: all 0.15s ease-in-out;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
   font-size: 13px;
   letter-spacing: -0.08px;
 }
 
-/* Light mode inputs - Apple style */
-:root input, :root textarea {
+/* Light mode inputs - Turquoise style */
+:root input,
+:root textarea {
   background-color: #ffffff;
-  border: 1px solid #d2d2d7;
-  color: #1d1d1f;
+  border: 1px solid #b3e6d9;
+  color: #0f2421;
   padding: 8px 12px;
 }
 
-:root input:focus, :root textarea:focus {
-  border-color: #007AFF;
-  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+:root input:focus,
+:root textarea:focus {
+  border-color: #32cda6;
+  box-shadow: 0 0 0 3px rgba(50, 205, 166, 0.1);
   background-color: #ffffff;
   outline: none;
 }
 
-:root input:hover:not(:focus), :root textarea:hover:not(:focus) {
-  border-color: #b8b8bd;
+:root input:hover:not(:focus),
+:root textarea:hover:not(:focus) {
+  border-color: #8cd9c6;
 }
 
 /* Dark mode inputs */
-.dark input, .dark textarea {
-  background-color: oklch(0.15 0 0);
-  border: 1px solid oklch(0.25 0 0);
-  color: oklch(0.9 0 0);
+.dark input,
+.dark textarea {
+  background-color: #1c4a38;
+  border: 1px solid #2a6f53;
+  color: #daf1ee;
 }
 
-.dark input:focus, .dark textarea:focus {
-  border-color: oklch(0.55 0.25 250);
-  box-shadow: 0 0 0 2px oklch(0.55 0.25 250 / 0.2);
+.dark input:focus,
+.dark textarea:focus {
+  border-color: #32cda6;
+  box-shadow: 0 0 0 2px rgba(50, 205, 166, 0.2);
 }
 
-/* Apple-style cards */
+/* Turquoise-style cards */
 .card {
   background-color: #ffffff;
-  border: 1px solid #d2d2d7;
+  border: 1px solid #b3e6d9;
   border-radius: 10px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
   transition: all 0.15s ease-in-out;
@@ -237,52 +383,52 @@ input, textarea {
 
 .card:hover {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  border-color: #b8b8bd;
+  border-color: #8cd9c6;
 }
 
-/* Apple-style links */
+/* Turquoise-style links */
 a {
-  color: #007AFF;
+  color: #32cda6;
   text-decoration: none;
   transition: color 0.15s ease;
   cursor: pointer;
 }
 
 a:hover {
-  color: #0051D5;
+  color: #28a485;
   text-decoration: none;
   cursor: pointer;
 }
 
 a:active {
-  color: #004BB8;
+  color: #1e7b64;
 }
 
-/* Apple status indicators */
+/* Turquoise status indicators */
 .status-active {
-  color: #007AFF;
+  color: #32cda6;
   font-weight: 500;
 }
 
 .text-brand-primary {
-  color: #1d1d1f;
+  color: #0f2421;
 }
 
 .text-brand-accent {
-  color: #007AFF;
+  color: #32cda6;
 }
 
 .text-brand-muted {
-  color: #86868b;
+  color: #3a9283;
 }
 
 .text-brand-link {
-  color: #007AFF;
+  color: #32cda6;
 }
 
-/* Apple separators */
+/* Turquoise separators */
 .separator {
-  border-color: #d2d2d7;
+  border-color: #b3e6d9;
   opacity: 1;
 }
 

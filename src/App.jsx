@@ -14,15 +14,12 @@ const SoundWaveIcon = ({ size = 16 }) => {
   return (
     <div className="flex items-center justify-center gap-1">
       <div
-        className={`bg-white rounded-full`}
+        className={`rounded-full bg-white`}
         style={{ width: size * 0.25, height: size * 0.6 }}
       ></div>
+      <div className={`rounded-full bg-white`} style={{ width: size * 0.25, height: size }}></div>
       <div
-        className={`bg-white rounded-full`}
-        style={{ width: size * 0.25, height: size }}
-      ></div>
-      <div
-        className={`bg-white rounded-full`}
+        className={`rounded-full bg-white`}
         style={{ width: size * 0.25, height: size * 0.6 }}
       ></div>
     </div>
@@ -36,8 +33,8 @@ const VoiceWaveIndicator = ({ isListening }) => {
       {[...Array(4)].map((_, i) => (
         <div
           key={i}
-          className={`w-0.5 bg-white rounded-full transition-all duration-150 ${
-            isListening ? "animate-pulse h-4" : "h-2"
+          className={`w-0.5 rounded-full bg-white transition-all duration-150 ${
+            isListening ? "h-4 animate-pulse" : "h-2"
           }`}
           style={{
             animationDelay: isListening ? `${i * 0.1}s` : "0s",
@@ -55,20 +52,17 @@ const Tooltip = ({ children, content, emoji }) => {
 
   return (
     <div className="relative inline-block">
-      <div
-        onMouseEnter={() => setIsVisible(true)}
-        onMouseLeave={() => setIsVisible(false)}
-      >
+      <div onMouseEnter={() => setIsVisible(true)} onMouseLeave={() => setIsVisible(false)}>
         {children}
       </div>
       {isVisible && (
         <div
-          className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-1 py-1 text-white bg-gradient-to-r from-neutral-800 to-neutral-700 rounded-md whitespace-nowrap z-10 transition-opacity duration-150"
+          className="absolute bottom-full left-1/2 z-10 mb-2 -translate-x-1/2 transform rounded-md bg-gradient-to-r from-neutral-800 to-neutral-700 px-1 py-1 whitespace-nowrap text-white transition-opacity duration-150"
           style={{ fontSize: "9.7px" }}
         >
           {emoji && <span className="mr-1">{emoji}</span>}
           {content}
-          <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-2 border-r-2 border-t-2 border-transparent border-t-neutral-800"></div>
+          <div className="absolute top-full left-1/2 h-0 w-0 -translate-x-1/2 transform border-t-2 border-r-2 border-l-2 border-transparent border-t-neutral-800"></div>
         </div>
       )}
     </div>
@@ -88,8 +82,7 @@ export default function App() {
   const buttonRef = useRef(null);
   const { toast } = useToast();
   const { hotkey } = useHotkey();
-  const { isDragging, handleMouseDown, handleMouseUp } =
-    useWindowDrag();
+  const { isDragging, handleMouseDown, handleMouseUp } = useWindowDrag();
   const [dragStartPos, setDragStartPos] = useState(null);
   const [hasDragged, setHasDragged] = useState(false);
 
@@ -101,7 +94,7 @@ export default function App() {
     reasoningModel,
     openaiApiKey,
     anthropicApiKey,
-    geminiApiKey
+    geminiApiKey,
   } = useSettings();
 
   const setWindowInteractivity = React.useCallback((shouldCapture) => {
@@ -169,8 +162,7 @@ export default function App() {
     } catch (err) {
       toast({
         title: "Paste Error",
-        description:
-          "Failed to paste text. Please check accessibility permissions.",
+        description: "Failed to paste text. Please check accessibility permissions.",
         variant: "destructive",
       });
     }
@@ -268,11 +260,9 @@ export default function App() {
             const pastePromise = safePaste(finalText);
 
             // Save to database in parallel
-            const savePromise = window.electronAPI
-              .saveTranscription(finalText)
-              .catch((err) => {
-                // Failed to save transcription
-              });
+            const savePromise = window.electronAPI.saveTranscription(finalText).catch((err) => {
+              // Failed to save transcription
+            });
 
             // Wait for paste to complete, but don't block on database save
             await pastePromise;
@@ -415,7 +405,7 @@ export default function App() {
   return (
     <>
       {/* Fixed bottom-right voice button */}
-      <div className="fixed bottom-6 right-6 z-50">
+      <div className="fixed right-6 bottom-6 z-50">
         <div className="relative">
           <Tooltip content={micProps.tooltip}>
             <button
@@ -475,8 +465,8 @@ export default function App() {
                   micState === "processing"
                     ? "not-allowed !important"
                     : isDragging
-                    ? "grabbing !important"
-                    : "pointer !important",
+                      ? "grabbing !important"
+                      : "pointer !important",
                 transition:
                   "transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.25s ease-out",
               }}
@@ -489,8 +479,7 @@ export default function App() {
               <div
                 className="absolute inset-0 transition-colors duration-150"
                 style={{
-                  backgroundColor:
-                    micState === "hover" ? "rgba(0,0,0,0.1)" : "transparent",
+                  backgroundColor: micState === "hover" ? "rgba(0,0,0,0.1)" : "transparent",
                 }}
               ></div>
 
@@ -505,7 +494,7 @@ export default function App() {
 
               {/* State indicator ring for recording */}
               {micState === "recording" && (
-                <div className="absolute inset-0 rounded-full border-2 border-blue-300 animate-pulse"></div>
+                <div className="absolute inset-0 animate-pulse rounded-full border-2 border-blue-300"></div>
               )}
 
               {/* State indicator ring for processing */}
@@ -517,7 +506,7 @@ export default function App() {
           {isCommandMenuOpen && (
             <div
               ref={commandMenuRef}
-              className="absolute bottom-full right-0 mb-3 w-48 rounded-lg border border-white/10 bg-neutral-900/95 text-white shadow-lg backdrop-blur-sm"
+              className="absolute right-0 bottom-full mb-3 w-48 rounded-lg border border-white/10 bg-neutral-900/95 text-white shadow-lg backdrop-blur-sm"
               onMouseEnter={() => {
                 setWindowInteractivity(true);
               }}
@@ -539,10 +528,10 @@ export default function App() {
               <button
                 className="w-full px-3 py-2 text-left text-sm hover:bg-white/10 focus:bg-white/10 focus:outline-none"
                 onClick={() => {
-                setIsCommandMenuOpen(false);
-                setWindowInteractivity(false);
-                handleClose();
-              }}
+                  setIsCommandMenuOpen(false);
+                  setWindowInteractivity(false);
+                  handleClose();
+                }}
               >
                 Hide this for now
               </button>

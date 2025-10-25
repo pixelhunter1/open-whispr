@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useEffect, useRef } from "react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "./ui/tabs";
 import { RefreshCw, Download, Keyboard, Mic, Shield } from "lucide-react";
 import WhisperModelPicker from "./WhisperModelPicker";
 import ProcessingModeSelector from "./ui/ProcessingModeSelector";
@@ -34,9 +35,7 @@ interface SettingsPageProps {
   activeSection?: SettingsSectionType;
 }
 
-export default function SettingsPage({
-  activeSection = "general",
-}: SettingsPageProps) {
+export default function SettingsPage({ activeSection = "general" }: SettingsPageProps) {
   // Use custom hooks
   const {
     confirmDialog,
@@ -104,15 +103,13 @@ export default function SettingsPage({
     releaseNotes?: string;
   }>({});
   const [isRemovingModels, setIsRemovingModels] = useState(false);
-  const [hotkeyInputMode, setHotkeyInputMode] = useState<"keyboard" | "capture">("capture");
   const cachePathHint =
     typeof navigator !== "undefined" && /Windows/i.test(navigator.userAgent)
       ? "%USERPROFILE%\\.cache\\openwhispr\\models"
       : "~/.cache/openwhispr/models";
 
   const isUpdateAvailable =
-    !updateStatus.isDevelopment &&
-    (updateStatus.updateAvailable || updateStatus.updateDownloaded);
+    !updateStatus.isDevelopment && (updateStatus.updateAvailable || updateStatus.updateDownloaded);
 
   const whisperHook = useWhisper(showAlertDialog);
   const permissionsHook = usePermissions(showAlertDialog);
@@ -198,7 +195,10 @@ export default function SettingsPage({
           updateAvailable: prev.updateAvailable || statusResult.updateAvailable,
           updateDownloaded: prev.updateDownloaded || statusResult.updateDownloaded,
         }));
-        if ((statusResult.updateAvailable || statusResult.updateDownloaded) && window.electronAPI?.getUpdateInfo) {
+        if (
+          (statusResult.updateAvailable || statusResult.updateDownloaded) &&
+          window.electronAPI?.getUpdateInfo
+        ) {
           const info = await window.electronAPI.getUpdateInfo();
           if (info) {
             setUpdateInfo({
@@ -259,16 +259,16 @@ export default function SettingsPage({
   }, [installInitiated, showAlertDialog]);
 
   const saveReasoningSettings = useCallback(async () => {
-    const normalizedReasoningBase = (cloudReasoningBaseUrl || '').trim();
+    const normalizedReasoningBase = (cloudReasoningBaseUrl || "").trim();
     setCloudReasoningBaseUrl(normalizedReasoningBase);
 
     // Update reasoning settings
-    updateReasoningSettings({ 
-      useReasoningModel, 
+    updateReasoningSettings({
+      useReasoningModel,
       reasoningModel,
-      cloudReasoningBaseUrl: normalizedReasoningBase
+      cloudReasoningBaseUrl: normalizedReasoningBase,
     });
-    
+
     // Save API keys to backend based on provider
     if (localReasoningProvider === "openai" && openaiApiKey) {
       await window.electronAPI?.saveOpenAIKey(openaiApiKey);
@@ -279,31 +279,25 @@ export default function SettingsPage({
     if (localReasoningProvider === "gemini" && geminiApiKey) {
       await window.electronAPI?.saveGeminiKey(geminiApiKey);
     }
-    
+
     updateApiKeys({
-      ...(localReasoningProvider === "openai" &&
-        openaiApiKey.trim() && { openaiApiKey }),
-      ...(localReasoningProvider === "anthropic" &&
-        anthropicApiKey.trim() && { anthropicApiKey }),
-      ...(localReasoningProvider === "gemini" &&
-        geminiApiKey.trim() && { geminiApiKey }),
+      ...(localReasoningProvider === "openai" && openaiApiKey.trim() && { openaiApiKey }),
+      ...(localReasoningProvider === "anthropic" && anthropicApiKey.trim() && { anthropicApiKey }),
+      ...(localReasoningProvider === "gemini" && geminiApiKey.trim() && { geminiApiKey }),
     });
-    
+
     // Save the provider separately since it's computed from the model
     localStorage.setItem("reasoningProvider", localReasoningProvider);
 
     const providerLabel =
-      localReasoningProvider === 'custom'
-        ? 'Custom'
-        : REASONING_PROVIDERS[
-            localReasoningProvider as keyof typeof REASONING_PROVIDERS
-          ]?.name || localReasoningProvider;
+      localReasoningProvider === "custom"
+        ? "Custom"
+        : REASONING_PROVIDERS[localReasoningProvider as keyof typeof REASONING_PROVIDERS]?.name ||
+          localReasoningProvider;
 
     showAlertDialog({
       title: "Reasoning Settings Saved",
-      description: `AI text enhancement ${
-        useReasoningModel ? "enabled" : "disabled"
-      } with ${
+      description: `AI text enhancement ${useReasoningModel ? "enabled" : "disabled"} with ${
         providerLabel
       } ${reasoningModel}`,
     });
@@ -330,7 +324,7 @@ export default function SettingsPage({
       if (geminiApiKey) {
         await window.electronAPI?.saveGeminiKey(geminiApiKey);
       }
-      
+
       updateApiKeys({ openaiApiKey, anthropicApiKey, geminiApiKey });
       updateTranscriptionSettings({ allowLocalFallback, fallbackWhisperModel });
 
@@ -338,15 +332,15 @@ export default function SettingsPage({
         if (openaiApiKey) {
           await window.electronAPI?.createProductionEnvFile(openaiApiKey);
         }
-        
+
         const savedKeys: string[] = [];
         if (openaiApiKey) savedKeys.push("OpenAI");
         if (anthropicApiKey) savedKeys.push("Anthropic");
         if (geminiApiKey) savedKeys.push("Gemini");
-        
+
         showAlertDialog({
           title: "API Keys Saved",
-          description: `${savedKeys.join(", ")} API key${savedKeys.length > 1 ? 's' : ''} saved successfully! Your credentials have been securely recorded.${
+          description: `${savedKeys.join(", ")} API key${savedKeys.length > 1 ? "s" : ""} saved successfully! Your credentials have been securely recorded.${
             allowLocalFallback ? " Local Whisper fallback is enabled." : ""
           }`,
         });
@@ -407,8 +401,7 @@ export default function SettingsPage({
         showAlertDialog({
           title: "Hotkey Not Saved",
           description:
-            result?.message ||
-            "This key could not be registered. Please choose a different key.",
+            result?.message || "This key could not be registered. Please choose a different key.",
         });
         return;
       }
@@ -431,8 +424,7 @@ export default function SettingsPage({
 
     showConfirmDialog({
       title: "Remove downloaded models?",
-      description:
-        `This deletes all locally cached Whisper models (${cachePathHint}) and frees disk space. You can download them again from the model picker.`,
+      description: `This deletes all locally cached Whisper models (${cachePathHint}) and frees disk space. You can download them again from the model picker.`,
       confirmText: "Delete Models",
       variant: "destructive",
       onConfirm: () => {
@@ -444,8 +436,7 @@ export default function SettingsPage({
               showAlertDialog({
                 title: "Unable to Remove Models",
                 description:
-                  result?.error ||
-                  "Something went wrong while deleting the cached models.",
+                  result?.error || "Something went wrong while deleting the cached models.",
               });
               return;
             }
@@ -478,38 +469,36 @@ export default function SettingsPage({
           <div className="space-y-6">
             {/* App Updates Section */}
             <section className="space-y-4">
-              <div className="border-b border-[#d2d2d7] pb-3">
-                <h3 className="text-base font-semibold text-[#1d1d1f]">
-                  App Updates
-                </h3>
-                <p className="text-sm text-[#86868b] mt-1">
+              <div className="border-b border-[#b3e6d9] pb-3">
+                <h3 className="text-base font-semibold text-[#0f2421]">App Updates</h3>
+                <p className="mt-1 text-sm text-[#3a9283]">
                   Keep OpenWhispr up to date with the latest features and improvements
                 </p>
               </div>
 
-              <div className="flex items-center justify-between p-4 bg-[#f5f5f7] border border-[#d2d2d7] rounded-lg">
+              <div className="flex items-center justify-between rounded-lg border border-[#b3e6d9] bg-[#ecf9f5] p-4">
                 <div>
-                  <p className="text-sm font-medium text-[#1d1d1f]">Current Version</p>
-                  <p className="text-sm text-[#86868b] mt-0.5">{currentVersion || "Loading..."}</p>
+                  <p className="text-sm font-medium text-[#0f2421]">Current Version</p>
+                  <p className="mt-0.5 text-sm text-[#3a9283]">{currentVersion || "Loading..."}</p>
                 </div>
                 <div>
                   {updateStatus.isDevelopment ? (
-                    <span className="text-xs text-[#86868b] bg-white px-2.5 py-1 rounded-md border border-[#d2d2d7]">
+                    <span className="rounded-md border border-[#b3e6d9] bg-white px-2.5 py-1 text-xs text-[#3a9283]">
                       Development
                     </span>
                   ) : updateStatus.updateAvailable ? (
-                    <span className="text-xs text-[#007AFF] bg-[rgba(0,122,255,0.1)] px-2.5 py-1 rounded-md border-0 font-medium">
+                    <span className="rounded-md border-0 bg-[rgba(50,205,166,0.1)] px-2.5 py-1 text-xs font-medium text-[#32cda6]">
                       Update Available
                     </span>
                   ) : (
-                    <span className="text-xs text-[#86868b] bg-white px-2.5 py-1 rounded-md border border-[#d2d2d7]">
+                    <span className="rounded-md border border-[#b3e6d9] bg-white px-2.5 py-1 text-xs text-[#3a9283]">
                       Up to Date
                     </span>
                   )}
                 </div>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <Button
                   onClick={async () => {
                     setCheckingForUpdates(true);
@@ -517,7 +506,7 @@ export default function SettingsPage({
                       const result = await window.electronAPI?.checkForUpdates();
                       if (result?.updateAvailable) {
                         setUpdateInfo({
-                          version: result.version || 'unknown',
+                          version: result.version || "unknown",
                           releaseDate: result.releaseDate,
                           releaseNotes: result.releaseNotes,
                         });
@@ -528,7 +517,7 @@ export default function SettingsPage({
                         }));
                         showAlertDialog({
                           title: "Update Available",
-                          description: `Update available: v${result.version || 'new version'}`,
+                          description: `Update available: v${result.version || "new version"}`,
                         });
                       } else {
                         showAlertDialog({
@@ -547,14 +536,13 @@ export default function SettingsPage({
                   }}
                   disabled={checkingForUpdates || updateStatus.isDevelopment}
                   variant="outline"
-                  className="w-full justify-start text-sm h-10 bg-white border-[#d2d2d7] hover:bg-[#f5f5f7] hover:border-[#b8b8bd] text-[#1d1d1f] rounded-lg transition-all duration-150"
                 >
                   <RefreshCw size={16} className="mr-2" />
                   {checkingForUpdates ? "Checking for Updates..." : "Check for Updates"}
                 </Button>
 
                 {isUpdateAvailable && !updateStatus.updateDownloaded && (
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     <Button
                       onClick={async () => {
                         setDownloadingUpdate(true);
@@ -570,21 +558,22 @@ export default function SettingsPage({
                         }
                       }}
                       disabled={downloadingUpdate}
-                      className="w-full justify-start text-sm h-10 bg-[#007AFF] hover:bg-[#0051D5] active:bg-[#004BB8] text-white rounded-lg transition-all duration-150 font-medium border-0"
+                      variant="default"
                     >
                       <Download size={16} className="mr-2" />
                       {downloadingUpdate
                         ? `Downloading Update... ${Math.round(updateDownloadProgress)}%`
-                        : `Download Update${updateInfo.version ? ` v${updateInfo.version}` : ''}`
-                      }
+                        : `Download Update${updateInfo.version ? ` v${updateInfo.version}` : ""}`}
                     </Button>
 
                     {downloadingUpdate && (
                       <div className="px-1">
-                        <div className="h-1 w-full overflow-hidden rounded-full bg-[#d2d2d7]">
+                        <div className="h-1 w-full overflow-hidden rounded-full bg-[#b3e6d9]">
                           <div
-                            className="h-full bg-[#007AFF] transition-all duration-300 ease-out rounded-full"
-                            style={{ width: `${Math.min(100, Math.max(0, updateDownloadProgress))}%` }}
+                            className="h-full rounded-full bg-[#32cda6] transition-all duration-300 ease-out"
+                            style={{
+                              width: `${Math.min(100, Math.max(0, updateDownloadProgress))}%`,
+                            }}
                           />
                         </div>
                       </div>
@@ -593,58 +582,64 @@ export default function SettingsPage({
                 )}
 
                 {updateStatus.updateDownloaded && (
-                  <Button
-                    onClick={() => {
-                      showConfirmDialog({
-                        title: "Install Update",
-                        description: `Ready to install update${updateInfo.version ? ` v${updateInfo.version}` : ''}. The app will restart to complete installation.`,
-                        confirmText: "Install & Restart",
-                        onConfirm: async () => {
-                          try {
-                            setInstallInitiated(true);
-                            const result = await window.electronAPI?.installUpdate?.();
-                            if (!result?.success) {
+                  <div>
+                    <Button
+                      onClick={() => {
+                        showConfirmDialog({
+                          title: "Install Update",
+                          description: `Ready to install update${updateInfo.version ? ` v${updateInfo.version}` : ""}. The app will restart to complete installation.`,
+                          confirmText: "Install & Restart",
+                          onConfirm: async () => {
+                            try {
+                              setInstallInitiated(true);
+                              const result = await window.electronAPI?.installUpdate?.();
+                              if (!result?.success) {
+                                setInstallInitiated(false);
+                                showAlertDialog({
+                                  title: "Install Failed",
+                                  description:
+                                    result?.message ||
+                                    "Failed to start the installer. Please try again.",
+                                });
+                                return;
+                              }
+                              showAlertDialog({
+                                title: "Installing Update",
+                                description:
+                                  "OpenWhispr will restart automatically to finish installing the newest version.",
+                              });
+                            } catch (error: any) {
                               setInstallInitiated(false);
                               showAlertDialog({
                                 title: "Install Failed",
-                                description: result?.message || "Failed to start the installer. Please try again.",
+                                description: `Failed to install update: ${error.message}`,
                               });
-                              return;
                             }
-                            showAlertDialog({
-                              title: "Installing Update",
-                              description: "OpenWhispr will restart automatically to finish installing the newest version.",
-                            });
-                          } catch (error: any) {
-                            setInstallInitiated(false);
-                            showAlertDialog({
-                              title: "Install Failed",
-                              description: `Failed to install update: ${error.message}`,
-                            });
-                          }
-                        },
-                      });
-                    }}
-                    disabled={installInitiated}
-                    className="w-full justify-start text-sm h-10 bg-[#007AFF] hover:bg-[#0051D5] active:bg-[#004BB8] text-white rounded-lg transition-all duration-150 font-medium border-0"
-                  >
-                    <RefreshCw size={16} className={`mr-2 ${installInitiated ? 'animate-spin' : ''}`} />
-                    {installInitiated ? "Installing Update..." : "Install & Restart"}
-                  </Button>
+                          },
+                        });
+                      }}
+                      disabled={installInitiated}
+                      variant="default"
+                    >
+                      <RefreshCw
+                        size={16}
+                        className={`mr-2 ${installInitiated ? "animate-spin" : ""}`}
+                      />
+                      {installInitiated ? "Installing Update..." : "Install & Restart"}
+                    </Button>
+                  </div>
                 )}
 
                 {updateInfo.version && (
-                  <div className="p-3 bg-[#f5f5f7] border border-[#d2d2d7] rounded-lg text-sm">
-                    <p className="font-medium text-[#1d1d1f] mb-1">
-                      Version {updateInfo.version}
-                    </p>
+                  <div className="rounded-lg border border-[#b3e6d9] bg-[#ecf9f5] p-3 text-sm">
+                    <p className="mb-1 font-medium text-[#0f2421]">Version {updateInfo.version}</p>
                     {updateInfo.releaseDate && (
-                      <p className="text-xs text-[#86868b] mb-2">
+                      <p className="mb-2 text-xs text-[#3a9283]">
                         {new Date(updateInfo.releaseDate).toLocaleDateString()}
                       </p>
                     )}
                     {updateInfo.releaseNotes && (
-                      <div className="text-xs text-[#1d1d1f] mt-2 pt-2 border-t border-[#d2d2d7]">
+                      <div className="mt-2 border-t border-[#b3e6d9] pt-2 text-xs text-[#0f2421]">
                         <div className="whitespace-pre-wrap">{updateInfo.releaseNotes}</div>
                       </div>
                     )}
@@ -655,42 +650,22 @@ export default function SettingsPage({
 
             {/* Hotkey Section */}
             <section className="space-y-4">
-              <div className="border-b border-[#d2d2d7] pb-3">
-                <h3 className="text-base font-semibold text-[#1d1d1f]">
-                  Dictation Hotkey
-                </h3>
-                <p className="text-sm text-[#86868b] mt-1">
+              <div className="border-b border-[#b3e6d9] pb-3">
+                <h3 className="text-base font-semibold text-[#0f2421]">Dictation Hotkey</h3>
+                <p className="mt-1 text-sm text-[#3a9283]">
                   Configure the key combination to start and stop voice dictation
                 </p>
               </div>
 
-              <div className="space-y-3">
-                <div className="flex gap-1 p-1 bg-[#f5f5f7] border border-[#d2d2d7] rounded-lg">
-                  <button
-                    onClick={() => setHotkeyInputMode("capture")}
-                    className={`flex-1 px-3 py-2 rounded-md text-sm font-medium transition-all duration-150 ${
-                      hotkeyInputMode === "capture"
-                        ? "bg-white text-[#1d1d1f] border border-[#d2d2d7] shadow-sm"
-                        : "text-[#86868b] hover:text-[#1d1d1f]"
-                    }`}
-                  >
-                    Key Combinations
-                  </button>
-                  <button
-                    onClick={() => setHotkeyInputMode("keyboard")}
-                    className={`flex-1 px-3 py-2 rounded-md text-sm font-medium transition-all duration-150 ${
-                      hotkeyInputMode === "keyboard"
-                        ? "bg-white text-[#1d1d1f] border border-[#d2d2d7] shadow-sm"
-                        : "text-[#86868b] hover:text-[#1d1d1f]"
-                    }`}
-                  >
-                    Visual Keyboard
-                  </button>
-                </div>
+              <Tabs defaultValue="capture" className="space-y-3">
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="capture">Key Combinations</TabsTrigger>
+                  <TabsTrigger value="keyboard">Visual Keyboard</TabsTrigger>
+                </TabsList>
 
-                {hotkeyInputMode === "capture" ? (
+                <TabsContent value="capture" className="space-y-2">
                   <div>
-                    <label className="block text-sm font-medium text-[#1d1d1f] mb-2">
+                    <label className="mb-2 block text-sm font-medium text-[#0f2421]">
                       Hotkey Combination
                     </label>
                     <HotkeyCapture
@@ -698,142 +673,117 @@ export default function SettingsPage({
                       onChange={setDictationKey}
                       placeholder="Click and press a key combination"
                     />
-                    <p className="text-xs text-[#86868b] mt-2">
+                    <p className="mt-2 text-xs text-[#3a9283]">
                       Supports modifier keys (Ctrl, Alt, Shift)
                     </p>
                   </div>
-                ) : (
-                  <div className="space-y-3">
-                    <div>
-                      <label className="block text-sm font-medium text-[#1d1d1f] mb-2">
-                        Activation Key
-                      </label>
-                      <Input
-                        placeholder="Default: ` (backtick)"
-                        value={dictationKey}
-                        onChange={(e) => setDictationKey(e.target.value)}
-                        className="text-center text-lg font-mono"
-                      />
-                      <p className="text-xs text-[#86868b] mt-2">
-                        Press this key from anywhere to start/stop dictation
-                      </p>
-                    </div>
-                    <div className="bg-[#f5f5f7] p-3 border border-[#d2d2d7] rounded-lg">
-                      <p className="text-sm font-medium text-[#1d1d1f] mb-2">
-                        Select a key:
-                      </p>
-                      <React.Suspense
-                        fallback={
-                          <div className="h-32 flex items-center justify-center text-[#86868b] text-sm">
-                            Loading keyboard...
-                          </div>
-                        }
-                      >
-                        <InteractiveKeyboard
-                          selectedKey={dictationKey}
-                          setSelectedKey={setDictationKey}
-                        />
-                      </React.Suspense>
-                    </div>
-                  </div>
-                )}
+                </TabsContent>
 
-                <Button
-                  onClick={saveKey}
-                  disabled={!dictationKey.trim()}
-                  className="w-full justify-start text-sm h-10 bg-[#007AFF] hover:bg-[#0051D5] active:bg-[#004BB8] text-white disabled:opacity-50 rounded-lg transition-all duration-150 font-medium border-0"
-                >
-                  <Keyboard size={16} className="mr-2" />
-                  Save Hotkey Configuration
-                </Button>
-              </div>
+                <TabsContent value="keyboard" className="space-y-3">
+                  <div>
+                    <label className="mb-2 block text-sm font-medium text-[#0f2421]">
+                      Activation Key
+                    </label>
+                    <Input
+                      placeholder="Default: ` (backtick)"
+                      value={dictationKey}
+                      onChange={(e) => setDictationKey(e.target.value)}
+                      className="text-center font-mono text-lg"
+                    />
+                    <p className="mt-2 text-xs text-[#3a9283]">
+                      Press this key from anywhere to start/stop dictation
+                    </p>
+                  </div>
+                  <div className="rounded-lg border border-[#b3e6d9] bg-[#ecf9f5] p-3">
+                    <p className="mb-2 text-sm font-medium text-[#0f2421]">Select a key:</p>
+                    <React.Suspense
+                      fallback={
+                        <div className="flex h-32 items-center justify-center text-sm text-[#3a9283]">
+                          Loading keyboard...
+                        </div>
+                      }
+                    >
+                      <InteractiveKeyboard
+                        selectedKey={dictationKey}
+                        setSelectedKey={setDictationKey}
+                      />
+                    </React.Suspense>
+                  </div>
+                </TabsContent>
+              </Tabs>
+
+              <Button onClick={saveKey} disabled={!dictationKey.trim()} variant="default">
+                <Keyboard size={16} className="mr-2" />
+                Save Hotkey
+              </Button>
             </section>
 
             {/* Permissions Section */}
             <section className="space-y-4">
-              <div className="border-b border-[#d2d2d7] pb-3">
-                <h3 className="text-base font-semibold text-[#1d1d1f]">
-                  System Permissions
-                </h3>
-                <p className="text-sm text-[#86868b] mt-1">
+              <div className="border-b border-[#b3e6d9] pb-3">
+                <h3 className="text-base font-semibold text-[#0f2421]">System Permissions</h3>
+                <p className="mt-1 text-sm text-[#3a9283]">
                   Manage microphone and accessibility permissions
                 </p>
               </div>
 
-              <div className="space-y-2">
-                <Button
-                  onClick={permissionsHook.requestMicPermission}
-                  variant="outline"
-                  className="w-full justify-start text-sm h-10 bg-white border-[#d2d2d7] hover:bg-[#f5f5f7] hover:border-[#b8b8bd] text-[#1d1d1f] rounded-lg transition-all duration-150"
-                >
+              <div className="flex flex-wrap gap-2">
+                <Button onClick={permissionsHook.requestMicPermission} variant="outline">
                   <Mic className="mr-2 h-4 w-4" />
-                  Test Microphone Access
+                  Test Microphone
                 </Button>
-                <Button
-                  onClick={permissionsHook.testAccessibilityPermission}
-                  variant="outline"
-                  className="w-full justify-start text-sm h-10 bg-white border-[#d2d2d7] hover:bg-[#f5f5f7] hover:border-[#b8b8bd] text-[#1d1d1f] rounded-lg transition-all duration-150"
-                >
+                <Button onClick={permissionsHook.testAccessibilityPermission} variant="outline">
                   <Shield className="mr-2 h-4 w-4" />
-                  Test Accessibility Access
+                  Test Accessibility
                 </Button>
-                <Button
-                  onClick={resetAccessibilityPermissions}
-                  variant="outline"
-                  className="w-full justify-start text-sm h-10 bg-white border-[#d2d2d7] hover:bg-[#f5f5f7] hover:border-[#b8b8bd] text-[#1d1d1f] rounded-lg transition-all duration-150"
-                >
+                <Button onClick={resetAccessibilityPermissions} variant="outline">
                   <RefreshCw className="mr-2 h-4 w-4" />
-                  Reset Accessibility Permissions
+                  Reset Permissions
                 </Button>
               </div>
             </section>
 
             {/* App Information */}
             <section className="space-y-4">
-              <div className="border-b border-[#d2d2d7] pb-3">
-                <h3 className="text-base font-semibold text-[#1d1d1f]">
-                  Application Info
-                </h3>
+              <div className="border-b border-[#b3e6d9] pb-3">
+                <h3 className="text-base font-semibold text-[#0f2421]">Application Info</h3>
               </div>
 
               <div className="grid grid-cols-3 gap-3">
-                <div className="p-3 bg-[#f5f5f7] border border-[#d2d2d7] rounded-lg text-center">
-                  <Keyboard className="w-5 h-5 text-[#86868b] mx-auto mb-2" />
-                  <p className="text-xs font-medium text-[#1d1d1f] mb-1">Hotkey</p>
-                  <p className="text-xs text-[#86868b] font-mono">
+                <div className="rounded-lg border border-[#b3e6d9] bg-[#ecf9f5] p-3 text-center">
+                  <Keyboard className="mx-auto mb-2 h-5 w-5 text-[#3a9283]" />
+                  <p className="mb-1 text-xs font-medium text-[#0f2421]">Hotkey</p>
+                  <p className="font-mono text-xs text-[#3a9283]">
                     {formatHotkeyLabel(dictationKey)}
                   </p>
                 </div>
-                <div className="p-3 bg-[#f5f5f7] border border-[#d2d2d7] rounded-lg text-center">
-                  <div className="w-5 h-5 mx-auto mb-2 text-[#86868b] font-medium">v</div>
-                  <p className="text-xs font-medium text-[#1d1d1f] mb-1">Version</p>
-                  <p className="text-xs text-[#86868b]">{currentVersion || "0.1.0"}</p>
+                <div className="rounded-lg border border-[#b3e6d9] bg-[#ecf9f5] p-3 text-center">
+                  <div className="mx-auto mb-2 h-5 w-5 font-medium text-[#3a9283]">v</div>
+                  <p className="mb-1 text-xs font-medium text-[#0f2421]">Version</p>
+                  <p className="text-xs text-[#3a9283]">{currentVersion || "0.1.0"}</p>
                 </div>
-                <div className="p-3 bg-[#f5f5f7] border border-[#d2d2d7] rounded-lg text-center">
-                  <div className="w-5 h-5 mx-auto mb-2 text-[#007AFF] font-bold">•</div>
-                  <p className="text-xs font-medium text-[#1d1d1f] mb-1">Status</p>
-                  <p className="text-xs text-[#007AFF] font-medium">Active</p>
+                <div className="rounded-lg border border-[#b3e6d9] bg-[#ecf9f5] p-3 text-center">
+                  <div className="mx-auto mb-2 h-5 w-5 font-bold text-[#32cda6]">•</div>
+                  <p className="mb-1 text-xs font-medium text-[#0f2421]">Status</p>
+                  <p className="text-xs font-medium text-[#32cda6]">Active</p>
                 </div>
               </div>
             </section>
 
             {/* Maintenance Section */}
             <section className="space-y-4">
-              <div className="border-b border-[#d2d2d7] pb-3">
-                <h3 className="text-base font-semibold text-[#1d1d1f]">
-                  Maintenance
-                </h3>
-                <p className="text-sm text-[#86868b] mt-1">
-                  Reset settings and manage local data
-                </p>
+              <div className="border-b border-[#b3e6d9] pb-3">
+                <h3 className="text-base font-semibold text-[#0f2421]">Maintenance</h3>
+                <p className="mt-1 text-sm text-[#3a9283]">Reset settings and manage local data</p>
               </div>
 
-              <div className="space-y-2">
+              <div className="flex flex-wrap gap-2">
                 <Button
                   onClick={() => {
                     showConfirmDialog({
                       title: "Reset Onboarding",
-                      description: "Are you sure you want to reset the onboarding process? This will clear your setup and show the welcome flow again.",
+                      description:
+                        "Are you sure you want to reset the onboarding process? This will clear your setup and show the welcome flow again.",
                       onConfirm: () => {
                         localStorage.removeItem("onboardingCompleted");
                         window.location.reload();
@@ -842,64 +792,66 @@ export default function SettingsPage({
                     });
                   }}
                   variant="outline"
-                  className="w-full justify-start text-sm h-10 bg-white border-[#d2d2d7] hover:bg-[#f5f5f7] hover:border-[#b8b8bd] text-[#1d1d1f] rounded-lg transition-all duration-150"
                 >
                   <RefreshCw className="mr-2 h-4 w-4" />
-                  Reset Onboarding Flow
+                  Reset Onboarding
+                </Button>
+
+                <Button variant="outline" onClick={handleRemoveModels} disabled={isRemovingModels}>
+                  <Download className="mr-2 h-4 w-4" />
+                  {isRemovingModels ? "Removing..." : "Remove Models"}
                 </Button>
 
                 <Button
-                  variant="outline"
-                  onClick={handleRemoveModels}
-                  disabled={isRemovingModels}
-                  className="w-full justify-start text-sm h-10 bg-white border-[#d2d2d7] hover:bg-[#f5f5f7] hover:border-[#b8b8bd] text-[#1d1d1f] rounded-lg transition-all duration-150 disabled:opacity-50"
-                >
-                  <Download className="mr-2 h-4 w-4" />
-                  {isRemovingModels ? "Removing Models..." : "Remove Downloaded Models"}
-                </Button>
-
-                <div className="pt-2 border-t border-[#d2d2d7]">
-                  <Button
-                    onClick={() => {
-                      showConfirmDialog({
-                        title: "Clean Up App Data",
-                        description: "This will permanently delete ALL OpenWhispr data including database, settings, and downloaded models. This action cannot be undone. Are you sure?",
-                        onConfirm: () => {
-                          window.electronAPI
-                            ?.cleanupApp()
-                            .then(() => {
-                              showAlertDialog({
-                                title: "Cleanup Completed",
-                                description: "All app data has been removed.",
-                              });
-                              setTimeout(() => {
-                                window.location.reload();
-                              }, 1000);
-                            })
-                            .catch((error) => {
-                              showAlertDialog({
-                                title: "Cleanup Failed",
-                                description: `Cleanup failed: ${error.message}`,
-                              });
+                  onClick={() => {
+                    showConfirmDialog({
+                      title: "Clean Up App Data",
+                      description:
+                        "This will permanently delete ALL OpenWhispr data including database, settings, and downloaded models. This action cannot be undone. Are you sure?",
+                      onConfirm: () => {
+                        window.electronAPI
+                          ?.cleanupApp()
+                          .then(() => {
+                            showAlertDialog({
+                              title: "Cleanup Completed",
+                              description: "All app data has been removed.",
                             });
-                        },
-                        variant: "destructive",
-                      });
-                    }}
-                    variant="outline"
-                    className="w-full justify-start text-sm h-10 bg-white text-[#ff3b30] border-[#ff3b30]/20 hover:bg-[#ff3b30]/5 hover:border-[#ff3b30]/30 rounded-lg transition-all duration-150"
+                            setTimeout(() => {
+                              window.location.reload();
+                            }, 1000);
+                          })
+                          .catch((error) => {
+                            showAlertDialog({
+                              title: "Cleanup Failed",
+                              description: `Cleanup failed: ${error.message}`,
+                            });
+                          });
+                      },
+                      variant: "destructive",
+                    });
+                  }}
+                  variant="destructive-outline"
+                >
+                  <svg
+                    className="mr-2 h-4 w-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
                   >
-                    <svg className="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                    Delete All Application Data
-                  </Button>
-                </div>
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                    />
+                  </svg>
+                  Delete All Data
+                </Button>
               </div>
 
-              <div className="p-3 bg-[#f5f5f7] border border-[#d2d2d7] rounded-lg">
-                <p className="text-xs text-[#86868b]">
-                  Model cache: <code className="text-[#1d1d1f]">{cachePathHint}</code>
+              <div className="rounded-lg border border-[#b3e6d9] bg-[#ecf9f5] p-3">
+                <p className="text-xs text-[#3a9283]">
+                  Model cache: <code className="text-[#0f2421]">{cachePathHint}</code>
                 </p>
               </div>
             </section>
@@ -910,11 +862,11 @@ export default function SettingsPage({
         return (
           <div className="space-y-6">
             <section className="space-y-4">
-              <div className="border-b border-[#d2d2d7] pb-3">
-                <h3 className="text-base font-semibold text-[#1d1d1f]">
+              <div className="border-b border-[#b3e6d9] pb-3">
+                <h3 className="text-base font-semibold text-[#0f2421]">
                   Speech to Text Processing
                 </h3>
-                <p className="text-sm text-[#86868b] mt-1">
+                <p className="mt-1 text-sm text-[#3a9283]">
                   Configure how your voice is transcribed
                 </p>
               </div>
@@ -928,15 +880,15 @@ export default function SettingsPage({
             </section>
 
             {!useLocalWhisper && (
-              <section className="space-y-4 p-4 bg-[#f5f5f7] border border-[#d2d2d7] rounded-lg">
-                <h4 className="font-medium text-[#1d1d1f]">Cloud Setup</h4>
+              <section className="space-y-4 rounded-lg border border-[#b3e6d9] bg-[#ecf9f5] p-4">
+                <h4 className="font-medium text-[#0f2421]">Cloud Setup</h4>
                 <ApiKeyInput
                   apiKey={openaiApiKey}
                   setApiKey={setOpenaiApiKey}
                   helpText="Supports OpenAI or compatible endpoints"
                 />
                 <div className="space-y-2">
-                  <label className="block text-sm font-medium text-[#1d1d1f]">
+                  <label className="block text-sm font-medium text-[#0f2421]">
                     Custom Base URL (optional)
                   </label>
                   <Input
@@ -953,159 +905,155 @@ export default function SettingsPage({
                   >
                     Reset to Default
                   </Button>
-                  <p className="text-xs text-[#86868b]">
+                  <p className="text-xs text-[#3a9283]">
                     Requests use this OpenAI-compatible base URL. Leave empty for default
-                    <code className="ml-1 text-[#1d1d1f]">{API_ENDPOINTS.TRANSCRIPTION_BASE}</code>
+                    <code className="ml-1 text-[#0f2421]">{API_ENDPOINTS.TRANSCRIPTION_BASE}</code>
                   </p>
                 </div>
               </section>
             )}
 
             {useLocalWhisper && whisperHook.whisperInstalled && (
-            <section className="space-y-4 p-4 bg-[#f5f5f7] border border-[#d2d2d7] rounded-lg">
-              <h4 className="font-medium text-[#1d1d1f]">
-                Local Whisper Model
-              </h4>
-              <WhisperModelPicker
-                selectedModel={whisperModel}
-                onModelSelect={setWhisperModel}
-                variant="settings"
-              />
-            </section>
-          )}
-
-          <section className="space-y-4 p-4 bg-[#f5f5f7] border border-[#d2d2d7] rounded-lg">
-            <h4 className="font-medium text-[#1d1d1f]">Preferred Language</h4>
-            <LanguageSelector
-              value={preferredLanguage}
-              onChange={(value) => {
-                setPreferredLanguage(value);
-                updateTranscriptionSettings({ preferredLanguage: value });
-              }}
-              className="w-full"
-            />
-            <p className="text-xs text-[#86868b]">
-              Language for speech recognition
-            </p>
-          </section>
-
-          {/* Translation Section */}
-          <section className="space-y-3 p-4 bg-[#f5f5f7] border border-[#d2d2d7] rounded-lg">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-[#1d1d1f]">Automatic Translation</p>
-                <p className="text-xs text-[#86868b] mt-0.5">
-                  Translate text to another language
-                </p>
-              </div>
-              <label className="relative inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={enableTranslation}
-                  onChange={(e) => {
-                    setEnableTranslation(e.target.checked);
-                    updateTranscriptionSettings({ enableTranslation: e.target.checked });
-                  }}
-                  className="sr-only peer"
+              <section className="space-y-4 rounded-lg border border-[#b3e6d9] bg-[#ecf9f5] p-4">
+                <h4 className="font-medium text-[#0f2421]">Local Whisper Model</h4>
+                <WhisperModelPicker
+                  selectedModel={whisperModel}
+                  onModelSelect={setWhisperModel}
+                  variant="settings"
                 />
-                <div className="w-11 h-6 bg-[#d2d2d7] peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-[#007AFF]/30 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-[#d2d2d7] after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#007AFF]"></div>
-              </label>
-            </div>
+              </section>
+            )}
 
-            {enableTranslation && (
-              <div className="space-y-3 pt-3 border-t border-[#d2d2d7]">
-                <div className="flex items-center gap-2 p-3 bg-white rounded-lg border border-[#d2d2d7] text-xs">
-                  <div className="flex-1">
-                    <p className="text-[#86868b] mb-0.5">From</p>
-                    <p className="text-[#1d1d1f] font-medium">
-                      {getLanguageLabel(preferredLanguage)}
-                    </p>
-                  </div>
-                  <div className="text-[#86868b]">→</div>
-                  <div className="flex-1">
-                    <p className="text-[#86868b] mb-0.5">To</p>
-                    <p className="text-[#1d1d1f] font-medium">
-                      {getLanguageLabel(targetLanguage)}
-                    </p>
-                  </div>
-                </div>
+            <section className="space-y-4 rounded-lg border border-[#b3e6d9] bg-[#ecf9f5] p-4">
+              <h4 className="font-medium text-[#0f2421]">Preferred Language</h4>
+              <LanguageSelector
+                value={preferredLanguage}
+                onChange={(value) => {
+                  setPreferredLanguage(value);
+                  updateTranscriptionSettings({ preferredLanguage: value });
+                }}
+                className="w-full"
+              />
+              <p className="text-xs text-[#3a9283]">Language for speech recognition</p>
+            </section>
 
+            {/* Translation Section */}
+            <section className="space-y-3 rounded-lg border border-[#b3e6d9] bg-[#ecf9f5] p-4">
+              <div className="flex items-center justify-between">
                 <div>
-                  <label className="block text-xs font-medium text-[#1d1d1f] mb-1.5">
-                    Target Language
-                  </label>
-                  <LanguageSelector
-                    value={targetLanguage}
-                    onChange={(value) => {
-                      setTargetLanguage(value);
-                      updateTranscriptionSettings({ targetLanguage: value });
-                    }}
-                    className="w-full"
-                  />
-                </div>
-
-                <div className="bg-white border border-[#d2d2d7] rounded-lg p-2.5">
-                  <p className="text-xs text-[#86868b]">
-                    Uses {reasoningModel}. Requires API key.
+                  <p className="text-sm font-medium text-[#0f2421]">Automatic Translation</p>
+                  <p className="mt-0.5 text-xs text-[#3a9283]">
+                    Translate text to another language
                   </p>
                 </div>
+                <label className="relative inline-flex cursor-pointer items-center">
+                  <input
+                    type="checkbox"
+                    checked={enableTranslation}
+                    onChange={(e) => {
+                      setEnableTranslation(e.target.checked);
+                      updateTranscriptionSettings({ enableTranslation: e.target.checked });
+                    }}
+                    className="peer sr-only"
+                  />
+                  <div className="peer h-6 w-11 rounded-full bg-[#b3e6d9] peer-checked:bg-[#32cda6] peer-focus:ring-2 peer-focus:ring-[#32cda6]/30 peer-focus:outline-none after:absolute after:top-[2px] after:left-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-[#b3e6d9] after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
+                </label>
               </div>
-            )}
-          </section>
 
-          <Button
-            onClick={() => {
-              const normalizedTranscriptionBase = (cloudTranscriptionBaseUrl || '').trim();
-              setCloudTranscriptionBaseUrl(normalizedTranscriptionBase);
+              {enableTranslation && (
+                <div className="space-y-3 border-t border-[#b3e6d9] pt-3">
+                  <div className="flex items-center gap-2 rounded-lg border border-[#b3e6d9] bg-white p-3 text-xs">
+                    <div className="flex-1">
+                      <p className="mb-0.5 text-[#3a9283]">From</p>
+                      <p className="font-medium text-[#0f2421]">
+                        {getLanguageLabel(preferredLanguage)}
+                      </p>
+                    </div>
+                    <div className="text-[#3a9283]">→</div>
+                    <div className="flex-1">
+                      <p className="mb-0.5 text-[#3a9283]">To</p>
+                      <p className="font-medium text-[#0f2421]">
+                        {getLanguageLabel(targetLanguage)}
+                      </p>
+                    </div>
+                  </div>
 
-              updateTranscriptionSettings({
-                useLocalWhisper,
-                whisperModel,
-                preferredLanguage,
-                cloudTranscriptionBaseUrl: normalizedTranscriptionBase,
-                enableTranslation,
-                targetLanguage,
-              });
+                  <div>
+                    <label className="mb-1.5 block text-xs font-medium text-[#0f2421]">
+                      Target Language
+                    </label>
+                    <LanguageSelector
+                      value={targetLanguage}
+                      onChange={(value) => {
+                        setTargetLanguage(value);
+                        updateTranscriptionSettings({ targetLanguage: value });
+                      }}
+                      className="w-full"
+                    />
+                  </div>
 
-              if (!useLocalWhisper && openaiApiKey.trim()) {
-                updateApiKeys({ openaiApiKey });
-              }
+                  <div className="rounded-lg border border-[#b3e6d9] bg-white p-2.5">
+                    <p className="text-xs text-[#3a9283]">
+                      Uses {reasoningModel}. Requires API key.
+                    </p>
+                  </div>
+                </div>
+              )}
+            </section>
 
-              const descriptionParts = [
-                `Transcription mode: ${useLocalWhisper ? 'Local Whisper' : 'Cloud'}.`,
-                `Language: ${preferredLanguage}.`,
-              ];
+            <Button
+              onClick={() => {
+                const normalizedTranscriptionBase = (cloudTranscriptionBaseUrl || "").trim();
+                setCloudTranscriptionBaseUrl(normalizedTranscriptionBase);
 
-              if (enableTranslation) {
-                descriptionParts.push(`Translation enabled: ${preferredLanguage} → ${targetLanguage}.`);
-              }
+                updateTranscriptionSettings({
+                  useLocalWhisper,
+                  whisperModel,
+                  preferredLanguage,
+                  cloudTranscriptionBaseUrl: normalizedTranscriptionBase,
+                  enableTranslation,
+                  targetLanguage,
+                });
 
-              if (!useLocalWhisper) {
-                const baseLabel = normalizedTranscriptionBase || API_ENDPOINTS.TRANSCRIPTION_BASE;
-                descriptionParts.push(`Endpoint: ${baseLabel}.`);
-              }
+                if (!useLocalWhisper && openaiApiKey.trim()) {
+                  updateApiKeys({ openaiApiKey });
+                }
 
-              showAlertDialog({
-                title: "Settings Saved",
-                description: descriptionParts.join(' '),
-              });
-            }}
-            className="w-full h-10"
-          >
-            Save Transcription Settings
-          </Button>
-        </div>
-      );
+                const descriptionParts = [
+                  `Transcription mode: ${useLocalWhisper ? "Local Whisper" : "Cloud"}.`,
+                  `Language: ${preferredLanguage}.`,
+                ];
+
+                if (enableTranslation) {
+                  descriptionParts.push(
+                    `Translation enabled: ${preferredLanguage} → ${targetLanguage}.`
+                  );
+                }
+
+                if (!useLocalWhisper) {
+                  const baseLabel = normalizedTranscriptionBase || API_ENDPOINTS.TRANSCRIPTION_BASE;
+                  descriptionParts.push(`Endpoint: ${baseLabel}.`);
+                }
+
+                showAlertDialog({
+                  title: "Settings Saved",
+                  description: descriptionParts.join(" "),
+                });
+              }}
+              className="h-10 w-full"
+            >
+              Save Transcription Settings
+            </Button>
+          </div>
+        );
 
       case "aiModels":
         return (
           <div className="space-y-6">
             <section className="space-y-4">
-              <div className="border-b border-[#d2d2d7] pb-3">
-                <h3 className="text-base font-semibold text-[#1d1d1f]">
-                  AI Text Enhancement
-                </h3>
-                <p className="text-sm text-[#86868b] mt-1">
+              <div className="border-b border-[#b3e6d9] pb-3">
+                <h3 className="text-base font-semibold text-[#0f2421]">AI Text Enhancement</h3>
+                <p className="mt-1 text-sm text-[#3a9283]">
                   Configure how AI models clean up and format your transcriptions
                 </p>
               </div>
@@ -1133,7 +1081,7 @@ export default function SettingsPage({
               showAlertDialog={showAlertDialog}
             />
 
-            <Button onClick={saveReasoningSettings} className="w-full h-10">
+            <Button onClick={saveReasoningSettings} className="h-10 w-full">
               Save AI Model Settings
             </Button>
           </div>
@@ -1143,44 +1091,34 @@ export default function SettingsPage({
         return (
           <div className="space-y-6">
             <section className="space-y-4">
-              <div className="border-b border-[#d2d2d7] pb-3">
-                <h3 className="text-base font-semibold text-[#1d1d1f]">
-                  Agent Configuration
-                </h3>
-                <p className="text-sm text-[#86868b] mt-1">
+              <div className="border-b border-[#b3e6d9] pb-3">
+                <h3 className="text-base font-semibold text-[#0f2421]">Agent Configuration</h3>
+                <p className="mt-1 text-sm text-[#3a9283]">
                   Customize your AI assistant name and behavior
                 </p>
               </div>
             </section>
 
-            <section className="space-y-4 p-4 bg-[#f5f5f7] border border-[#d2d2d7] rounded-lg">
-              <h4 className="font-medium text-[#1d1d1f] mb-3">
-                How to use agent names
-              </h4>
-              <ul className="text-sm text-[#1d1d1f] space-y-2">
-                <li>
-                  Say "Hey {agentName}, write a formal email" for specific instructions
-                </li>
-                <li>
-                  Use "Hey {agentName}, format this as a list" for text enhancement
-                </li>
+            <section className="space-y-4 rounded-lg border border-[#b3e6d9] bg-[#ecf9f5] p-4">
+              <h4 className="mb-3 font-medium text-[#0f2421]">How to use agent names</h4>
+              <ul className="space-y-2 text-sm text-[#0f2421]">
+                <li>Say "Hey {agentName}, write a formal email" for specific instructions</li>
+                <li>Use "Hey {agentName}, format this as a list" for text enhancement</li>
                 <li>
                   The agent recognizes when you're addressing it directly vs. dictating content
                 </li>
-                <li>
-                  Makes conversations natural and helps distinguish commands from dictation
-                </li>
+                <li>Makes conversations natural and helps distinguish commands from dictation</li>
               </ul>
             </section>
 
-            <section className="space-y-4 p-4 bg-[#f5f5f7] border border-[#d2d2d7] rounded-lg">
-              <h4 className="font-medium text-[#1d1d1f]">Current Agent Name</h4>
+            <section className="space-y-4 rounded-lg border border-[#b3e6d9] bg-[#ecf9f5] p-4">
+              <h4 className="font-medium text-[#0f2421]">Current Agent Name</h4>
               <div className="flex gap-3">
                 <Input
                   placeholder="e.g., Assistant, Jarvis, Alex..."
                   value={agentName}
                   onChange={(e) => setAgentName(e.target.value)}
-                  className="flex-1 text-center text-lg font-mono"
+                  className="flex-1 text-center font-mono text-lg"
                 />
                 <Button
                   onClick={() => {
@@ -1196,24 +1134,18 @@ export default function SettingsPage({
                   Save
                 </Button>
               </div>
-              <p className="text-xs text-[#86868b] mt-2">
+              <p className="mt-2 text-xs text-[#3a9283]">
                 Choose a name that feels natural to say and remember
               </p>
             </section>
 
-            <section className="bg-[#f5f5f7] p-4 border border-[#d2d2d7] rounded-lg">
-              <h4 className="font-medium text-[#1d1d1f] mb-3">
-                Example Usage
-              </h4>
-              <div className="text-sm text-[#1d1d1f] space-y-2">
-                <p>
-                  "Hey {agentName}, write an email to my team about the meeting"
-                </p>
-                <p>
-                  "Hey {agentName}, make this more professional" (after dictating text)
-                </p>
+            <section className="rounded-lg border border-[#b3e6d9] bg-[#ecf9f5] p-4">
+              <h4 className="mb-3 font-medium text-[#0f2421]">Example Usage</h4>
+              <div className="space-y-2 text-sm text-[#0f2421]">
+                <p>"Hey {agentName}, write an email to my team about the meeting"</p>
+                <p>"Hey {agentName}, make this more professional" (after dictating text)</p>
                 <p>"Hey {agentName}, convert this to bullet points"</p>
-                <p className="text-[#86868b]">
+                <p className="text-[#3a9283]">
                   Regular dictation: "This is just normal text" (no agent name needed)
                 </p>
               </div>
@@ -1221,16 +1153,13 @@ export default function SettingsPage({
           </div>
         );
 
-
       case "prompts":
         return (
           <div className="space-y-6">
             <section className="space-y-4">
-              <div className="border-b border-[#d2d2d7] pb-3">
-                <h3 className="text-base font-semibold text-[#1d1d1f]">
-                  AI Prompt Management
-                </h3>
-                <p className="text-sm text-[#86868b] mt-1">
+              <div className="border-b border-[#b3e6d9] pb-3">
+                <h3 className="text-base font-semibold text-[#0f2421]">AI Prompt Management</h3>
+                <p className="mt-1 text-sm text-[#3a9283]">
                   View and customize prompts that power AI text processing
                 </p>
               </div>
