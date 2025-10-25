@@ -1,28 +1,34 @@
 @import "tailwindcss";
+@import "./styles/design-system.css";
 
 :root {
-  /* OpenWhispr Modern Theme - Clean & Professional */
-  --color-primary: #4f46e5;
+  /* Apple macOS Design System */
+  --color-primary: #007AFF;
   --color-primary-foreground: #ffffff;
-  --color-secondary: #f5f5f5;
-  --color-secondary-foreground: #171717;
-  --color-muted: #f5f5f5;
-  --color-muted-foreground: #737373;
-  --color-accent: #f5f5f5;
-  --color-accent-foreground: #171717;
-  --color-destructive: #dc2626;
+  --color-secondary: #f5f5f7;
+  --color-secondary-foreground: #1d1d1f;
+  --color-muted: #f5f5f7;
+  --color-muted-foreground: #86868b;
+  --color-accent: #007AFF;
+  --color-accent-foreground: #ffffff;
+  --color-destructive: #ff3b30;
   --color-destructive-foreground: #ffffff;
-  --color-border: #e5e5e5;
+  --color-border: #d2d2d7;
   --color-input: #ffffff;
-  --color-ring: #4f46e5;
+  --color-ring: #007AFF;
   --color-background: #ffffff;
-  --color-foreground: #171717;
+  --color-foreground: #1d1d1f;
   --color-card: #ffffff;
-  --color-card-foreground: #171717;
+  --color-card-foreground: #1d1d1f;
   --color-popover: #ffffff;
-  --color-popover-foreground: #171717;
-  --color-link: #4f46e5;
+  --color-popover-foreground: #1d1d1f;
+  --color-link: #007AFF;
   --radius: 0.5rem;
+
+  /* Apple Typography Scale */
+  font-size: 13px;
+  line-height: 1.47059;
+  letter-spacing: -0.08px;
 }
 
 .dark {
@@ -49,57 +55,66 @@
 
 @layer base {
   * {
-    @apply border-gray-200 outline-indigo-500/50;
+    @apply border-[#d2d2d7] outline-[#007AFF]/50;
   }
-  
+
   body {
-    @apply bg-white text-gray-900;
+    @apply bg-white text-[#1d1d1f];
     margin: 0;
     padding: 0;
-    font-family: 'Noto Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
     font-feature-settings: "liga" 1, "kern" 1;
     text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
-  
+
   /* Electron specific styles */
   html, body, #root {
     background: transparent;
   }
 }
 
-/* OpenWhispr Brand Typography */
+/* Apple Typography System */
 .brand-heading {
-  font-family: 'Noto Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
   font-weight: 600;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
 }
 
 .brand-body {
-  font-family: 'Noto Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  line-height: 1.6;
-}
-
-.brand-script {
-  font-family: 'Noto Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  font-style: italic;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+  line-height: 1.47059;
+  letter-spacing: -0.08px;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Noto Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
   font-weight: 600;
-  letter-spacing: -0.02em;
-  line-height: 1.2;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  color: #1d1d1f;
 }
 
 h1 {
   font-size: 2.5rem;
   font-weight: 700;
+  letter-spacing: -0.015em;
 }
 
-/* Modern Button Styling - handled by button component */
+h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+/* Apple Button Styling */
 button {
-  font-family: 'Noto Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
   cursor: pointer;
+  font-weight: 400;
+  letter-spacing: -0.08px;
+  transition: all 0.15s ease-in-out;
 }
 
 /* Ensure all interactive elements have pointer cursor */
@@ -112,25 +127,91 @@ svg:hover,
   cursor: pointer;
 }
 
-/* Embossed paper-like input styling */
-input, textarea {
+/* Apple-style button variants */
+.btn-filled {
+  background: #007AFF;
+  color: white;
+  border: none;
   border-radius: 8px;
-  transition: all 0.2s ease;
-  font-family: 'Noto Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  box-shadow: inset 0 1px 3px rgba(43, 31, 20, 0.1);
+  padding: 8px 16px;
+  font-weight: 500;
 }
 
-/* Light mode inputs - embossed parchment */
+.btn-filled:hover:not(:disabled) {
+  background: #0051D5;
+}
+
+.btn-filled:active:not(:disabled) {
+  background: #004BB8;
+  transform: scale(0.98);
+}
+
+.btn-tinted {
+  background: rgba(0, 122, 255, 0.1);
+  color: #007AFF;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-weight: 500;
+}
+
+.btn-tinted:hover:not(:disabled) {
+  background: rgba(0, 122, 255, 0.15);
+}
+
+.btn-outline {
+  background: white;
+  color: #1d1d1f;
+  border: 1px solid #d2d2d7;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-weight: 400;
+}
+
+.btn-outline:hover:not(:disabled) {
+  background: #f5f5f7;
+  border-color: #b8b8bd;
+}
+
+.btn-destructive {
+  background: #ff3b30;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-weight: 500;
+}
+
+.btn-destructive:hover:not(:disabled) {
+  background: #e62e24;
+}
+
+/* Apple-style input fields */
+input, textarea {
+  border-radius: 8px;
+  transition: all 0.15s ease-in-out;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+  font-size: 13px;
+  letter-spacing: -0.08px;
+}
+
+/* Light mode inputs - Apple style */
 :root input, :root textarea {
-  background-color: #F9F6F1;
-  border: 1px solid #DDD4C7;
-  color: #2B1F14;
+  background-color: #ffffff;
+  border: 1px solid #d2d2d7;
+  color: #1d1d1f;
+  padding: 8px 12px;
 }
 
 :root input:focus, :root textarea:focus {
-  border-color: #C0A77D;
-  box-shadow: 0 0 0 2px rgba(192, 167, 125, 0.2), inset 0 1px 3px rgba(43, 31, 20, 0.1);
-  background-color: #FFFFFF;
+  border-color: #007AFF;
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+  background-color: #ffffff;
+  outline: none;
+}
+
+:root input:hover:not(:focus), :root textarea:hover:not(:focus) {
+  border-color: #b8b8bd;
 }
 
 /* Dark mode inputs */
@@ -145,54 +226,64 @@ input, textarea {
   box-shadow: 0 0 0 2px oklch(0.55 0.25 250 / 0.2);
 }
 
-/* Card styling - elevated parchment */
+/* Apple-style cards */
 .card {
-  background-color: #FFFFFF;
-  border: 1px solid #DDD4C7;
-  border-radius: 12px;
-  box-shadow: 0 4px 8px rgba(43, 31, 20, 0.08), 0 1px 0 rgba(255, 255, 255, 0.5) inset;
-  transition: all 0.2s ease;
+  background-color: #ffffff;
+  border: 1px solid #d2d2d7;
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: all 0.15s ease-in-out;
 }
 
 .card:hover {
-  box-shadow: 0 8px 16px rgba(43, 31, 20, 0.1), 0 1px 0 rgba(255, 255, 255, 0.5) inset;
-  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-color: #b8b8bd;
 }
 
-/* Link styling */
+/* Apple-style links */
 a {
-  color: #2E3659;
+  color: #007AFF;
   text-decoration: none;
-  transition: color 0.2s ease;
+  transition: color 0.15s ease;
   cursor: pointer;
 }
 
 a:hover {
-  color: #4B2E2B;
-  text-decoration: underline;
+  color: #0051D5;
+  text-decoration: none;
   cursor: pointer;
 }
 
-/* Status indicators */
+a:active {
+  color: #004BB8;
+}
+
+/* Apple status indicators */
 .status-active {
-  color: #4B2E2B;
-  font-weight: 600;
+  color: #007AFF;
+  font-weight: 500;
 }
 
 .text-brand-primary {
-  color: #2B1F14;
+  color: #1d1d1f;
 }
 
 .text-brand-accent {
-  color: #4B2E2B;
+  color: #007AFF;
 }
 
-.text-brand-highlight {
-  color: #C0A77D;
+.text-brand-muted {
+  color: #86868b;
 }
 
 .text-brand-link {
-  color: #2E3659;
+  color: #007AFF;
+}
+
+/* Apple separators */
+.separator {
+  border-color: #d2d2d7;
+  opacity: 1;
 }
 
 /* Additional CSS variables for theme support */
