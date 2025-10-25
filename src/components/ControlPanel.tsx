@@ -225,25 +225,25 @@ export default function ControlPanel() {
       {/* Main content */}
       <div className="p-6">
         <div className="space-y-6 max-w-4xl mx-auto">
+          {/* Transcriptions - Minimal Professional Design */}
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center gap-2">
-                  <FileText size={18} className="text-indigo-600" />
+                <CardTitle className="text-[15px] font-semibold text-gray-900">
                   Recent Transcriptions
                 </CardTitle>
-                <div className="flex gap-2">
-                  <Button onClick={refreshHistory} variant="ghost" size="icon">
-                    <RefreshCw size={16} />
+                <div className="flex gap-1">
+                  <Button onClick={refreshHistory} variant="ghost" size="sm" className="h-8 w-8 p-0">
+                    <RefreshCw size={14} className="text-gray-600" />
                   </Button>
                   {history.length > 0 && (
                     <Button
                       onClick={clearHistory}
                       variant="ghost"
-                      size="icon"
-                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                      size="sm"
+                      className="h-8 w-8 p-0 text-gray-600 hover:text-red-600 hover:bg-red-50"
                     >
-                      <Trash2 size={16} />
+                      <Trash2 size={14} />
                     </Button>
                   )}
                 </div>
@@ -252,50 +252,46 @@ export default function ControlPanel() {
             <CardContent>
               {isLoading ? (
                 <div className="text-center py-8">
-                  <div className="w-8 h-8 mx-auto mb-3 bg-indigo-600 rounded-lg flex items-center justify-center">
-                    <span className="text-white text-sm">📝</span>
-                  </div>
-                  <p className="text-neutral-600">Loading transcriptions...</p>
+                  <div className="w-6 h-6 mx-auto mb-2 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin loader" />
+                  <p className="text-[12px] text-gray-500">Loading...</p>
                 </div>
               ) : history.length === 0 ? (
-                <div className="text-center py-12">
-                  <div className="w-16 h-16 mx-auto mb-4 bg-neutral-100 rounded-full flex items-center justify-center">
-                    <Mic className="w-8 h-8 text-neutral-400" />
-                  </div>
-                  <h3 className="text-lg font-medium text-neutral-900 mb-2">
+                <div className="text-center py-10">
+                  <p className="text-[14px] font-medium text-gray-900 mb-1">
                     No transcriptions yet
-                  </h3>
-                  <p className="text-neutral-600 mb-4 max-w-sm mx-auto">
-                    Press your hotkey to start recording and create your first
-                    transcription.
                   </p>
-                  <div className="bg-neutral-50 border border-neutral-200 rounded-lg p-4 max-w-md mx-auto">
-                    <h4 className="font-medium text-neutral-800 mb-2">
-                      Quick Start:
-                    </h4>
-                    <ol className="text-sm text-neutral-600 text-left space-y-1">
+                  <p className="text-[12px] text-gray-500 mb-6">
+                    Press your hotkey to start recording
+                  </p>
+
+                  {/* Quick Start Guide - Minimal */}
+                  <div className="bg-gray-50 border border-gray-200 rounded p-4 max-w-sm mx-auto text-left">
+                    <p className="text-[13px] font-medium text-gray-900 mb-3">
+                      Quick Start
+                    </p>
+                    <ol className="text-[12px] text-gray-600 space-y-1.5">
                       <li>1. Click in any text field</li>
                       <li>
                         2. Press{" "}
-                        <kbd className="bg-white px-2 py-1 rounded text-xs font-mono border border-neutral-300">
+                        <kbd className="px-1.5 py-0.5 bg-white border border-gray-300 rounded text-[11px] font-mono">
                           {hotkey}
                         </kbd>{" "}
-                        to start recording
+                        to start
                       </li>
                       <li>3. Speak your text</li>
                       <li>
                         4. Press{" "}
-                        <kbd className="bg-white px-2 py-1 rounded text-xs font-mono border border-neutral-300">
+                        <kbd className="px-1.5 py-0.5 bg-white border border-gray-300 rounded text-[11px] font-mono">
                           {hotkey}
                         </kbd>{" "}
-                        again to stop
+                        to stop
                       </li>
-                      <li>5. Your text will appear automatically!</li>
+                      <li>5. Text appears automatically</li>
                     </ol>
                   </div>
                 </div>
               ) : (
-                <div className="space-y-3 max-h-80 overflow-y-auto">
+                <div className="space-y-2 max-h-96 overflow-y-auto">
                   {history.map((item, index) => (
                     <TranscriptionItem
                       key={item.id}
