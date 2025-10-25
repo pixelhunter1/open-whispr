@@ -1,5 +1,5 @@
 const { ipcMain, app, shell } = require("electron");
-const AppUtils = require("../utils");
+const AppUtils = require("../appUtils");
 const debugLogger = require("./debugLogger");
 
 class IPCHandlers {

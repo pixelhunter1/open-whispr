@@ -1,4 +1,4 @@
-import modelManager from "../helpers/ModelManager";
+import modelManager from "../helpers/modelManager";
 import { inferenceConfig } from "../config/InferenceConfig";
 import { BaseReasoningService } from "./BaseReasoningService";
 import { TOKEN_LIMITS } from "../config/constants";
