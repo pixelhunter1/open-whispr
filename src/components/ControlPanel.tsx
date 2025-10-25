@@ -223,7 +223,7 @@ export default function ControlPanel() {
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle className="text-[15px] font-semibold text-gray-900">
+                <CardTitle className="text-[15px] font-semibold text-primary-900">
                   Recent Transcriptions
                 </CardTitle>
                 <div className="flex gap-1">
@@ -233,14 +233,14 @@ export default function ControlPanel() {
                     size="sm"
                     className="h-8 w-8 p-0"
                   >
-                    <RefreshCw size={14} className="text-gray-600" />
+                    <RefreshCw size={14} className="text-secondary-500" />
                   </Button>
                   {history.length > 0 && (
                     <Button
                       onClick={clearHistory}
                       variant="ghost"
                       size="sm"
-                      className="h-8 w-8 p-0 text-gray-600 hover:bg-red-50 hover:text-red-600"
+                      className="h-8 w-8 p-0 text-secondary-500 hover:bg-error-50 hover:text-error-600"
                     >
                       <Trash2 size={14} />
                     </Button>
@@ -251,26 +251,26 @@ export default function ControlPanel() {
             <CardContent>
               {isLoading ? (
                 <div className="py-8 text-center">
-                  <div className="loader mx-auto mb-2 h-6 w-6 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600" />
-                  <p className="text-[12px] text-gray-500">Loading...</p>
+                  <div className="loader mx-auto mb-2 h-6 w-6 animate-spin rounded-full border-2 border-primary-200 border-t-primary-600" />
+                  <p className="text-[12px] text-secondary-500">Loading...</p>
                 </div>
               ) : history.length === 0 ? (
                 <div className="py-10 text-center">
-                  <p className="mb-1 text-[14px] font-medium text-gray-900">
+                  <p className="mb-1 text-[14px] font-medium text-primary-900">
                     No transcriptions yet
                   </p>
-                  <p className="mb-6 text-[12px] text-gray-500">
+                  <p className="mb-6 text-[12px] text-secondary-500">
                     Press your hotkey to start recording
                   </p>
 
                   {/* Quick Start Guide - Minimal */}
-                  <div className="mx-auto max-w-sm rounded border border-gray-200 bg-gray-50 p-4 text-left">
-                    <p className="mb-3 text-[13px] font-medium text-gray-900">Quick Start</p>
-                    <ol className="space-y-1.5 text-[12px] text-gray-600">
+                  <div className="mx-auto max-w-sm rounded border border-primary-200 bg-primary-50 p-4 text-left">
+                    <p className="mb-3 text-[13px] font-medium text-primary-900">Quick Start</p>
+                    <ol className="space-y-1.5 text-[12px] text-secondary-500">
                       <li>1. Click in any text field</li>
                       <li>
                         2. Press{" "}
-                        <kbd className="rounded border border-gray-300 bg-white px-1.5 py-0.5 font-mono text-[11px]">
+                        <kbd className="rounded border border-primary-300 bg-white px-1.5 py-0.5 font-mono text-[11px]">
                           {hotkey}
                         </kbd>{" "}
                         to start
@@ -278,7 +278,7 @@ export default function ControlPanel() {
                       <li>3. Speak your text</li>
                       <li>
                         4. Press{" "}
-                        <kbd className="rounded border border-gray-300 bg-white px-1.5 py-0.5 font-mono text-[11px]">
+                        <kbd className="rounded border border-primary-300 bg-white px-1.5 py-0.5 font-mono text-[11px]">
                           {hotkey}
                         </kbd>{" "}
                         to stop

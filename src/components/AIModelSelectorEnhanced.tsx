@@ -548,10 +548,10 @@ export default function AIModelSelectorEnhanced({
   return (
     <div className="space-y-6">
       {/* Enable/Disable Toggle */}
-      <div className="flex items-center justify-between rounded-xl border border-green-200 bg-green-50 p-4">
+      <div className="flex items-center justify-between rounded-xl border border-success-200 bg-success-50 p-4">
         <div>
-          <label className="text-sm font-medium text-green-800">Enable AI Text Enhancement</label>
-          <p className="text-xs text-green-700">
+          <label className="text-sm font-medium text-success-800">Enable AI Text Enhancement</label>
+          <p className="text-xs text-success-700">
             Use AI to automatically improve transcription quality
           </p>
         </div>
@@ -563,12 +563,12 @@ export default function AIModelSelectorEnhanced({
             onChange={(e) => setUseReasoningModel(e.target.checked)}
           />
           <div
-            className={`h-6 w-11 rounded-full bg-gray-200 transition-colors duration-200 ${
-              useReasoningModel ? "bg-green-600" : "bg-gray-300"
+            className={`h-6 w-11 rounded-full bg-primary-200 transition-colors duration-200 ${
+              useReasoningModel ? "bg-success-600" : "bg-primary-300"
             }`}
           >
             <div
-              className={`absolute top-0.5 left-0.5 h-5 w-5 rounded-full border border-gray-300 bg-white transition-transform duration-200 ${
+              className={`absolute top-0.5 left-0.5 h-5 w-5 rounded-full border border-primary-300 bg-white transition-transform duration-200 ${
                 useReasoningModel ? "translate-x-5" : "translate-x-0"
               }`}
             />
@@ -584,20 +584,20 @@ export default function AIModelSelectorEnhanced({
               onClick={() => handleModeChange("cloud")}
               className={`cursor-pointer rounded-xl border-2 p-4 text-left transition-all ${
                 selectedMode === "cloud"
-                  ? "border-indigo-500 bg-indigo-50"
-                  : "border-neutral-200 bg-white hover:border-neutral-300"
+                  ? "border-primary-500 bg-primary-50"
+                  : "border-primary-200 bg-white hover:border-primary-300"
               }`}
             >
               <div className="mb-2 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <Cloud className="h-6 w-6 text-blue-600" />
-                  <h4 className="font-medium text-neutral-900">Cloud AI</h4>
+                  <Cloud className="h-6 w-6 text-primary-600" />
+                  <h4 className="font-medium text-primary-900">Cloud AI</h4>
                 </div>
-                <span className="rounded-full bg-green-100 px-2 py-1 text-xs text-green-600">
+                <span className="rounded-full bg-success-100 px-2 py-1 text-xs text-success-600">
                   Powerful
                 </span>
               </div>
-              <p className="text-sm text-neutral-600">
+              <p className="text-sm text-secondary-500">
                 Advanced models via API. Fast and capable, requires internet.
               </p>
             </button>
@@ -606,20 +606,20 @@ export default function AIModelSelectorEnhanced({
               onClick={() => handleModeChange("local")}
               className={`cursor-pointer rounded-xl border-2 p-4 text-left transition-all ${
                 selectedMode === "local"
-                  ? "border-indigo-500 bg-indigo-50"
-                  : "border-neutral-200 bg-white hover:border-neutral-300"
+                  ? "border-primary-500 bg-primary-50"
+                  : "border-primary-200 bg-white hover:border-primary-300"
               }`}
             >
               <div className="mb-2 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <Lock className="h-6 w-6 text-purple-600" />
-                  <h4 className="font-medium text-neutral-900">Local AI</h4>
+                  <Lock className="h-6 w-6 text-primary-600" />
+                  <h4 className="font-medium text-primary-900">Local AI</h4>
                 </div>
-                <span className="rounded-full bg-blue-100 px-2 py-1 text-xs text-blue-600">
+                <span className="rounded-full bg-primary-100 px-2 py-1 text-xs text-primary-600">
                   Private
                 </span>
               </div>
-              <p className="text-sm text-neutral-600">
+              <p className="text-sm text-secondary-500">
                 Runs on your device. Complete privacy, works offline.
               </p>
             </button>
@@ -629,8 +629,8 @@ export default function AIModelSelectorEnhanced({
           {selectedMode === "cloud" ? (
             <div className="space-y-4">
               {/* Cloud Provider Tabs */}
-              <div className="overflow-hidden rounded-xl border border-gray-200">
-                <div className="flex border-b border-gray-200 bg-gray-50">
+              <div className="overflow-hidden rounded-xl border border-primary-200">
+                <div className="flex border-b border-primary-200 bg-primary-50">
                   {cloudProviders.map((provider) => {
                     const isSelected = selectedCloudProvider === provider;
                     const color = getProviderColor(provider);
@@ -646,7 +646,7 @@ export default function AIModelSelectorEnhanced({
                         className={`flex flex-1 items-center justify-center gap-2 px-4 py-3 font-medium transition-all ${
                           isSelected
                             ? `text-${color}-700 border-b-2`
-                            : "text-gray-600 hover:bg-gray-100"
+                            : "text-secondary-500 hover:bg-primary-100"
                         }`}
                         style={
                           isSelected
@@ -669,7 +669,7 @@ export default function AIModelSelectorEnhanced({
                   {selectedCloudProvider === "custom" ? (
                     <>
                       <div className="space-y-3">
-                        <h4 className="font-medium text-gray-900">Endpoint Settings</h4>
+                        <h4 className="font-medium text-primary-900">Endpoint Settings</h4>
                         <Input
                           value={customBaseInput}
                           onChange={(event) => setCustomBaseInput(event.target.value)}
@@ -706,7 +706,7 @@ export default function AIModelSelectorEnhanced({
                             Apply the new base URL to refresh models.
                           </p>
                         )}
-                        <p className="text-xs text-gray-600">
+                        <p className="text-xs text-secondary-500">
                           We'll query{" "}
                           <code>
                             {hasCustomBase
@@ -717,8 +717,8 @@ export default function AIModelSelectorEnhanced({
                         </p>
                       </div>
 
-                      <div className="space-y-3 border-t border-gray-200 pt-4">
-                        <h4 className="font-medium text-gray-900">Authentication</h4>
+                      <div className="space-y-3 border-t border-primary-200 pt-4">
+                        <h4 className="font-medium text-primary-900">Authentication</h4>
                         <ApiKeyInput
                           apiKey={openaiApiKey}
                           setApiKey={setOpenaiApiKey}
@@ -726,15 +726,15 @@ export default function AIModelSelectorEnhanced({
                         />
                       </div>
 
-                      <div className="space-y-3 border-t border-gray-200 pt-4">
-                        <h4 className="text-sm font-medium text-gray-700">Available Models</h4>
+                      <div className="space-y-3 border-t border-primary-200 pt-4">
+                        <h4 className="text-sm font-medium text-secondary-500">Available Models</h4>
                         {!hasCustomBase && (
                           <p className="text-xs text-amber-600">Enter a base URL to load models.</p>
                         )}
                         {hasCustomBase && (
                           <>
                             {customModelsLoading && (
-                              <p className="text-xs text-blue-600">Fetching model list...</p>
+                              <p className="text-xs text-primary-600">Fetching model list...</p>
                             )}
                             {customModelsError && (
                               <p className="text-xs text-red-600">{customModelsError}</p>
@@ -758,7 +758,7 @@ export default function AIModelSelectorEnhanced({
                   ) : (
                     <>
                       <div className="space-y-3">
-                        <h4 className="text-sm font-medium text-gray-700">Select Model</h4>
+                        <h4 className="text-sm font-medium text-secondary-500">Select Model</h4>
                         <UnifiedModelPickerCompact
                           models={selectedCloudModels}
                           selectedModel={reasoningModel}
@@ -767,10 +767,10 @@ export default function AIModelSelectorEnhanced({
                       </div>
 
                       {/* API Key Configuration */}
-                      <div className="mt-4 border-t border-gray-200 pt-4">
+                      <div className="mt-4 border-t border-primary-200 pt-4">
                         {selectedCloudProvider === "openai" && (
                           <div className="space-y-3">
-                            <h4 className="font-medium text-gray-900">API Configuration</h4>
+                            <h4 className="font-medium text-primary-900">API Configuration</h4>
                             <ApiKeyInput
                               apiKey={openaiApiKey}
                               setApiKey={setOpenaiApiKey}
@@ -781,7 +781,7 @@ export default function AIModelSelectorEnhanced({
 
                         {selectedCloudProvider === "anthropic" && (
                           <div className="space-y-3">
-                            <h4 className="font-medium text-gray-900">API Configuration</h4>
+                            <h4 className="font-medium text-primary-900">API Configuration</h4>
                             <div className="flex gap-2">
                               <Input
                                 type="password"
@@ -798,7 +798,7 @@ export default function AIModelSelectorEnhanced({
                                 Paste
                               </Button>
                             </div>
-                            <p className="text-xs text-gray-600">
+                            <p className="text-xs text-secondary-500">
                               Get your API key from console.anthropic.com
                             </p>
                           </div>
@@ -806,7 +806,7 @@ export default function AIModelSelectorEnhanced({
 
                         {selectedCloudProvider === "gemini" && (
                           <div className="space-y-3">
-                            <h4 className="font-medium text-gray-900">API Configuration</h4>
+                            <h4 className="font-medium text-primary-900">API Configuration</h4>
                             <div className="flex gap-2">
                               <Input
                                 type="password"
@@ -823,7 +823,7 @@ export default function AIModelSelectorEnhanced({
                                 Paste
                               </Button>
                             </div>
-                            <p className="text-xs text-gray-600">
+                            <p className="text-xs text-secondary-500">
                               Get your API key from makersuite.google.com/app/apikey
                             </p>
                           </div>
@@ -837,8 +837,8 @@ export default function AIModelSelectorEnhanced({
           ) : (
             <div className="space-y-4">
               {/* Local Provider Tabs */}
-              <div className="overflow-hidden rounded-xl border border-gray-200">
-                <div className="flex overflow-x-auto border-b border-gray-200 bg-gray-50">
+              <div className="overflow-hidden rounded-xl border border-primary-200">
+                <div className="flex overflow-x-auto border-b border-primary-200 bg-primary-50">
                   {localProviders.map((provider) => {
                     const isSelected = selectedLocalProvider === provider;
                     const providerData = modelRegistry.getProvider(provider);
@@ -848,8 +848,8 @@ export default function AIModelSelectorEnhanced({
                         onClick={() => handleLocalProviderChange(provider)}
                         className={`flex items-center justify-center gap-2 px-4 py-3 font-medium whitespace-nowrap transition-all ${
                           isSelected
-                            ? "border-b-2 text-purple-700"
-                            : "text-gray-600 hover:bg-gray-100"
+                            ? "border-b-2 text-primary-700"
+                            : "text-secondary-500 hover:bg-primary-100"
                         }`}
                         style={
                           isSelected
@@ -870,12 +870,12 @@ export default function AIModelSelectorEnhanced({
                 {/* Local Model List with Download */}
                 <div className="p-4">
                   <div className="space-y-3">
-                    <h4 className="text-sm font-medium text-gray-700">Available Models</h4>
+                    <h4 className="text-sm font-medium text-secondary-500">Available Models</h4>
                     {(() => {
                       const provider = modelRegistry.getProvider(selectedLocalProvider);
                       if (!provider || !provider.models) {
                         return (
-                          <p className="text-sm text-gray-500">
+                          <p className="text-sm text-secondary-500">
                             No models available for this provider
                           </p>
                         );
@@ -893,28 +893,28 @@ export default function AIModelSelectorEnhanced({
                                 key={model.id}
                                 className={`rounded-lg border-2 p-3 transition-all ${
                                   isSelected
-                                    ? "border-purple-500 bg-purple-50"
-                                    : "border-gray-200 bg-white hover:border-gray-300"
+                                    ? "border-primary-500 bg-primary-50"
+                                    : "border-primary-200 bg-white hover:border-primary-300"
                                 }`}
                               >
                                 <div className="flex items-center justify-between">
                                   <div className="flex-1">
-                                    <div className="font-medium text-gray-900">{model.name}</div>
+                                    <div className="font-medium text-primary-900">{model.name}</div>
                                     <div className="mt-1 text-xs text-gray-600">
                                       {model.description}
                                     </div>
                                     <div className="mt-1 flex items-center gap-2">
-                                      <span className="text-xs text-gray-500">
+                                      <span className="text-xs text-secondary-500">
                                         Size: {model.size}
                                       </span>
                                       {isDownloaded && (
-                                        <span className="rounded bg-green-100 px-2 py-0.5 text-xs text-green-600">
+                                        <span className="rounded bg-success-100 px-2 py-0.5 text-xs text-success-600">
                                           <Check className="mr-1 inline h-3 w-3" />
                                           Downloaded
                                         </span>
                                       )}
                                       {model.recommended && (
-                                        <span className="rounded bg-blue-100 px-2 py-0.5 text-xs text-blue-600">
+                                        <span className="rounded bg-blue-100 px-2 py-0.5 text-xs text-primary-600">
                                           Recommended
                                         </span>
                                       )}

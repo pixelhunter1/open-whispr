@@ -200,108 +200,84 @@ export default function PromptStudio({ className = "" }: PromptStudioProps) {
   const renderCurrentPrompts = () => (
     <div className="space-y-6">
       <div>
-        <h3 className="mb-4 flex items-center gap-2 text-lg font-semibold">
-          <Eye className="h-5 w-5 text-blue-600" />
+        <h3 className="mb-4 flex items-center gap-2 text-lg font-semibold text-primary-900">
+          <Eye className="h-5 w-5 text-primary-500" />
           Current AI Prompts
         </h3>
-        <p className="mb-6 text-sm text-gray-600">
+        <p className="mb-6 text-sm text-secondary-500">
           These are the exact prompts currently being sent to your AI models. Understanding these
           helps you see how OpenWhispr thinks!
         </p>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-base">
-            <Sparkles className="h-4 w-4 text-purple-600" />
-            Agent Mode Prompt (when you say "Hey {agentName}")
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="rounded-lg border bg-gray-50 p-4 font-mono text-sm">
-            <pre className="whitespace-pre-wrap">
-              {editedAgentPrompt.replace(/\{\{agentName\}\}/g, agentName)}
-            </pre>
-          </div>
-          <Button
-            onClick={() => copyPrompt(editedAgentPrompt)}
-            variant="outline"
-            size="sm"
-            className="mt-3"
-          >
-            <Copy className="mr-2 h-4 w-4" />
-            Copy Prompt
-          </Button>
-        </CardContent>
-      </Card>
+      <div className="space-y-4 rounded-lg border border-primary-200 bg-primary-50 p-4">
+        <h4 className="font-medium text-primary-900">Agent Mode Prompt (when you say "Hey {agentName}")</h4>
+        <div className="rounded-lg border border-primary-200 bg-white p-4 font-mono text-sm text-primary-900">
+          <pre className="whitespace-pre-wrap">
+            {editedAgentPrompt.replace(/\{\{agentName\}\}/g, agentName)}
+          </pre>
+        </div>
+        <Button
+          onClick={() => copyPrompt(editedAgentPrompt)}
+          variant="outline"
+          size="sm"
+        >
+          <Copy className="mr-2 h-4 w-4" />
+          Copy Prompt
+        </Button>
+      </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-base">
-            <Zap className="h-4 w-4 text-green-600" />
-            Regular Mode Prompt (for automatic cleanup)
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="rounded-lg border bg-gray-50 p-4 font-mono text-sm">
-            <pre className="whitespace-pre-wrap">{editedRegularPrompt}</pre>
-          </div>
-          <Button
-            onClick={() => copyPrompt(editedRegularPrompt)}
-            variant="outline"
-            size="sm"
-            className="mt-3"
-          >
-            <Copy className="mr-2 h-4 w-4" />
-            Copy Prompt
-          </Button>
-        </CardContent>
-      </Card>
+      <div className="space-y-4 rounded-lg border border-primary-200 bg-primary-50 p-4">
+        <h4 className="font-medium text-primary-900">Regular Mode Prompt (for automatic cleanup)</h4>
+        <div className="rounded-lg border border-primary-200 bg-white p-4 font-mono text-sm text-primary-900">
+          <pre className="whitespace-pre-wrap">{editedRegularPrompt}</pre>
+        </div>
+        <Button
+          onClick={() => copyPrompt(editedRegularPrompt)}
+          variant="outline"
+          size="sm"
+        >
+          <Copy className="mr-2 h-4 w-4" />
+          Copy Prompt
+        </Button>
+      </div>
     </div>
   );
 
   const renderEditPrompts = () => (
     <div className="space-y-6">
       <div>
-        <h3 className="mb-4 flex items-center gap-2 text-lg font-semibold">
-          <Edit3 className="h-5 w-5 text-indigo-600" />
+        <h3 className="mb-4 flex items-center gap-2 text-lg font-semibold text-primary-900">
+          <Edit3 className="h-5 w-5 text-primary-500" />
           Customize Your AI Prompts
         </h3>
-        <p className="mb-6 text-sm text-gray-600">
-          Edit these prompts to change how your AI behaves. Use <code>{"{{agentName}}"}</code> and{" "}
-          <code>{"{{text}}"}</code> as placeholders.
+        <p className="mb-6 text-sm text-secondary-500">
+          Edit these prompts to change how your AI behaves. Use <code className="text-primary-900">{"{{agentName}}"}</code> and{" "}
+          <code className="text-primary-900">{"{{text}}"}</code> as placeholders.
         </p>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Agent Mode Prompt</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Textarea
-            value={editedAgentPrompt}
-            onChange={(e) => setEditedAgentPrompt(e.target.value)}
-            rows={12}
-            className="font-mono text-sm"
-            placeholder="Enter your custom agent prompt..."
-          />
-        </CardContent>
-      </Card>
+      <div className="space-y-4 rounded-lg border border-primary-200 bg-primary-50 p-4">
+        <h4 className="font-medium text-primary-900">Agent Mode Prompt</h4>
+        <Textarea
+          value={editedAgentPrompt}
+          onChange={(e) => setEditedAgentPrompt(e.target.value)}
+          rows={12}
+          className="font-mono text-sm"
+          placeholder="Enter your custom agent prompt..."
+        />
+      </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Regular Mode Prompt</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Textarea
-            value={editedRegularPrompt}
-            onChange={(e) => setEditedRegularPrompt(e.target.value)}
-            rows={12}
-            className="font-mono text-sm"
-            placeholder="Enter your custom regular prompt..."
-          />
-        </CardContent>
-      </Card>
+      <div className="space-y-4 rounded-lg border border-primary-200 bg-primary-50 p-4">
+        <h4 className="font-medium text-primary-900">Regular Mode Prompt</h4>
+        <Textarea
+          value={editedRegularPrompt}
+          onChange={(e) => setEditedRegularPrompt(e.target.value)}
+          rows={12}
+          className="font-mono text-sm"
+          placeholder="Enter your custom regular prompt..."
+        />
+      </div>
 
       <div className="flex gap-3">
         <Button onClick={savePrompts} className="flex-1">
@@ -331,11 +307,11 @@ export default function PromptStudio({ className = "" }: PromptStudioProps) {
     return (
       <div className="space-y-6">
         <div>
-          <h3 className="mb-4 flex items-center gap-2 text-lg font-semibold">
-            <TestTube className="h-5 w-5 text-green-600" />
+          <h3 className="mb-4 flex items-center gap-2 text-lg font-semibold text-primary-900">
+            <TestTube className="h-5 w-5 text-primary-500" />
             Test Your Prompts
           </h3>
-          <p className="mb-6 text-sm text-gray-600">
+          <p className="mb-6 text-sm text-secondary-500">
             Test your custom prompts with the actual AI model to see real results.
           </p>
         </div>
@@ -354,18 +330,18 @@ export default function PromptStudio({ className = "" }: PromptStudioProps) {
           </div>
         )}
 
-        <Card>
-          <CardContent className="space-y-4 p-6">
+        <div className="space-y-4 rounded-lg border border-primary-200 bg-primary-50 p-4">
+          <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
-                <span className="text-gray-600">Current Model:</span>
-                <span className="ml-2 font-medium">{reasoningModel}</span>
+                <span className="text-secondary-500">Current Model:</span>
+                <span className="ml-2 font-medium text-primary-900">{reasoningModel}</span>
               </div>
               <div>
-                <span className="text-gray-600">Provider:</span>
-                <span className="ml-2 font-medium capitalize">{providerLabel}</span>
+                <span className="text-secondary-500">Provider:</span>
+                <span className="ml-2 font-medium capitalize text-primary-900">{providerLabel}</span>
                 {providerConfig.baseStorageKey && (
-                  <div className="mt-1 text-xs break-all text-gray-500">
+                  <div className="mt-1 text-xs break-all text-secondary-500">
                     Endpoint: {providerEndpoint || "Not configured"}
                   </div>
                 )}
@@ -373,7 +349,7 @@ export default function PromptStudio({ className = "" }: PromptStudioProps) {
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium">Test Input</label>
+              <label className="mb-2 block text-sm font-medium text-primary-900">Test Input</label>
               <Textarea
                 value={testText}
                 onChange={(e) => setTestText(e.target.value)}
@@ -381,7 +357,7 @@ export default function PromptStudio({ className = "" }: PromptStudioProps) {
                 placeholder="Enter text to test with your custom prompts..."
               />
               <div className="mt-2 flex items-center justify-between">
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-secondary-500">
                   Try including "{agentName}" in your text to test agent mode prompts
                 </p>
                 {testText && (
@@ -412,7 +388,7 @@ export default function PromptStudio({ className = "" }: PromptStudioProps) {
             {testResult && (
               <div>
                 <div className="mb-2 flex items-center justify-between">
-                  <label className="text-sm font-medium">AI Response</label>
+                  <label className="text-sm font-medium text-primary-900">AI Response</label>
                   <Button onClick={() => copyPrompt(testResult)} variant="ghost" size="sm">
                     <Copy className="h-4 w-4" />
                   </Button>
@@ -421,15 +397,15 @@ export default function PromptStudio({ className = "" }: PromptStudioProps) {
                   className={`max-h-60 overflow-y-auto rounded-lg border p-4 text-sm ${
                     testResult.startsWith("⚠️") || testResult.startsWith("❌")
                       ? "border-amber-200 bg-amber-50 text-amber-800"
-                      : "border-gray-200 bg-gray-50"
+                      : "border-primary-200 bg-white text-primary-900"
                   }`}
                 >
                   <pre className="whitespace-pre-wrap">{testResult}</pre>
                 </div>
               </div>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     );
   };
@@ -445,7 +421,7 @@ export default function PromptStudio({ className = "" }: PromptStudioProps) {
       />
 
       <Tabs defaultValue="current" className="w-full">
-        <TabsList className="mb-6">
+        <TabsList className="mb-6 !bg-white border border-primary-200">
           <TabsTrigger value="current" className="flex items-center gap-2">
             <Eye className="h-4 w-4" />
             Current Prompts

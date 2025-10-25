@@ -1,79 +1,118 @@
 /**
- * Design Tokens - OpenWhispr
+ * Design Tokens - OpenWhispr Turquoise Design System
  * Central source of truth for design values
  */
 
 export const designTokens = {
   colors: {
-    text: {
-      50: "var(--text-50)",
-      100: "var(--text-100)",
-      200: "var(--text-200)",
-      300: "var(--text-300)",
-      400: "var(--text-400)",
-      500: "var(--text-500)",
-      600: "var(--text-600)",
-      700: "var(--text-700)",
-      800: "var(--text-800)",
-      900: "var(--text-900)",
-      950: "var(--text-950)",
-      DEFAULT: "var(--text-900)",
-    },
-    background: {
-      50: "var(--background-50)",
-      100: "var(--background-100)",
-      200: "var(--background-200)",
-      300: "var(--background-300)",
-      400: "var(--background-400)",
-      500: "var(--background-500)",
-      600: "var(--background-600)",
-      700: "var(--background-700)",
-      800: "var(--background-800)",
-      900: "var(--background-900)",
-      950: "var(--background-950)",
-      DEFAULT: "var(--background-50)",
-    },
+    // Turquoise/Teal Primary Colors
     primary: {
-      50: "var(--primary-50)",
-      100: "var(--primary-100)",
-      200: "var(--primary-200)",
-      300: "var(--primary-300)",
-      400: "var(--primary-400)",
-      500: "var(--primary-500)",
-      600: "var(--primary-600)",
-      700: "var(--primary-700)",
-      800: "var(--primary-800)",
-      900: "var(--primary-900)",
-      950: "var(--primary-950)",
-      DEFAULT: "var(--primary-500)",
+      50: "#ecf9f5",
+      100: "#d9f2ec",
+      200: "#b3e6d9",
+      300: "#8cd9c6",
+      400: "#66ccb3",
+      500: "#32cda6", // Main turquoise
+      600: "#28a485",
+      700: "#1e7b64",
+      800: "#145243",
+      900: "#0f2421", // Very dark teal (text)
+      950: "#0a1814",
+      DEFAULT: "#32cda6",
     },
+    // Secondary/Text colors (teal tones)
     secondary: {
-      50: "var(--secondary-50)",
-      100: "var(--secondary-100)",
-      200: "var(--secondary-200)",
-      300: "var(--secondary-300)",
-      400: "var(--secondary-400)",
-      500: "var(--secondary-500)",
-      600: "var(--secondary-600)",
-      700: "var(--secondary-700)",
-      800: "var(--secondary-800)",
-      900: "var(--secondary-900)",
-      950: "var(--secondary-950)",
-      DEFAULT: "var(--secondary-500)",
+      50: "#f0f9f7",
+      100: "#d9f2ec",
+      200: "#b3e6d9",
+      300: "#8cd9c6",
+      400: "#5bb5a0",
+      500: "#3a9283", // Medium teal (description text)
+      600: "#2e7569",
+      700: "#22584f",
+      800: "#173b35",
+      900: "#0f2421", // Dark teal
+      950: "#0a1814",
+      DEFAULT: "#3a9283",
     },
-    accent: {
-      50: "var(--accent-50)",
-      100: "var(--accent-100)",
-      200: "var(--accent-200)",
-      300: "var(--accent-300)",
-      400: "var(--accent-400)",
-      500: "var(--accent-500)",
-      600: "var(--accent-600)",
-      700: "var(--accent-700)",
-      800: "var(--accent-800)",
-      900: "var(--accent-900)",
-      950: "var(--accent-950)",
-      DEFAULT: "var(--accent-500)",
+    // Background colors
+    background: {
+      50: "#ffffff",
+      100: "#fafafa",
+      200: "#f5f5f5",
+      300: "#ecf9f5", // Very light turquoise
+      400: "#d9f2ec",
+      500: "#b3e6d9",
+      600: "#8cd9c6",
+      700: "#66ccb3",
+      800: "#0f2421",
+      900: "#0a1814",
+      950: "#050c0a",
+      DEFAULT: "#ffffff",
+    },
+    // Text colors
+    text: {
+      50: "#fafafa",
+      100: "#f5f5f5",
+      200: "#e5e5e5",
+      300: "#d4d4d4",
+      400: "#a3a3a3",
+      500: "#737373",
+      600: "#525252",
+      700: "#3a9283", // Medium teal
+      800: "#0f2421", // Dark teal
+      900: "#0a1814", // Very dark teal
+      950: "#050c0a",
+      DEFAULT: "#0f2421",
+    },
+    // Status colors
+    success: {
+      50: "#f0fdf4",
+      100: "#dcfce7",
+      200: "#bbf7d0",
+      300: "#86efac",
+      400: "#4ade80",
+      500: "#34C759", // Apple green
+      600: "#30B84D",
+      700: "#2AA644",
+      800: "#166534",
+      900: "#14532d",
+      950: "#052e16",
+      DEFAULT: "#34C759",
+    },
+    error: {
+      50: "#fef2f2",
+      100: "#fee2e2",
+      200: "#fecaca",
+      300: "#fca5a5",
+      400: "#f87171",
+      500: "#ff3b30", // Apple red
+      600: "#e62e24",
+      700: "#d32119",
+      800: "#991b1b",
+      900: "#7f1d1d",
+      950: "#450a0a",
+      DEFAULT: "#ff3b30",
+    },
+    warning: {
+      50: "#fffbeb",
+      100: "#fef3c7",
+      200: "#fde68a",
+      300: "#fcd34d",
+      400: "#fbbf24",
+      500: "#FF9500", // Apple orange
+      600: "#E68A00",
+      700: "#CC7A00",
+      800: "#92400e",
+      900: "#78350f",
+      950: "#451a03",
+      DEFAULT: "#FF9500",
+    },
+    // Border colors (using turquoise tints)
+    border: {
+      light: "#b3e6d9",
+      DEFAULT: "#8cd9c6",
+      dark: "#66ccb3",
     },
   },
   spacing: {

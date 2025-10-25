@@ -8,13 +8,13 @@ import { cva } from "class-variance-authority";
 export const cardVariants = cva("rounded-xl border bg-background transition-all duration-200", {
   variants: {
     variant: {
-      default: "border-[#d2d2d7] bg-white shadow-sm",
-      elevated: "border-[#d2d2d7] bg-white shadow-lg",
+      default: "border-primary-200 bg-white shadow-sm",
+      elevated: "border-primary-200 bg-white shadow-lg",
       ghost: "border-transparent bg-transparent shadow-none",
       outline: "border-primary-500 bg-white",
       success: "border-primary-300 bg-primary-50",
       warning: "border-secondary-300 bg-secondary-50",
-      error: "border-[#ff3b30]/20 bg-[#ff3b30]/5",
+      error: "border-error/20 bg-error/5",
     },
     padding: {
       none: "p-0",

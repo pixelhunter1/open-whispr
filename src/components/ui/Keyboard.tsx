@@ -36,7 +36,7 @@ const Key: React.FC<KeyProps> = ({
     <button
       onClick={handleClick}
       disabled={disabled}
-      className={` ${width} h-12 transform rounded-lg font-mono text-sm font-medium transition-all duration-150 ease-in-out active:scale-95 ${isPressed ? "translate-y-1 shadow-inner" : "translate-y-0 shadow-lg"} hover:translate-y-0.5 hover:shadow-md focus:ring-2 focus:ring-indigo-300 focus:outline-none ${
+      className={` ${width} h-12 transform rounded-lg font-mono text-sm font-medium transition-all duration-150 ease-in-out active:scale-95 ${isPressed ? "translate-y-1" : "translate-y-0"} hover:translate-y-0.5 focus:ring-2 focus:ring-indigo-300 focus:outline-none ${
         isSelected
           ? "border-2 border-indigo-600 bg-indigo-500 text-white"
           : disabled
@@ -87,7 +87,7 @@ export default function Keyboard({ selectedKey, setSelectedKey }: KeyboardProps)
   }, [canUseGlobe, selectedKey, setSelectedKey]);
 
   return (
-    <div className="rounded-2xl border border-gray-300 bg-gradient-to-b from-gray-100 to-gray-200 p-6 shadow-2xl">
+    <div className="rounded-2xl border border-gray-300 bg-gradient-to-b from-gray-100 to-gray-200 p-6">
       {/* Function Keys Row */}
       <div className="mb-4 flex justify-center gap-2">
         {functionKeys.map((key) => (

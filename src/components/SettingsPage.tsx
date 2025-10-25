@@ -467,127 +467,128 @@ export default function SettingsPage({ activeSection = "general" }: SettingsPage
       case "general":
         return (
           <div className="space-y-6">
-            {/* App Updates Section */}
+            {/* Version & Updates */}
             <section className="space-y-4">
-              <div className="border-b border-[#b3e6d9] pb-3">
-                <h3 className="text-base font-semibold text-[#0f2421]">App Updates</h3>
-                <p className="mt-1 text-sm text-[#3a9283]">
-                  Keep OpenWhispr up to date with the latest features and improvements
+              <div className="border-b border-primary-200 pb-3">
+                <h3 className="text-base font-semibold text-primary-900">Version & Updates</h3>
+                <p className="mt-1 text-sm text-secondary-500">
+                  Keep OpenWhispr up to date with the latest features
                 </p>
               </div>
 
-              <div className="flex items-center justify-between rounded-lg border border-[#b3e6d9] bg-[#ecf9f5] p-4">
-                <div>
-                  <p className="text-sm font-medium text-[#0f2421]">Current Version</p>
-                  <p className="mt-0.5 text-sm text-[#3a9283]">{currentVersion || "Loading..."}</p>
+              <div className="space-y-4 rounded-lg border border-primary-200 bg-primary-50 p-4">
+                <h4 className="font-medium text-primary-900">Version Information</h4>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-primary-900">Current Version</p>
+                    <p className="mt-0.5 text-sm text-secondary-500">{currentVersion || "Loading..."}</p>
+                  </div>
+                  <div>
+                    {updateStatus.isDevelopment ? (
+                      <span className="rounded-lg border border-primary-200 bg-primary-50 px-2.5 py-1 text-xs font-medium text-secondary-500">
+                        Development
+                      </span>
+                    ) : updateStatus.updateAvailable ? (
+                      <span className="rounded-lg bg-primary-500/10 px-2.5 py-1 text-xs font-medium text-primary-600">
+                        Update Available
+                      </span>
+                    ) : (
+                      <span className="rounded-lg border border-primary-200 bg-primary-50 px-2.5 py-1 text-xs font-medium text-secondary-500">
+                        Up to Date
+                      </span>
+                    )}
+                  </div>
                 </div>
-                <div>
-                  {updateStatus.isDevelopment ? (
-                    <span className="rounded-md border border-[#b3e6d9] bg-white px-2.5 py-1 text-xs text-[#3a9283]">
-                      Development
-                    </span>
-                  ) : updateStatus.updateAvailable ? (
-                    <span className="rounded-md border-0 bg-[rgba(50,205,166,0.1)] px-2.5 py-1 text-xs font-medium text-[#32cda6]">
-                      Update Available
-                    </span>
-                  ) : (
-                    <span className="rounded-md border border-[#b3e6d9] bg-white px-2.5 py-1 text-xs text-[#3a9283]">
-                      Up to Date
-                    </span>
-                  )}
-                </div>
-              </div>
 
-              <div className="space-y-3">
-                <Button
-                  onClick={async () => {
-                    setCheckingForUpdates(true);
-                    try {
-                      const result = await window.electronAPI?.checkForUpdates();
-                      if (result?.updateAvailable) {
-                        setUpdateInfo({
-                          version: result.version || "unknown",
-                          releaseDate: result.releaseDate,
-                          releaseNotes: result.releaseNotes,
-                        });
-                        setUpdateStatus((prev) => ({
-                          ...prev,
-                          updateAvailable: true,
-                          updateDownloaded: false,
-                        }));
-                        showAlertDialog({
-                          title: "Update Available",
-                          description: `Update available: v${result.version || "new version"}`,
-                        });
-                      } else {
-                        showAlertDialog({
-                          title: "No Updates",
-                          description: result?.message || "No updates available",
-                        });
-                      }
-                    } catch (error: any) {
-                      showAlertDialog({
-                        title: "Update Check Failed",
-                        description: `Error checking for updates: ${error.message}`,
-                      });
-                    } finally {
-                      setCheckingForUpdates(false);
-                    }
-                  }}
-                  disabled={checkingForUpdates || updateStatus.isDevelopment}
-                  variant="outline"
-                >
-                  <RefreshCw size={16} className="mr-2" />
-                  {checkingForUpdates ? "Checking for Updates..." : "Check for Updates"}
-                </Button>
-
-                {isUpdateAvailable && !updateStatus.updateDownloaded && (
-                  <div className="space-y-3">
-                    <Button
-                      onClick={async () => {
-                        setDownloadingUpdate(true);
-                        setUpdateDownloadProgress(0);
-                        try {
-                          await window.electronAPI?.downloadUpdate();
-                        } catch (error: any) {
-                          setDownloadingUpdate(false);
+                <div className="space-y-2">
+                  <Button
+                    onClick={async () => {
+                      setCheckingForUpdates(true);
+                      try {
+                        const result = await window.electronAPI?.checkForUpdates();
+                        if (result?.updateAvailable) {
+                          setUpdateInfo({
+                            version: result.version || "unknown",
+                            releaseDate: result.releaseDate,
+                            releaseNotes: result.releaseNotes,
+                          });
+                          setUpdateStatus((prev) => ({
+                            ...prev,
+                            updateAvailable: true,
+                            updateDownloaded: false,
+                          }));
                           showAlertDialog({
-                            title: "Download Failed",
-                            description: `Failed to download update: ${error.message}`,
+                            title: "Update Available",
+                            description: `Update available: v${result.version || "new version"}`,
+                          });
+                        } else {
+                          showAlertDialog({
+                            title: "No Updates",
+                            description: result?.message || "No updates available",
                           });
                         }
-                      }}
-                      disabled={downloadingUpdate}
-                      variant="default"
-                    >
-                      <Download size={16} className="mr-2" />
-                      {downloadingUpdate
-                        ? `Downloading Update... ${Math.round(updateDownloadProgress)}%`
-                        : `Download Update${updateInfo.version ? ` v${updateInfo.version}` : ""}`}
-                    </Button>
+                      } catch (error: any) {
+                        showAlertDialog({
+                          title: "Update Check Failed",
+                          description: `Error checking for updates: ${error.message}`,
+                        });
+                      } finally {
+                        setCheckingForUpdates(false);
+                      }
+                    }}
+                    disabled={checkingForUpdates || updateStatus.isDevelopment}
+                    variant="outline"
+                    className="w-full"
+                  >
+                    <RefreshCw size={16} />
+                    {checkingForUpdates ? "Checking..." : "Check for Updates"}
+                  </Button>
 
-                    {downloadingUpdate && (
-                      <div className="px-1">
-                        <div className="h-1 w-full overflow-hidden rounded-full bg-[#b3e6d9]">
+                  {isUpdateAvailable && !updateStatus.updateDownloaded && (
+                    <>
+                      <Button
+                        onClick={async () => {
+                          setDownloadingUpdate(true);
+                          setUpdateDownloadProgress(0);
+                          try {
+                            await window.electronAPI?.downloadUpdate();
+                          } catch (error: any) {
+                            setDownloadingUpdate(false);
+                            showAlertDialog({
+                              title: "Download Failed",
+                              description: `Failed to download update: ${error.message}`,
+                            });
+                          }
+                        }}
+                        disabled={downloadingUpdate}
+                        variant="default"
+                        className="w-full"
+                      >
+                        <Download size={16} />
+                        {downloadingUpdate
+                          ? `Downloading... ${Math.round(updateDownloadProgress)}%`
+                          : `Download v${updateInfo.version || ""}`}
+                      </Button>
+
+                      {downloadingUpdate && (
+                        <div className="h-1.5 w-full overflow-hidden rounded-full bg-primary-100">
                           <div
-                            className="h-full rounded-full bg-[#32cda6] transition-all duration-300 ease-out"
+                            className="h-full rounded-full bg-primary transition-all duration-300"
                             style={{
                               width: `${Math.min(100, Math.max(0, updateDownloadProgress))}%`,
                             }}
                           />
                         </div>
-                      </div>
-                    )}
-                  </div>
-                )}
+                      )}
+                    </>
+                  )}
 
-                {updateStatus.updateDownloaded && (
-                  <div>
+                  {updateStatus.updateDownloaded && (
                     <Button
                       onClick={() => {
                         showConfirmDialog({
                           title: "Install Update",
-                          description: `Ready to install update${updateInfo.version ? ` v${updateInfo.version}` : ""}. The app will restart to complete installation.`,
+                          description: `Ready to install v${updateInfo.version || ""}. The app will restart.`,
                           confirmText: "Install & Restart",
                           onConfirm: async () => {
                             try {
@@ -597,22 +598,19 @@ export default function SettingsPage({ activeSection = "general" }: SettingsPage
                                 setInstallInitiated(false);
                                 showAlertDialog({
                                   title: "Install Failed",
-                                  description:
-                                    result?.message ||
-                                    "Failed to start the installer. Please try again.",
+                                  description: result?.message || "Failed to start installer.",
                                 });
                                 return;
                               }
                               showAlertDialog({
                                 title: "Installing Update",
-                                description:
-                                  "OpenWhispr will restart automatically to finish installing the newest version.",
+                                description: "OpenWhispr will restart to complete installation.",
                               });
                             } catch (error: any) {
                               setInstallInitiated(false);
                               showAlertDialog({
                                 title: "Install Failed",
-                                description: `Failed to install update: ${error.message}`,
+                                description: `Failed to install: ${error.message}`,
                               });
                             }
                           },
@@ -620,26 +618,24 @@ export default function SettingsPage({ activeSection = "general" }: SettingsPage
                       }}
                       disabled={installInitiated}
                       variant="default"
+                      className="w-full"
                     >
-                      <RefreshCw
-                        size={16}
-                        className={`mr-2 ${installInitiated ? "animate-spin" : ""}`}
-                      />
-                      {installInitiated ? "Installing Update..." : "Install & Restart"}
+                      <RefreshCw size={16} className={installInitiated ? "animate-spin" : ""} />
+                      {installInitiated ? "Installing..." : "Install & Restart"}
                     </Button>
-                  </div>
-                )}
+                  )}
+                </div>
 
                 {updateInfo.version && (
-                  <div className="rounded-lg border border-[#b3e6d9] bg-[#ecf9f5] p-3 text-sm">
-                    <p className="mb-1 font-medium text-[#0f2421]">Version {updateInfo.version}</p>
+                  <div className="mt-3 rounded-lg border border-primary-200 bg-primary-50 p-3 text-sm">
+                    <p className="mb-1 font-medium text-primary-900">Version {updateInfo.version}</p>
                     {updateInfo.releaseDate && (
-                      <p className="mb-2 text-xs text-[#3a9283]">
+                      <p className="mb-2 text-xs text-secondary-500">
                         {new Date(updateInfo.releaseDate).toLocaleDateString()}
                       </p>
                     )}
                     {updateInfo.releaseNotes && (
-                      <div className="mt-2 border-t border-[#b3e6d9] pt-2 text-xs text-[#0f2421]">
+                      <div className="mt-2 border-t border-primary-200 pt-2 text-xs text-primary-800">
                         <div className="whitespace-pre-wrap">{updateInfo.releaseNotes}</div>
                       </div>
                     )}
@@ -648,211 +644,218 @@ export default function SettingsPage({ activeSection = "general" }: SettingsPage
               </div>
             </section>
 
-            {/* Hotkey Section */}
+            {/* Dictation Hotkey */}
             <section className="space-y-4">
-              <div className="border-b border-[#b3e6d9] pb-3">
-                <h3 className="text-base font-semibold text-[#0f2421]">Dictation Hotkey</h3>
-                <p className="mt-1 text-sm text-[#3a9283]">
-                  Configure the key combination to start and stop voice dictation
+              <div className="border-b border-primary-200 pb-3">
+                <h3 className="text-base font-semibold text-primary-900">Dictation Hotkey</h3>
+                <p className="mt-1 text-sm text-secondary-500">
+                  Key combination to start and stop dictation
                 </p>
               </div>
 
-              <Tabs defaultValue="capture" className="space-y-3">
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="capture">Key Combinations</TabsTrigger>
-                  <TabsTrigger value="keyboard">Visual Keyboard</TabsTrigger>
-                </TabsList>
+              <div className="space-y-4 rounded-lg border border-primary-200 bg-primary-50 p-4">
+                <h4 className="font-medium text-primary-900">Configure Hotkey</h4>
 
-                <TabsContent value="capture" className="space-y-2">
-                  <div>
-                    <label className="mb-2 block text-sm font-medium text-[#0f2421]">
-                      Hotkey Combination
-                    </label>
-                    <HotkeyCapture
-                      value={dictationKey}
-                      onChange={setDictationKey}
-                      placeholder="Click and press a key combination"
-                    />
-                    <p className="mt-2 text-xs text-[#3a9283]">
-                      Supports modifier keys (Ctrl, Alt, Shift)
-                    </p>
-                  </div>
-                </TabsContent>
+                <Tabs defaultValue="capture" className="space-y-4">
+                  <TabsList className="grid w-full grid-cols-2 !bg-white border border-primary-200">
+                    <TabsTrigger value="capture">Key Combinations</TabsTrigger>
+                    <TabsTrigger value="keyboard">Visual Keyboard</TabsTrigger>
+                  </TabsList>
 
-                <TabsContent value="keyboard" className="space-y-3">
-                  <div>
-                    <label className="mb-2 block text-sm font-medium text-[#0f2421]">
-                      Activation Key
-                    </label>
-                    <Input
-                      placeholder="Default: ` (backtick)"
-                      value={dictationKey}
-                      onChange={(e) => setDictationKey(e.target.value)}
-                      className="text-center font-mono text-lg"
-                    />
-                    <p className="mt-2 text-xs text-[#3a9283]">
-                      Press this key from anywhere to start/stop dictation
-                    </p>
-                  </div>
-                  <div className="rounded-lg border border-[#b3e6d9] bg-[#ecf9f5] p-3">
-                    <p className="mb-2 text-sm font-medium text-[#0f2421]">Select a key:</p>
-                    <React.Suspense
-                      fallback={
-                        <div className="flex h-32 items-center justify-center text-sm text-[#3a9283]">
-                          Loading keyboard...
-                        </div>
-                      }
-                    >
-                      <InteractiveKeyboard
-                        selectedKey={dictationKey}
-                        setSelectedKey={setDictationKey}
+                  <TabsContent value="capture" className="space-y-3">
+                    <div>
+                      <label className="mb-2 block text-sm font-medium text-primary-900">
+                        Hotkey Combination
+                      </label>
+                      <HotkeyCapture
+                        value={dictationKey}
+                        onChange={setDictationKey}
+                        placeholder="Click and press a key combination"
                       />
-                    </React.Suspense>
-                  </div>
-                </TabsContent>
-              </Tabs>
+                      <p className="mt-2 text-xs text-secondary-500">
+                        Supports modifier keys (Ctrl, Alt, Shift)
+                      </p>
+                    </div>
+                  </TabsContent>
 
-              <Button onClick={saveKey} disabled={!dictationKey.trim()} variant="default">
-                <Keyboard size={16} className="mr-2" />
-                Save Hotkey
-              </Button>
+                  <TabsContent value="keyboard" className="space-y-3">
+                    <div>
+                      <label className="mb-2 block text-sm font-medium text-primary-900">
+                        Activation Key
+                      </label>
+                      <Input
+                        placeholder="Default: ` (backtick)"
+                        value={dictationKey}
+                        onChange={(e) => setDictationKey(e.target.value)}
+                        className="text-center font-mono text-lg"
+                      />
+                      <p className="mt-2 text-xs text-secondary-500">
+                        Press this key from anywhere to start/stop dictation
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      <p className="text-sm font-medium text-primary-900">Select a key:</p>
+                      <React.Suspense
+                        fallback={
+                          <div className="flex h-32 items-center justify-center text-sm text-secondary-500">
+                            Loading keyboard...
+                          </div>
+                        }
+                      >
+                        <InteractiveKeyboard
+                          selectedKey={dictationKey}
+                          setSelectedKey={setDictationKey}
+                        />
+                      </React.Suspense>
+                    </div>
+                  </TabsContent>
+                </Tabs>
+
+                <Button onClick={saveKey} disabled={!dictationKey.trim()} variant="default" className="w-full">
+                  <Keyboard size={16} />
+                  Save Hotkey
+                </Button>
+              </div>
             </section>
 
-            {/* Permissions Section */}
+            {/* System Permissions */}
             <section className="space-y-4">
-              <div className="border-b border-[#b3e6d9] pb-3">
-                <h3 className="text-base font-semibold text-[#0f2421]">System Permissions</h3>
-                <p className="mt-1 text-sm text-[#3a9283]">
-                  Manage microphone and accessibility permissions
+              <div className="border-b border-primary-200 pb-3">
+                <h3 className="text-base font-semibold text-primary-900">System Permissions</h3>
+                <p className="mt-1 text-sm text-secondary-500">
+                  Manage microphone and accessibility access
                 </p>
               </div>
 
-              <div className="flex flex-wrap gap-2">
-                <Button onClick={permissionsHook.requestMicPermission} variant="outline">
-                  <Mic className="mr-2 h-4 w-4" />
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+                <Button onClick={permissionsHook.requestMicPermission} variant="outline" className="w-full">
+                  <Mic className="h-4 w-4" />
                   Test Microphone
                 </Button>
-                <Button onClick={permissionsHook.testAccessibilityPermission} variant="outline">
-                  <Shield className="mr-2 h-4 w-4" />
+                <Button onClick={permissionsHook.testAccessibilityPermission} variant="outline" className="w-full">
+                  <Shield className="h-4 w-4" />
                   Test Accessibility
                 </Button>
-                <Button onClick={resetAccessibilityPermissions} variant="outline">
-                  <RefreshCw className="mr-2 h-4 w-4" />
+                <Button onClick={resetAccessibilityPermissions} variant="outline" className="w-full">
+                  <RefreshCw className="h-4 w-4" />
                   Reset Permissions
                 </Button>
               </div>
             </section>
 
-            {/* App Information */}
+            {/* Application Info */}
             <section className="space-y-4">
-              <div className="border-b border-[#b3e6d9] pb-3">
-                <h3 className="text-base font-semibold text-[#0f2421]">Application Info</h3>
+              <div className="border-b border-primary-200 pb-3">
+                <h3 className="text-base font-semibold text-primary-900">Application Info</h3>
+                <p className="mt-1 text-sm text-secondary-500">Quick overview of app status</p>
               </div>
 
               <div className="grid grid-cols-3 gap-3">
-                <div className="rounded-lg border border-[#b3e6d9] bg-[#ecf9f5] p-3 text-center">
-                  <Keyboard className="mx-auto mb-2 h-5 w-5 text-[#3a9283]" />
-                  <p className="mb-1 text-xs font-medium text-[#0f2421]">Hotkey</p>
-                  <p className="font-mono text-xs text-[#3a9283]">
+                <div className="rounded-lg border border-primary-200 bg-primary-50 p-4 text-center">
+                  <Keyboard className="mx-auto mb-2 h-5 w-5 text-secondary-500" />
+                  <p className="mb-1 text-xs font-medium text-primary-900">Hotkey</p>
+                  <p className="font-mono text-xs text-secondary-500">
                     {formatHotkeyLabel(dictationKey)}
                   </p>
                 </div>
-                <div className="rounded-lg border border-[#b3e6d9] bg-[#ecf9f5] p-3 text-center">
-                  <div className="mx-auto mb-2 h-5 w-5 font-medium text-[#3a9283]">v</div>
-                  <p className="mb-1 text-xs font-medium text-[#0f2421]">Version</p>
-                  <p className="text-xs text-[#3a9283]">{currentVersion || "0.1.0"}</p>
+                <div className="rounded-lg border border-primary-200 bg-primary-50 p-4 text-center">
+                  <div className="mx-auto mb-2 h-5 w-5 text-center text-sm font-semibold text-secondary-500">v</div>
+                  <p className="mb-1 text-xs font-medium text-primary-900">Version</p>
+                  <p className="text-xs text-secondary-500">{currentVersion || "0.1.0"}</p>
                 </div>
-                <div className="rounded-lg border border-[#b3e6d9] bg-[#ecf9f5] p-3 text-center">
-                  <div className="mx-auto mb-2 h-5 w-5 font-bold text-[#32cda6]">•</div>
-                  <p className="mb-1 text-xs font-medium text-[#0f2421]">Status</p>
-                  <p className="text-xs font-medium text-[#32cda6]">Active</p>
+                <div className="rounded-lg border border-primary-200 bg-primary-50 p-4 text-center">
+                  <div className="mx-auto mb-2 h-5 w-5 text-center text-2xl leading-5 text-primary-500">•</div>
+                  <p className="mb-1 text-xs font-medium text-primary-900">Status</p>
+                  <p className="text-xs font-medium text-primary-600">Active</p>
                 </div>
               </div>
             </section>
 
-            {/* Maintenance Section */}
+            {/* Maintenance & Storage */}
             <section className="space-y-4">
-              <div className="border-b border-[#b3e6d9] pb-3">
-                <h3 className="text-base font-semibold text-[#0f2421]">Maintenance</h3>
-                <p className="mt-1 text-sm text-[#3a9283]">Reset settings and manage local data</p>
+              <div className="border-b border-primary-200 pb-3">
+                <h3 className="text-base font-semibold text-primary-900">Maintenance & Storage</h3>
+                <p className="mt-1 text-sm text-secondary-500">Reset settings and manage app data</p>
               </div>
 
-              <div className="flex flex-wrap gap-2">
-                <Button
-                  onClick={() => {
-                    showConfirmDialog({
-                      title: "Reset Onboarding",
-                      description:
-                        "Are you sure you want to reset the onboarding process? This will clear your setup and show the welcome flow again.",
-                      onConfirm: () => {
-                        localStorage.removeItem("onboardingCompleted");
-                        window.location.reload();
-                      },
-                      variant: "destructive",
-                    });
-                  }}
-                  variant="outline"
-                >
-                  <RefreshCw className="mr-2 h-4 w-4" />
-                  Reset Onboarding
-                </Button>
+              <div className="space-y-3">
+                <div className="rounded-lg border border-primary-200 bg-primary-50 p-3">
+                  <p className="text-xs text-secondary-500">
+                    Model cache: <code className="font-mono text-primary-800">{cachePathHint}</code>
+                  </p>
+                </div>
 
-                <Button variant="outline" onClick={handleRemoveModels} disabled={isRemovingModels}>
-                  <Download className="mr-2 h-4 w-4" />
-                  {isRemovingModels ? "Removing..." : "Remove Models"}
-                </Button>
-
-                <Button
-                  onClick={() => {
-                    showConfirmDialog({
-                      title: "Clean Up App Data",
-                      description:
-                        "This will permanently delete ALL OpenWhispr data including database, settings, and downloaded models. This action cannot be undone. Are you sure?",
-                      onConfirm: () => {
-                        window.electronAPI
-                          ?.cleanupApp()
-                          .then(() => {
-                            showAlertDialog({
-                              title: "Cleanup Completed",
-                              description: "All app data has been removed.",
-                            });
-                            setTimeout(() => {
-                              window.location.reload();
-                            }, 1000);
-                          })
-                          .catch((error) => {
-                            showAlertDialog({
-                              title: "Cleanup Failed",
-                              description: `Cleanup failed: ${error.message}`,
-                            });
-                          });
-                      },
-                      variant: "destructive",
-                    });
-                  }}
-                  variant="destructive-outline"
-                >
-                  <svg
-                    className="mr-2 h-4 w-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+                  <Button
+                    onClick={() => {
+                      showConfirmDialog({
+                        title: "Reset Onboarding",
+                        description:
+                          "Reset the onboarding process and show the welcome flow again?",
+                        onConfirm: () => {
+                          localStorage.removeItem("onboardingCompleted");
+                          window.location.reload();
+                        },
+                        variant: "destructive",
+                      });
+                    }}
+                    variant="outline"
+                    className="w-full"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                    />
-                  </svg>
-                  Delete All Data
-                </Button>
-              </div>
+                    <RefreshCw className="h-4 w-4" />
+                    Reset Setup
+                  </Button>
 
-              <div className="rounded-lg border border-[#b3e6d9] bg-[#ecf9f5] p-3">
-                <p className="text-xs text-[#3a9283]">
-                  Model cache: <code className="text-[#0f2421]">{cachePathHint}</code>
-                </p>
+                  <Button
+                    variant="outline"
+                    onClick={handleRemoveModels}
+                    disabled={isRemovingModels}
+                    className="w-full"
+                  >
+                    <Download className="h-4 w-4" />
+                    {isRemovingModels ? "Removing..." : "Remove Models"}
+                  </Button>
+
+                  <Button
+                    onClick={() => {
+                      showConfirmDialog({
+                        title: "Delete All Data",
+                        description:
+                          "Permanently delete ALL app data including database, settings, and models? This cannot be undone.",
+                        onConfirm: () => {
+                          window.electronAPI
+                            ?.cleanupApp()
+                            .then(() => {
+                              showAlertDialog({
+                                title: "Data Deleted",
+                                description: "All app data has been removed.",
+                              });
+                              setTimeout(() => window.location.reload(), 1000);
+                            })
+                            .catch((error) => {
+                              showAlertDialog({
+                                title: "Cleanup Failed",
+                                description: `Error: ${error.message}`,
+                              });
+                            });
+                        },
+                        variant: "destructive",
+                      });
+                    }}
+                    variant="destructive-outline"
+                    className="w-full"
+                  >
+                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                      />
+                    </svg>
+                    Delete Data
+                  </Button>
+                </div>
               </div>
             </section>
           </div>
@@ -862,11 +865,11 @@ export default function SettingsPage({ activeSection = "general" }: SettingsPage
         return (
           <div className="space-y-6">
             <section className="space-y-4">
-              <div className="border-b border-[#b3e6d9] pb-3">
-                <h3 className="text-base font-semibold text-[#0f2421]">
+              <div className="border-b border-primary-200 pb-3">
+                <h3 className="text-base font-semibold text-primary-900">
                   Speech to Text Processing
                 </h3>
-                <p className="mt-1 text-sm text-[#3a9283]">
+                <p className="mt-1 text-sm text-secondary-500">
                   Configure how your voice is transcribed
                 </p>
               </div>
@@ -880,15 +883,15 @@ export default function SettingsPage({ activeSection = "general" }: SettingsPage
             </section>
 
             {!useLocalWhisper && (
-              <section className="space-y-4 rounded-lg border border-[#b3e6d9] bg-[#ecf9f5] p-4">
-                <h4 className="font-medium text-[#0f2421]">Cloud Setup</h4>
+              <section className="space-y-4 rounded-lg border border-primary-200 bg-primary-50 p-4">
+                <h4 className="font-medium text-primary-900">Cloud Setup</h4>
                 <ApiKeyInput
                   apiKey={openaiApiKey}
                   setApiKey={setOpenaiApiKey}
                   helpText="Supports OpenAI or compatible endpoints"
                 />
                 <div className="space-y-2">
-                  <label className="block text-sm font-medium text-[#0f2421]">
+                  <label className="block text-sm font-medium text-primary-900">
                     Custom Base URL (optional)
                   </label>
                   <Input
@@ -905,17 +908,17 @@ export default function SettingsPage({ activeSection = "general" }: SettingsPage
                   >
                     Reset to Default
                   </Button>
-                  <p className="text-xs text-[#3a9283]">
+                  <p className="text-xs text-secondary-500">
                     Requests use this OpenAI-compatible base URL. Leave empty for default
-                    <code className="ml-1 text-[#0f2421]">{API_ENDPOINTS.TRANSCRIPTION_BASE}</code>
+                    <code className="ml-1 text-primary-900">{API_ENDPOINTS.TRANSCRIPTION_BASE}</code>
                   </p>
                 </div>
               </section>
             )}
 
             {useLocalWhisper && whisperHook.whisperInstalled && (
-              <section className="space-y-4 rounded-lg border border-[#b3e6d9] bg-[#ecf9f5] p-4">
-                <h4 className="font-medium text-[#0f2421]">Local Whisper Model</h4>
+              <section className="space-y-4 rounded-lg border border-primary-200 bg-primary-50 p-4">
+                <h4 className="font-medium text-primary-900">Local Whisper Model</h4>
                 <WhisperModelPicker
                   selectedModel={whisperModel}
                   onModelSelect={setWhisperModel}
@@ -924,8 +927,8 @@ export default function SettingsPage({ activeSection = "general" }: SettingsPage
               </section>
             )}
 
-            <section className="space-y-4 rounded-lg border border-[#b3e6d9] bg-[#ecf9f5] p-4">
-              <h4 className="font-medium text-[#0f2421]">Preferred Language</h4>
+            <section className="space-y-4 rounded-lg border border-primary-200 bg-primary-50 p-4">
+              <h4 className="font-medium text-primary-900">Preferred Language</h4>
               <LanguageSelector
                 value={preferredLanguage}
                 onChange={(value) => {
@@ -934,15 +937,15 @@ export default function SettingsPage({ activeSection = "general" }: SettingsPage
                 }}
                 className="w-full"
               />
-              <p className="text-xs text-[#3a9283]">Language for speech recognition</p>
+              <p className="text-xs text-secondary-500">Language for speech recognition</p>
             </section>
 
             {/* Translation Section */}
-            <section className="space-y-3 rounded-lg border border-[#b3e6d9] bg-[#ecf9f5] p-4">
+            <section className="space-y-3 rounded-lg border border-primary-200 bg-primary-50 p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-[#0f2421]">Automatic Translation</p>
-                  <p className="mt-0.5 text-xs text-[#3a9283]">
+                  <p className="text-sm font-medium text-primary-900">Automatic Translation</p>
+                  <p className="mt-0.5 text-xs text-secondary-500">
                     Translate text to another language
                   </p>
                 </div>
@@ -956,30 +959,30 @@ export default function SettingsPage({ activeSection = "general" }: SettingsPage
                     }}
                     className="peer sr-only"
                   />
-                  <div className="peer h-6 w-11 rounded-full bg-[#b3e6d9] peer-checked:bg-[#32cda6] peer-focus:ring-2 peer-focus:ring-[#32cda6]/30 peer-focus:outline-none after:absolute after:top-[2px] after:left-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-[#b3e6d9] after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
+                  <div className="peer h-6 w-11 rounded-full bg-primary-200 peer-checked:bg-primary peer-focus:ring-2 peer-focus:ring-primary/30 peer-focus:outline-none after:absolute after:top-[2px] after:left-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-primary-200 after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
                 </label>
               </div>
 
               {enableTranslation && (
-                <div className="space-y-3 border-t border-[#b3e6d9] pt-3">
-                  <div className="flex items-center gap-2 rounded-lg border border-[#b3e6d9] bg-white p-3 text-xs">
+                <div className="space-y-3 border-t border-primary-200 pt-3">
+                  <div className="flex items-center gap-2 rounded-lg border border-primary-200 bg-white p-3 text-xs">
                     <div className="flex-1">
-                      <p className="mb-0.5 text-[#3a9283]">From</p>
-                      <p className="font-medium text-[#0f2421]">
+                      <p className="mb-0.5 text-secondary-500">From</p>
+                      <p className="font-medium text-primary-900">
                         {getLanguageLabel(preferredLanguage)}
                       </p>
                     </div>
-                    <div className="text-[#3a9283]">→</div>
+                    <div className="text-secondary-500">→</div>
                     <div className="flex-1">
-                      <p className="mb-0.5 text-[#3a9283]">To</p>
-                      <p className="font-medium text-[#0f2421]">
+                      <p className="mb-0.5 text-secondary-500">To</p>
+                      <p className="font-medium text-primary-900">
                         {getLanguageLabel(targetLanguage)}
                       </p>
                     </div>
                   </div>
 
                   <div>
-                    <label className="mb-1.5 block text-xs font-medium text-[#0f2421]">
+                    <label className="mb-1.5 block text-xs font-medium text-primary-900">
                       Target Language
                     </label>
                     <LanguageSelector
@@ -992,8 +995,8 @@ export default function SettingsPage({ activeSection = "general" }: SettingsPage
                     />
                   </div>
 
-                  <div className="rounded-lg border border-[#b3e6d9] bg-white p-2.5">
-                    <p className="text-xs text-[#3a9283]">
+                  <div className="rounded-lg border border-primary-200 bg-white p-2.5">
+                    <p className="text-xs text-secondary-500">
                       Uses {reasoningModel}. Requires API key.
                     </p>
                   </div>
@@ -1051,9 +1054,9 @@ export default function SettingsPage({ activeSection = "general" }: SettingsPage
         return (
           <div className="space-y-6">
             <section className="space-y-4">
-              <div className="border-b border-[#b3e6d9] pb-3">
-                <h3 className="text-base font-semibold text-[#0f2421]">AI Text Enhancement</h3>
-                <p className="mt-1 text-sm text-[#3a9283]">
+              <div className="border-b border-primary-200 pb-3">
+                <h3 className="text-base font-semibold text-primary-900">AI Text Enhancement</h3>
+                <p className="mt-1 text-sm text-secondary-500">
                   Configure how AI models clean up and format your transcriptions
                 </p>
               </div>
@@ -1091,17 +1094,17 @@ export default function SettingsPage({ activeSection = "general" }: SettingsPage
         return (
           <div className="space-y-6">
             <section className="space-y-4">
-              <div className="border-b border-[#b3e6d9] pb-3">
-                <h3 className="text-base font-semibold text-[#0f2421]">Agent Configuration</h3>
-                <p className="mt-1 text-sm text-[#3a9283]">
+              <div className="border-b border-primary-200 pb-3">
+                <h3 className="text-base font-semibold text-primary-900">Agent Configuration</h3>
+                <p className="mt-1 text-sm text-secondary-500">
                   Customize your AI assistant name and behavior
                 </p>
               </div>
             </section>
 
-            <section className="space-y-4 rounded-lg border border-[#b3e6d9] bg-[#ecf9f5] p-4">
-              <h4 className="mb-3 font-medium text-[#0f2421]">How to use agent names</h4>
-              <ul className="space-y-2 text-sm text-[#0f2421]">
+            <section className="space-y-4 rounded-lg border border-primary-200 bg-primary-50 p-4">
+              <h4 className="mb-3 font-medium text-primary-900">How to use agent names</h4>
+              <ul className="space-y-2 text-sm text-primary-900">
                 <li>Say "Hey {agentName}, write a formal email" for specific instructions</li>
                 <li>Use "Hey {agentName}, format this as a list" for text enhancement</li>
                 <li>
@@ -1111,8 +1114,8 @@ export default function SettingsPage({ activeSection = "general" }: SettingsPage
               </ul>
             </section>
 
-            <section className="space-y-4 rounded-lg border border-[#b3e6d9] bg-[#ecf9f5] p-4">
-              <h4 className="font-medium text-[#0f2421]">Current Agent Name</h4>
+            <section className="space-y-4 rounded-lg border border-primary-200 bg-primary-50 p-4">
+              <h4 className="font-medium text-primary-900">Current Agent Name</h4>
               <div className="flex gap-3">
                 <Input
                   placeholder="e.g., Assistant, Jarvis, Alex..."
@@ -1134,18 +1137,18 @@ export default function SettingsPage({ activeSection = "general" }: SettingsPage
                   Save
                 </Button>
               </div>
-              <p className="mt-2 text-xs text-[#3a9283]">
+              <p className="mt-2 text-xs text-secondary-500">
                 Choose a name that feels natural to say and remember
               </p>
             </section>
 
-            <section className="rounded-lg border border-[#b3e6d9] bg-[#ecf9f5] p-4">
-              <h4 className="mb-3 font-medium text-[#0f2421]">Example Usage</h4>
-              <div className="space-y-2 text-sm text-[#0f2421]">
+            <section className="rounded-lg border border-primary-200 bg-primary-50 p-4">
+              <h4 className="mb-3 font-medium text-primary-900">Example Usage</h4>
+              <div className="space-y-2 text-sm text-primary-900">
                 <p>"Hey {agentName}, write an email to my team about the meeting"</p>
                 <p>"Hey {agentName}, make this more professional" (after dictating text)</p>
                 <p>"Hey {agentName}, convert this to bullet points"</p>
-                <p className="text-[#3a9283]">
+                <p className="text-secondary-500">
                   Regular dictation: "This is just normal text" (no agent name needed)
                 </p>
               </div>
@@ -1157,9 +1160,9 @@ export default function SettingsPage({ activeSection = "general" }: SettingsPage
         return (
           <div className="space-y-6">
             <section className="space-y-4">
-              <div className="border-b border-[#b3e6d9] pb-3">
-                <h3 className="text-base font-semibold text-[#0f2421]">AI Prompt Management</h3>
-                <p className="mt-1 text-sm text-[#3a9283]">
+              <div className="border-b border-primary-200 pb-3">
+                <h3 className="text-base font-semibold text-primary-900">AI Prompt Management</h3>
+                <p className="mt-1 text-sm text-secondary-500">
                   View and customize prompts that power AI text processing
                 </p>
               </div>
