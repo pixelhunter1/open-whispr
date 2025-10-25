@@ -5,6 +5,9 @@ import { LoadingDots } from "./components/ui/LoadingDots";
 import { useHotkey } from "./hooks/useHotkey";
 import { useWindowDrag } from "./hooks/useWindowDrag";
 import AudioManager from "./helpers/audioManager";
+import { useSettings } from "./hooks/useSettings";
+import TranslationService from "./services/TranslationService";
+import { getModelProvider } from "./utils/languages";
 
 // Sound Wave Icon Component (for idle/hover states)
 const SoundWaveIcon = ({ size = 16 }) => {
@@ -89,6 +92,17 @@ export default function App() {
     useWindowDrag();
   const [dragStartPos, setDragStartPos] = useState(null);
   const [hasDragged, setHasDragged] = useState(false);
+
+  // Translation settings
+  const {
+    enableTranslation,
+    targetLanguage,
+    preferredLanguage,
+    reasoningModel,
+    openaiApiKey,
+    anthropicApiKey,
+    geminiApiKey
+  } = useSettings();
 
   const setWindowInteractivity = React.useCallback((shouldCapture) => {
     window.electronAPI?.setMainWindowInteractivity?.(shouldCapture);
@@ -179,14 +193,83 @@ export default function App() {
         },
         onTranscriptionComplete: async (result) => {
           if (result.success && result.text) {
-            setTranscript(result.text);
+            let finalText = result.text;
+
+            // Debug translation settings
+            console.log("[Translation Debug]", {
+              enableTranslation,
+              targetLanguage,
+              preferredLanguage,
+              reasoningModel,
+              hasOpenAI: !!openaiApiKey,
+              hasAnthropic: !!anthropicApiKey,
+              hasGemini: !!geminiApiKey,
+            });
+
+            // Translate if enabled and target language is different
+            if (enableTranslation && targetLanguage && targetLanguage !== preferredLanguage) {
+              console.log("[Translation] Starting translation...");
+              try {
+                // Determine which provider and API key to use
+                const provider = getModelProvider(reasoningModel);
+                let apiKey = "";
+
+                console.log("[Translation] Provider detected:", provider);
+
+                if (provider === "openai") {
+                  apiKey = openaiApiKey;
+                } else if (provider === "anthropic") {
+                  apiKey = anthropicApiKey;
+                } else if (provider === "gemini") {
+                  apiKey = geminiApiKey;
+                }
+
+                console.log("[Translation] Has API key:", !!apiKey);
+
+                if (apiKey) {
+                  console.log("[Translation] Calling translation service...");
+                  const translationResult = await TranslationService.translate({
+                    text: result.text,
+                    sourceLanguage: preferredLanguage,
+                    targetLanguage: targetLanguage,
+                    provider: provider,
+                    apiKey: apiKey,
+                    model: reasoningModel,
+                  });
+
+                  console.log("[Translation] Result:", translationResult);
+
+                  if (translationResult.success) {
+                    finalText = translationResult.translatedText;
+                    console.log("[Translation] Success! Translated text:", finalText);
+                  } else {
+                    // If translation fails, show a toast but continue with original text
+                    console.error("[Translation] Failed:", translationResult.error);
+                    toast({
+                      title: "Translation Failed",
+                      description: translationResult.error || "Using original text",
+                      variant: "destructive",
+                    });
+                  }
+                } else {
+                  console.log("[Translation] No API key found, skipping translation");
+                }
+              } catch (error) {
+                console.error("Translation error:", error);
+                // Continue with original text if translation fails
+              }
+            } else {
+              console.log("[Translation] Skipped - conditions not met");
+            }
+
+            setTranscript(finalText);
 
             // Paste immediately - don't wait for database save
-            const pastePromise = safePaste(result.text);
+            const pastePromise = safePaste(finalText);
 
             // Save to database in parallel
             const savePromise = window.electronAPI
-              .saveTranscription(result.text)
+              .saveTranscription(finalText)
               .catch((err) => {
                 // Failed to save transcription
               });

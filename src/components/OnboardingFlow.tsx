@@ -37,6 +37,7 @@ import { getLanguageLabel, REASONING_PROVIDERS } from "../utils/languages";
 import LanguageSelector from "./ui/LanguageSelector";
 import { UnifiedModelPickerCompact } from "./UnifiedModelPicker";
 const InteractiveKeyboard = React.lazy(() => import("./ui/Keyboard"));
+import HotkeyCapture from "./ui/HotkeyCapture";
 import { setAgentName as saveAgentName } from "../utils/agentName";
 import { formatHotkeyLabel } from "../utils/hotkeys";
 import { API_ENDPOINTS, buildApiUrl, normalizeBaseUrl } from "../config/constants";
@@ -87,6 +88,7 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
 
   const [apiKey, setApiKey] = useState(openaiApiKey);
   const [hotkey, setHotkey] = useState(dictationKey || "`");
+  const [hotkeyInputMode, setHotkeyInputMode] = useState<"keyboard" | "capture">("capture");
   const [transcriptionBaseUrl, setTranscriptionBaseUrl] = useState(cloudTranscriptionBaseUrl);
   const [reasoningBaseUrl, setReasoningBaseUrl] = useState(cloudReasoningBaseUrl);
   const [agentName, setAgentName] = useState("Agent");
@@ -771,29 +773,71 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
             </div>
 
             <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Activation Key
-                </label>
-                <Input
-                  placeholder="Default: ` (backtick)"
-                  value={hotkey}
-                  onChange={(e) => setHotkey(e.target.value)}
-                  className="text-center text-lg font-mono"
-                />
-                <p className="text-xs text-gray-500 mt-2">
-                  Press this key from anywhere to start/stop dictation
-                </p>
+              {/* Mode Selector */}
+              <div className="flex gap-2 p-1 bg-gray-100 rounded-lg">
+                <button
+                  onClick={() => setHotkeyInputMode("capture")}
+                  className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                    hotkeyInputMode === "capture"
+                      ? "bg-white text-gray-900 shadow-sm"
+                      : "text-gray-600 hover:text-gray-900"
+                  }`}
+                >
+                  Key Combinations
+                </button>
+                <button
+                  onClick={() => setHotkeyInputMode("keyboard")}
+                  className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                    hotkeyInputMode === "keyboard"
+                      ? "bg-white text-gray-900 shadow-sm"
+                      : "text-gray-600 hover:text-gray-900"
+                  }`}
+                >
+                  Visual Keyboard
+                </button>
               </div>
 
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <h4 className="font-medium text-gray-900 mb-3">
-                  Click any key to select it:
-                </h4>
-                <React.Suspense fallback={<div>Loading keyboard...</div>}>
-                  <InteractiveKeyboard selectedKey={hotkey} setSelectedKey={setHotkey} />
-                </React.Suspense>
-              </div>
+              {hotkeyInputMode === "capture" ? (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Hotkey Combination
+                  </label>
+                  <HotkeyCapture
+                    value={hotkey}
+                    onChange={setHotkey}
+                    placeholder="Click and press a key combination"
+                  />
+                  <p className="text-xs text-gray-500 mt-2">
+                    Use modifier keys (Ctrl, Alt, Shift) for more control
+                  </p>
+                </div>
+              ) : (
+                <>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Activation Key
+                    </label>
+                    <Input
+                      placeholder="Default: ` (backtick)"
+                      value={hotkey}
+                      onChange={(e) => setHotkey(e.target.value)}
+                      className="text-center text-lg font-mono"
+                    />
+                    <p className="text-xs text-gray-500 mt-2">
+                      Press this key from anywhere to start/stop dictation
+                    </p>
+                  </div>
+
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <h4 className="font-medium text-gray-900 mb-3">
+                      Click any key to select it:
+                    </h4>
+                    <React.Suspense fallback={<div>Loading keyboard...</div>}>
+                      <InteractiveKeyboard selectedKey={hotkey} setSelectedKey={setHotkey} />
+                    </React.Suspense>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         );

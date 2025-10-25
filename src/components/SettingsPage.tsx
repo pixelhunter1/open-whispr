@@ -20,6 +20,7 @@ import { API_ENDPOINTS } from "../config/constants";
 import AIModelSelectorEnhanced from "./AIModelSelectorEnhanced";
 import type { UpdateInfoResult } from "../types/electron";
 const InteractiveKeyboard = React.lazy(() => import("./ui/Keyboard"));
+import HotkeyCapture from "./ui/HotkeyCapture";
 
 export type SettingsSectionType =
   | "general"
@@ -53,6 +54,8 @@ export default function SettingsPage({
     fallbackWhisperModel,
     preferredLanguage,
     cloudTranscriptionBaseUrl,
+    enableTranslation,
+    targetLanguage,
     cloudReasoningBaseUrl,
     useReasoningModel,
     reasoningModel,
@@ -68,6 +71,8 @@ export default function SettingsPage({
     setFallbackWhisperModel,
     setPreferredLanguage,
     setCloudTranscriptionBaseUrl,
+    setEnableTranslation,
+    setTargetLanguage,
     setCloudReasoningBaseUrl,
     setUseReasoningModel,
     setReasoningModel,
@@ -98,6 +103,7 @@ export default function SettingsPage({
     releaseNotes?: string;
   }>({});
   const [isRemovingModels, setIsRemovingModels] = useState(false);
+  const [hotkeyInputMode, setHotkeyInputMode] = useState<"keyboard" | "capture">("capture");
   const cachePathHint =
     typeof navigator !== "undefined" && /Windows/i.test(navigator.userAgent)
       ? "%USERPROFILE%\\.cache\\openwhispr\\models"
@@ -693,37 +699,80 @@ export default function SettingsPage({
                 </p>
               </div>
               <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Activation Key
-                  </label>
-                  <Input
-                    placeholder="Default: ` (backtick)"
-                    value={dictationKey}
-                    onChange={(e) => setDictationKey(e.target.value)}
-                    className="text-center text-lg font-mono"
-                  />
-                  <p className="text-xs text-gray-500 mt-2">
-                    Press this key from anywhere to start/stop dictation
-                  </p>
-                </div>
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <h4 className="font-medium text-gray-900 mb-3">
-                    Click any key to select it:
-                  </h4>
-                  <React.Suspense
-                    fallback={
-                      <div className="h-32 flex items-center justify-center text-gray-500">
-                        Loading keyboard...
-                      </div>
-                    }
+                {/* Mode Selector */}
+                <div className="flex gap-2 p-1 bg-gray-100 rounded-lg">
+                  <button
+                    onClick={() => setHotkeyInputMode("capture")}
+                    className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                      hotkeyInputMode === "capture"
+                        ? "bg-white text-gray-900 shadow-sm"
+                        : "text-gray-600 hover:text-gray-900"
+                    }`}
                   >
-                    <InteractiveKeyboard
-                      selectedKey={dictationKey}
-                      setSelectedKey={setDictationKey}
-                    />
-                  </React.Suspense>
+                    Key Combinations
+                  </button>
+                  <button
+                    onClick={() => setHotkeyInputMode("keyboard")}
+                    className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                      hotkeyInputMode === "keyboard"
+                        ? "bg-white text-gray-900 shadow-sm"
+                        : "text-gray-600 hover:text-gray-900"
+                    }`}
+                  >
+                    Visual Keyboard
+                  </button>
                 </div>
+
+                {hotkeyInputMode === "capture" ? (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Hotkey Combination
+                    </label>
+                    <HotkeyCapture
+                      value={dictationKey}
+                      onChange={setDictationKey}
+                      placeholder="Click and press a key combination"
+                    />
+                    <p className="text-xs text-gray-500 mt-2">
+                      Supports modifier keys (Ctrl, Alt, Shift) for more flexibility
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Activation Key
+                      </label>
+                      <Input
+                        placeholder="Default: ` (backtick)"
+                        value={dictationKey}
+                        onChange={(e) => setDictationKey(e.target.value)}
+                        className="text-center text-lg font-mono"
+                      />
+                      <p className="text-xs text-gray-500 mt-2">
+                        Press this key from anywhere to start/stop dictation
+                      </p>
+                    </div>
+                    <div className="bg-gray-50 p-4 rounded-lg">
+                      <h4 className="font-medium text-gray-900 mb-3">
+                        Click any key to select it:
+                      </h4>
+                      <React.Suspense
+                        fallback={
+                          <div className="h-32 flex items-center justify-center text-gray-500">
+                            Loading keyboard...
+                          </div>
+                        }
+                      >
+                        <InteractiveKeyboard
+                          selectedKey={dictationKey}
+                          setSelectedKey={setDictationKey}
+                        />
+                      </React.Suspense>
+                    </div>
+                  </>
+                )}
+
                 <Button
                   onClick={saveKey}
                   disabled={!dictationKey.trim()}
@@ -969,6 +1018,57 @@ export default function SettingsPage({
               }}
               className="w-full"
             />
+            <p className="text-xs text-gray-600">
+              Language for speech recognition
+            </p>
+          </div>
+
+          {/* Translation Section */}
+          <div className="space-y-4 p-4 bg-indigo-50 border border-indigo-200 rounded-xl">
+            <div className="flex items-center justify-between">
+              <h4 className="font-medium text-indigo-900">Automatic Translation</h4>
+              <label className="flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={enableTranslation}
+                  onChange={(e) => {
+                    setEnableTranslation(e.target.checked);
+                    updateTranscriptionSettings({ enableTranslation: e.target.checked });
+                  }}
+                  className="sr-only peer"
+                />
+                <div className="relative w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+              </label>
+            </div>
+            <p className="text-xs text-indigo-800">
+              Translate transcribed text to another language before pasting
+            </p>
+
+            {enableTranslation && (
+              <div className="space-y-3 mt-4">
+                <div>
+                  <label className="block text-sm font-medium text-indigo-900 mb-2">
+                    Target Language
+                  </label>
+                  <LanguageSelector
+                    value={targetLanguage}
+                    onChange={(value) => {
+                      setTargetLanguage(value);
+                      updateTranscriptionSettings({ targetLanguage: value });
+                    }}
+                    className="w-full"
+                  />
+                  <p className="text-xs text-indigo-700 mt-2">
+                    Text will be translated from {preferredLanguage.toUpperCase()} to {targetLanguage.toUpperCase()}
+                  </p>
+                </div>
+                <div className="bg-indigo-100 border border-indigo-300 rounded-lg p-3">
+                  <p className="text-xs text-indigo-900">
+                    <strong>Note:</strong> Translation uses your AI model ({reasoningModel}) and requires an API key to be configured.
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
 
           <Button
@@ -981,6 +1081,8 @@ export default function SettingsPage({
                 whisperModel,
                 preferredLanguage,
                 cloudTranscriptionBaseUrl: normalizedTranscriptionBase,
+                enableTranslation,
+                targetLanguage,
               });
 
               if (!useLocalWhisper && openaiApiKey.trim()) {
@@ -991,6 +1093,10 @@ export default function SettingsPage({
                 `Transcription mode: ${useLocalWhisper ? 'Local Whisper' : 'Cloud'}.`,
                 `Language: ${preferredLanguage}.`,
               ];
+
+              if (enableTranslation) {
+                descriptionParts.push(`Translation enabled: ${preferredLanguage} → ${targetLanguage}.`);
+              }
 
               if (!useLocalWhisper) {
                 const baseLabel = normalizedTranscriptionBase || API_ENDPOINTS.TRANSCRIPTION_BASE;

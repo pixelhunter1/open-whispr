@@ -11,6 +11,8 @@ export interface TranscriptionSettings {
   fallbackWhisperModel: string;
   preferredLanguage: string;
   cloudTranscriptionBaseUrl?: string;
+  enableTranslation?: boolean;
+  targetLanguage?: string;
 }
 
 export interface ReasoningSettings {
@@ -88,6 +90,24 @@ export function useSettings() {
   const [cloudTranscriptionBaseUrl, setCloudTranscriptionBaseUrl] = useLocalStorage(
     "cloudTranscriptionBaseUrl",
     API_ENDPOINTS.TRANSCRIPTION_BASE,
+    {
+      serialize: String,
+      deserialize: String,
+    }
+  );
+
+  const [enableTranslation, setEnableTranslation] = useLocalStorage(
+    "enableTranslation",
+    false,
+    {
+      serialize: String,
+      deserialize: (value) => value === "true",
+    }
+  );
+
+  const [targetLanguage, setTargetLanguage] = useLocalStorage(
+    "targetLanguage",
+    "en",
     {
       serialize: String,
       deserialize: String,
@@ -172,6 +192,10 @@ export function useSettings() {
         setPreferredLanguage(settings.preferredLanguage);
       if (settings.cloudTranscriptionBaseUrl !== undefined)
         setCloudTranscriptionBaseUrl(settings.cloudTranscriptionBaseUrl);
+      if (settings.enableTranslation !== undefined)
+        setEnableTranslation(settings.enableTranslation);
+      if (settings.targetLanguage !== undefined)
+        setTargetLanguage(settings.targetLanguage);
     },
     [
       setUseLocalWhisper,
@@ -181,6 +205,8 @@ export function useSettings() {
       setFallbackWhisperModel,
       setPreferredLanguage,
       setCloudTranscriptionBaseUrl,
+      setEnableTranslation,
+      setTargetLanguage,
     ]
   );
 
@@ -216,6 +242,8 @@ export function useSettings() {
     fallbackWhisperModel,
     preferredLanguage,
     cloudTranscriptionBaseUrl,
+    enableTranslation,
+    targetLanguage,
     cloudReasoningBaseUrl,
     useReasoningModel,
     reasoningModel,
@@ -231,6 +259,8 @@ export function useSettings() {
     setFallbackWhisperModel,
     setPreferredLanguage,
     setCloudTranscriptionBaseUrl,
+    setEnableTranslation,
+    setTargetLanguage,
     setCloudReasoningBaseUrl,
     setUseReasoningModel,
     setReasoningModel,
