@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
 import { Trash2, RefreshCw, Settings, FileText, Mic, X } from "lucide-react";
@@ -39,9 +39,29 @@ export default function ControlPanel() {
     void window.electronAPI.windowClose();
   };
 
+  // Memoize loadTranscriptions to prevent recreating on every render
+  const loadTranscriptions = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const transcriptions = await window.electronAPI.getTranscriptions(50);
+      console.log('[ControlPanel] Loaded transcriptions:', transcriptions.length);
+      setHistory(transcriptions);
+    } catch (error) {
+      console.error('[ControlPanel] Error loading transcriptions:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []); // No dependencies - function never changes
+
   useEffect(() => {
     // Load transcription history from database
     loadTranscriptions();
+
+    // Auto-refresh transcriptions every 2 seconds
+    const refreshInterval = setInterval(() => {
+      console.log('[ControlPanel] Auto-refreshing transcriptions...');
+      loadTranscriptions();
+    }, 2000);
 
     // Initialize update status
     const initializeUpdateStatus = async () => {
@@ -74,22 +94,12 @@ export default function ControlPanel() {
 
     // Cleanup listeners on unmount
     return () => {
+      clearInterval(refreshInterval);
       window.electronAPI.removeAllListeners?.("update-available");
       window.electronAPI.removeAllListeners?.("update-downloaded");
       window.electronAPI.removeAllListeners?.("update-error");
     };
-  }, []);
-
-  const loadTranscriptions = async () => {
-    try {
-      setIsLoading(true);
-      const transcriptions = await window.electronAPI.getTranscriptions(50);
-      setHistory(transcriptions);
-    } catch (error) {
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  }, [loadTranscriptions]); // Include loadTranscriptions as dependency
 
   const copyToClipboard = async (text: string) => {
     try {

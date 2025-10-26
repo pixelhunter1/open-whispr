@@ -287,16 +287,18 @@ export default function App() {
 
             setTranscript(finalText);
 
-            // Paste immediately - don't wait for database save
-            const pastePromise = safePaste(finalText);
+            // Save to database first to ensure it's available for Control Panel
+            try {
+              console.log('[App] Saving transcription to database...');
+              await window.electronAPI.saveTranscription(finalText);
+              console.log('[App] Transcription saved successfully');
+            } catch (err) {
+              console.error('[App] Failed to save transcription:', err);
+              // Continue even if save fails
+            }
 
-            // Save to database in parallel
-            const savePromise = window.electronAPI.saveTranscription(finalText).catch((err) => {
-              // Failed to save transcription
-            });
-
-            // Wait for paste to complete, but don't block on database save
-            await pastePromise;
+            // Then paste to clipboard
+            await safePaste(finalText);
           }
         },
       });
