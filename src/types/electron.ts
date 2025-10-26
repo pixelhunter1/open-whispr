@@ -125,6 +125,7 @@ declare global {
       getTranscriptions: (limit?: number) => Promise<TranscriptionItem[]>;
       clearTranscriptions: () => Promise<{ cleared: number; success: boolean }>;
       deleteTranscription: (id: number) => Promise<{ success: boolean }>;
+      onTranscriptionAdded: (callback: (event: any, result: any) => void) => void;
 
       // API key management
       getOpenAIKey: () => Promise<string>;

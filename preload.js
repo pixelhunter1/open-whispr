@@ -14,6 +14,8 @@ contextBridge.exposeInMainWorld("electronAPI", {
   clearTranscriptions: () => ipcRenderer.invoke("db-clear-transcriptions"),
   deleteTranscription: (id) =>
     ipcRenderer.invoke("db-delete-transcription", id),
+  onTranscriptionAdded: (callback) =>
+    ipcRenderer.on("transcription-added", callback),
 
   // Environment variables
   getOpenAIKey: () => ipcRenderer.invoke("get-openai-key"),

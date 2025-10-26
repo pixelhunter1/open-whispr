@@ -54,14 +54,16 @@ export default function ControlPanel() {
   }, []); // No dependencies - function never changes
 
   useEffect(() => {
-    // Load transcription history from database
+    // Load transcription history from database on mount
     loadTranscriptions();
 
-    // Auto-refresh transcriptions every 2 seconds
-    const refreshInterval = setInterval(() => {
-      console.log('[ControlPanel] Auto-refreshing transcriptions...');
+    // Listen for new transcriptions (event-based, no polling)
+    const handleTranscriptionAdded = (_event: any, _result: any) => {
+      console.log('[ControlPanel] New transcription added, refreshing list...');
       loadTranscriptions();
-    }, 2000);
+    };
+
+    window.electronAPI.onTranscriptionAdded(handleTranscriptionAdded);
 
     // Initialize update status
     const initializeUpdateStatus = async () => {
@@ -94,7 +96,7 @@ export default function ControlPanel() {
 
     // Cleanup listeners on unmount
     return () => {
-      clearInterval(refreshInterval);
+      window.electronAPI.removeAllListeners?.("transcription-added");
       window.electronAPI.removeAllListeners?.("update-available");
       window.electronAPI.removeAllListeners?.("update-downloaded");
       window.electronAPI.removeAllListeners?.("update-error");

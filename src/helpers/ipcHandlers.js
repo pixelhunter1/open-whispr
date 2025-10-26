@@ -99,7 +99,14 @@ class IPCHandlers {
 
     // Database handlers
     ipcMain.handle("db-save-transcription", async (event, text) => {
-      return this.databaseManager.saveTranscription(text);
+      const result = this.databaseManager.saveTranscription(text);
+
+      // Notify all windows that a new transcription was added
+      if (result.success && this.windowManager.controlPanelWindow) {
+        this.windowManager.controlPanelWindow.webContents.send("transcription-added", result);
+      }
+
+      return result;
     });
 
     ipcMain.handle("db-get-transcriptions", async (event, limit = 50) => {
