@@ -285,27 +285,20 @@ export default function ControlPanel() {
                     Start recording to see your transcriptions here
                   </p>
 
-                  {/* Quick Start - Modern Card */}
-                  <div className="mx-auto max-w-md rounded-xl border border-neutral-200 bg-white p-4 shadow-sm">
-                    <div className="flex items-start gap-3 text-left">
-                      <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-primary-600">
-                        <FileText className="h-4 w-4 text-white" />
-                      </div>
-                      <div className="flex-1">
-                        <p className="mb-1 text-sm font-semibold text-neutral-900">Quick Start</p>
-                        <p className="text-xs text-neutral-600">
-                          Press{" "}
-                          <kbd className="mx-1 rounded border border-neutral-300 bg-neutral-100 px-1.5 py-0.5 font-mono text-[11px] font-semibold text-neutral-700 shadow-sm">
-                            {hotkey}
-                          </kbd>{" "}
-                          to start recording, speak your text, then press{" "}
-                          <kbd className="mx-1 rounded border border-neutral-300 bg-neutral-100 px-1.5 py-0.5 font-mono text-[11px] font-semibold text-neutral-700 shadow-sm">
-                            {hotkey}
-                          </kbd>{" "}
-                          again to stop.
-                        </p>
-                      </div>
-                    </div>
+                  {/* Quick Start - Clean Card */}
+                  <div className="mx-auto max-w-md rounded-xl border border-neutral-200 bg-white p-5 text-left shadow-sm">
+                    <p className="mb-2 text-sm font-semibold text-neutral-900">Quick Start</p>
+                    <p className="text-xs leading-relaxed text-neutral-600">
+                      Press{" "}
+                      <kbd className="mx-0.5 rounded border border-neutral-300 bg-neutral-100 px-1.5 py-0.5 font-mono text-[11px] font-semibold text-neutral-700 shadow-sm">
+                        {hotkey}
+                      </kbd>{" "}
+                      to start recording, speak your text, then press{" "}
+                      <kbd className="mx-0.5 rounded border border-neutral-300 bg-neutral-100 px-1.5 py-0.5 font-mono text-[11px] font-semibold text-neutral-700 shadow-sm">
+                        {hotkey}
+                      </kbd>{" "}
+                      again to stop.
+                    </p>
                   </div>
                 </div>
               ) : (
