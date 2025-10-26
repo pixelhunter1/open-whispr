@@ -548,10 +548,10 @@ export default function AIModelSelectorEnhanced({
   return (
     <div className="space-y-6">
       {/* Enable/Disable Toggle */}
-      <div className="flex items-center justify-between rounded-xl border border-success-200 bg-success-50 p-4">
+      <div className="flex items-center justify-between rounded-xl border border-primary-200 bg-primary-50 p-4">
         <div>
-          <label className="text-sm font-medium text-success-800">Enable AI Text Enhancement</label>
-          <p className="text-xs text-success-700">
+          <label className="text-sm font-medium text-primary-800">Enable AI Text Enhancement</label>
+          <p className="text-xs text-primary-700">
             Use AI to automatically improve transcription quality
           </p>
         </div>
@@ -564,7 +564,7 @@ export default function AIModelSelectorEnhanced({
           />
           <div
             className={`h-6 w-11 rounded-full bg-primary-200 transition-colors duration-200 ${
-              useReasoningModel ? "bg-success-600" : "bg-primary-300"
+              useReasoningModel ? "bg-primary-600" : "bg-primary-300"
             }`}
           >
             <div
@@ -593,7 +593,7 @@ export default function AIModelSelectorEnhanced({
                   <Cloud className="h-6 w-6 text-primary-600" />
                   <h4 className="font-medium text-primary-900">Cloud AI</h4>
                 </div>
-                <span className="rounded-full bg-success-100 px-2 py-1 text-xs text-success-600">
+                <span className="rounded-full bg-primary-100 px-2 py-1 text-xs text-primary-600">
                   Powerful
                 </span>
               </div>

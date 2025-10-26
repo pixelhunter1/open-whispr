@@ -200,8 +200,7 @@ export default function PromptStudio({ className = "" }: PromptStudioProps) {
   const renderCurrentPrompts = () => (
     <div className="space-y-6">
       <div>
-        <h3 className="mb-4 flex items-center gap-2 text-lg font-semibold text-primary-900">
-          <Eye className="h-5 w-5 text-primary-500" />
+        <h3 className="mb-4 text-lg font-semibold text-primary-900">
           Current AI Prompts
         </h3>
         <p className="mb-6 text-sm text-secondary-500">
@@ -247,8 +246,7 @@ export default function PromptStudio({ className = "" }: PromptStudioProps) {
   const renderEditPrompts = () => (
     <div className="space-y-6">
       <div>
-        <h3 className="mb-4 flex items-center gap-2 text-lg font-semibold text-primary-900">
-          <Edit3 className="h-5 w-5 text-primary-500" />
+        <h3 className="mb-4 text-lg font-semibold text-primary-900">
           Customize Your AI Prompts
         </h3>
         <p className="mb-6 text-sm text-secondary-500">
@@ -307,8 +305,7 @@ export default function PromptStudio({ className = "" }: PromptStudioProps) {
     return (
       <div className="space-y-6">
         <div>
-          <h3 className="mb-4 flex items-center gap-2 text-lg font-semibold text-primary-900">
-            <TestTube className="h-5 w-5 text-primary-500" />
+          <h3 className="mb-4 text-lg font-semibold text-primary-900">
             Test Your Prompts
           </h3>
           <p className="mb-6 text-sm text-secondary-500">

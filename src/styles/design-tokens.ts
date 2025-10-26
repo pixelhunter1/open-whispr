@@ -1,53 +1,53 @@
 /**
- * Design Tokens - OpenWhispr Turquoise Design System
+ * Design Tokens - OpenWhispr Dark Blue Design System
  * Central source of truth for design values
  */
 
 export const designTokens = {
   colors: {
-    // Turquoise/Teal Primary Colors
+    // Dark Blue Primary Colors
     primary: {
-      50: "#ecf9f5",
-      100: "#d9f2ec",
-      200: "#b3e6d9",
-      300: "#8cd9c6",
-      400: "#66ccb3",
-      500: "#32cda6", // Main turquoise
-      600: "#28a485",
-      700: "#1e7b64",
-      800: "#145243",
-      900: "#0f2421", // Very dark teal (text)
-      950: "#0a1814",
-      DEFAULT: "#32cda6",
+      50: "#eff6ff",
+      100: "#dbeafe",
+      200: "#bfdbfe",
+      300: "#93c5fd",
+      400: "#60a5fa",
+      500: "#3b82f6", // Main blue
+      600: "#2563eb", // Dark blue
+      700: "#1d4ed8",
+      800: "#1e3a8a",
+      900: "#1e2a5a", // Very dark blue
+      950: "#172554",
+      DEFAULT: "#2563eb",
     },
-    // Secondary/Text colors (teal tones)
+    // Secondary/Text colors (slate blue tones)
     secondary: {
-      50: "#f0f9f7",
-      100: "#d9f2ec",
-      200: "#b3e6d9",
-      300: "#8cd9c6",
-      400: "#5bb5a0",
-      500: "#3a9283", // Medium teal (description text)
-      600: "#2e7569",
-      700: "#22584f",
-      800: "#173b35",
-      900: "#0f2421", // Dark teal
-      950: "#0a1814",
-      DEFAULT: "#3a9283",
+      50: "#f8fafc",
+      100: "#f1f5f9",
+      200: "#e2e8f0",
+      300: "#cbd5e1",
+      400: "#94a3b8",
+      500: "#64748b", // Medium slate (description text)
+      600: "#475569",
+      700: "#334155",
+      800: "#1e293b",
+      900: "#0f172a", // Dark slate
+      950: "#020617",
+      DEFAULT: "#64748b",
     },
     // Background colors
     background: {
       50: "#ffffff",
       100: "#fafafa",
       200: "#f5f5f5",
-      300: "#ecf9f5", // Very light turquoise
-      400: "#d9f2ec",
-      500: "#b3e6d9",
-      600: "#8cd9c6",
-      700: "#66ccb3",
-      800: "#0f2421",
-      900: "#0a1814",
-      950: "#050c0a",
+      300: "#eff6ff", // Very light blue
+      400: "#dbeafe",
+      500: "#bfdbfe",
+      600: "#93c5fd",
+      700: "#60a5fa",
+      800: "#1e2a5a",
+      900: "#172554",
+      950: "#0f1729",
       DEFAULT: "#ffffff",
     },
     // Text colors
@@ -59,11 +59,11 @@ export const designTokens = {
       400: "#a3a3a3",
       500: "#737373",
       600: "#525252",
-      700: "#3a9283", // Medium teal
-      800: "#0f2421", // Dark teal
-      900: "#0a1814", // Very dark teal
-      950: "#050c0a",
-      DEFAULT: "#0f2421",
+      700: "#334155", // Medium slate
+      800: "#1e293b", // Dark slate
+      900: "#0f172a", // Very dark slate
+      950: "#020617",
+      DEFAULT: "#1e293b",
     },
     // Status colors
     success: {
@@ -108,11 +108,11 @@ export const designTokens = {
       950: "#451a03",
       DEFAULT: "#FF9500",
     },
-    // Border colors (using turquoise tints)
+    // Border colors (using blue tints)
     border: {
-      light: "#b3e6d9",
-      DEFAULT: "#8cd9c6",
-      dark: "#66ccb3",
+      light: "#bfdbfe",
+      DEFAULT: "#93c5fd",
+      dark: "#60a5fa",
     },
   },
   spacing: {

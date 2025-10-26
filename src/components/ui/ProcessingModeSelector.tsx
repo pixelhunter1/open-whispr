@@ -27,7 +27,7 @@ export default function ProcessingModeSelector({
             <Cloud className="h-6 w-6 text-primary-600" />
             <h4 className="font-medium text-primary-900">Cloud Processing</h4>
           </div>
-          <span className="rounded-full bg-success-100 px-2 py-1 text-xs text-success-600">
+          <span className="rounded-full bg-primary-100 px-2 py-1 text-xs text-primary-600">
             Fastest
           </span>
         </div>
