@@ -645,17 +645,9 @@ export default function AIModelSelectorEnhanced({
                         onClick={() => handleCloudProviderChange(provider)}
                         className={`flex flex-1 items-center justify-center gap-2 px-4 py-3 font-medium transition-all ${
                           isSelected
-                            ? `text-${color}-700 border-b-2`
+                            ? `text-primary-700 border-b-2 border-primary-500 bg-primary-50`
                             : "text-secondary-500 hover:bg-primary-100"
                         }`}
-                        style={
-                          isSelected
-                            ? {
-                                borderBottomColor: `rgb(99 102 241)`,
-                                backgroundColor: "rgb(238 242 255)",
-                              }
-                            : {}
-                        }
                       >
                         <ProviderIcon provider={provider} />
                         <span>{providerDisplayName}</span>
@@ -848,17 +840,9 @@ export default function AIModelSelectorEnhanced({
                         onClick={() => handleLocalProviderChange(provider)}
                         className={`flex items-center justify-center gap-2 px-4 py-3 font-medium whitespace-nowrap transition-all ${
                           isSelected
-                            ? "border-b-2 text-primary-700"
+                            ? "border-b-2 border-primary-500 bg-primary-50 text-primary-700"
                             : "text-secondary-500 hover:bg-primary-100"
                         }`}
-                        style={
-                          isSelected
-                            ? {
-                                borderBottomColor: "rgb(147 51 234)",
-                                backgroundColor: "rgb(250 245 255)",
-                              }
-                            : {}
-                        }
                       >
                         <ProviderIcon provider={provider} />
                         <span>{providerData?.name}</span>

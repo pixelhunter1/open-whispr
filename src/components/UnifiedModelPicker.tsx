@@ -100,7 +100,7 @@ export function UnifiedModelPickerCompact({
           onClick={() => onModelSelect(model.value)}
           className={`w-full rounded-lg border-2 p-3 text-left transition-all ${
             selectedModel === model.value
-              ? "border-indigo-500 bg-indigo-50"
+              ? "border-primary-500 bg-primary-50"
               : "border-gray-200 bg-white hover:border-gray-300"
           }`}
         >
@@ -119,7 +119,7 @@ export function UnifiedModelPickerCompact({
               )}
             </div>
             {selectedModel === model.value && (
-              <span className="rounded-full bg-indigo-100 px-2 py-1 text-xs font-medium text-indigo-600">
+              <span className="rounded-full bg-primary-100 px-2 py-1 text-xs font-medium text-primary-600">
                 ✓ Selected
               </span>
             )}
