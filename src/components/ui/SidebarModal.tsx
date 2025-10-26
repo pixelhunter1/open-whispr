@@ -42,27 +42,23 @@ export default function SidebarModal<T extends string>({
 
             <div className="flex h-[90vh]">
               {/* Sidebar */}
-              <div className={`${sidebarWidth} border-r border-gray-200 bg-gray-50 p-4`}>
-                <h2 className="mb-4 px-2 text-xl font-semibold text-gray-900">{title}</h2>
-                <nav className="space-y-1">
+              <div className={`${sidebarWidth} border-r border-primary-200 bg-primary-50/50 p-6`}>
+                <h2 className="mb-6 px-2 text-xl font-semibold text-primary-900">{title}</h2>
+                <nav className="space-y-1.5">
                   {sidebarItems.map((item) => {
                     const Icon = item.icon;
                     return (
                       <button
                         key={item.id}
                         onClick={() => onSectionChange(item.id)}
-                        className={`flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm transition-all duration-200 ${
+                        className={`flex w-full items-center gap-3 rounded-lg px-4 py-3 text-left text-sm font-medium transition-all duration-200 ${
                           activeSection === item.id
-                            ? "border border-gray-200 bg-white text-gray-900 shadow-sm"
-                            : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                            ? "bg-primary-500 text-white shadow-sm shadow-primary-500/20"
+                            : "text-secondary-600 hover:bg-primary-100 hover:text-primary-900"
                         }`}
                       >
-                        <Icon
-                          className={`h-4 w-4 flex-shrink-0 ${
-                            activeSection === item.id ? "text-indigo-600" : ""
-                          }`}
-                        />
-                        <span className="flex-1 font-medium">{item.label}</span>
+                        <Icon className="h-5 w-5 flex-shrink-0" />
+                        <span className="flex-1">{item.label}</span>
                       </button>
                     );
                   })}
