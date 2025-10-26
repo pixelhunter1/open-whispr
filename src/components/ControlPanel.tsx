@@ -229,86 +229,102 @@ export default function ControlPanel() {
       {/* Main content */}
       <div className="p-6">
         <div className="mx-auto max-w-4xl space-y-6">
-          {/* Transcriptions - Minimal Professional Design */}
-          <Card>
-            <CardHeader>
+          {/* Transcriptions - Modern Clean Design */}
+          <Card className="border border-neutral-200 shadow-none">
+            <CardHeader className="border-b border-neutral-100 bg-neutral-50/50 pb-4">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-[15px] font-semibold text-primary-900">
-                  Recent Transcriptions
-                </CardTitle>
-                <div className="flex gap-1">
+                <div>
+                  <CardTitle className="text-lg font-semibold text-neutral-900">
+                    Recent Transcriptions
+                  </CardTitle>
+                  <p className="mt-0.5 text-xs text-neutral-500">
+                    Your dictation history
+                  </p>
+                </div>
+                <div className="flex items-center gap-1">
                   <Button
                     onClick={refreshHistory}
                     variant="ghost"
                     size="sm"
-                    className="h-8 w-8 p-0"
+                    className="h-8 w-8 p-0 text-neutral-500 hover:bg-neutral-100 hover:text-neutral-700"
+                    title="Refresh"
                   >
-                    <RefreshCw size={14} className="text-secondary-500" />
+                    <RefreshCw size={16} />
                   </Button>
                   {history.length > 0 && (
                     <Button
                       onClick={clearHistory}
                       variant="ghost"
                       size="sm"
-                      className="h-8 w-8 p-0 text-secondary-500 hover:bg-error-50 hover:text-error-600"
+                      className="h-8 w-8 p-0 text-neutral-500 hover:bg-error-50 hover:text-error-600"
+                      title="Clear all"
                     >
-                      <Trash2 size={14} />
+                      <Trash2 size={16} />
                     </Button>
                   )}
                 </div>
               </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="bg-neutral-50/30 px-6 pb-6">
               {isLoading ? (
-                <div className="py-8 text-center">
-                  <div className="loader mx-auto mb-2 h-6 w-6 animate-spin rounded-full border-2 border-primary-200 border-t-primary-600" />
-                  <p className="text-[12px] text-secondary-500">Loading...</p>
+                <div className="py-12 text-center">
+                  <div className="loader mx-auto mb-3 h-8 w-8 animate-spin rounded-full border-2 border-neutral-200 border-t-primary-600" />
+                  <p className="text-sm text-neutral-500">Loading transcriptions...</p>
                 </div>
               ) : history.length === 0 ? (
-                <div className="py-10 text-center">
-                  <p className="mb-1 text-[14px] font-medium text-primary-900">
+                <div className="py-12 text-center">
+                  <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-primary-500 to-primary-700">
+                    <Mic className="h-8 w-8 text-white" />
+                  </div>
+                  <h4 className="mb-2 text-base font-semibold text-neutral-900">
                     No transcriptions yet
-                  </p>
-                  <p className="mb-6 text-[12px] text-secondary-500">
-                    Press your hotkey to start recording
+                  </h4>
+                  <p className="mb-6 text-sm text-neutral-500">
+                    Start recording to see your transcriptions here
                   </p>
 
-                  {/* Quick Start Guide - Minimal */}
-                  <div className="mx-auto max-w-sm rounded border border-primary-200 bg-primary-50 p-4 text-left">
-                    <p className="mb-3 text-[13px] font-medium text-primary-900">Quick Start</p>
-                    <ol className="space-y-1.5 text-[12px] text-secondary-500">
-                      <li>1. Click in any text field</li>
-                      <li>
-                        2. Press{" "}
-                        <kbd className="rounded border border-primary-300 bg-white px-1.5 py-0.5 font-mono text-[11px]">
-                          {hotkey}
-                        </kbd>{" "}
-                        to start
-                      </li>
-                      <li>3. Speak your text</li>
-                      <li>
-                        4. Press{" "}
-                        <kbd className="rounded border border-primary-300 bg-white px-1.5 py-0.5 font-mono text-[11px]">
-                          {hotkey}
-                        </kbd>{" "}
-                        to stop
-                      </li>
-                      <li>5. Text appears automatically</li>
-                    </ol>
+                  {/* Quick Start - Modern Card */}
+                  <div className="mx-auto max-w-md rounded-xl border border-neutral-200 bg-white p-4 shadow-sm">
+                    <div className="flex items-start gap-3 text-left">
+                      <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-primary-600">
+                        <FileText className="h-4 w-4 text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="mb-1 text-sm font-semibold text-neutral-900">Quick Start</p>
+                        <p className="text-xs text-neutral-600">
+                          Press{" "}
+                          <kbd className="mx-1 rounded border border-neutral-300 bg-neutral-100 px-1.5 py-0.5 font-mono text-[11px] font-semibold text-neutral-700 shadow-sm">
+                            {hotkey}
+                          </kbd>{" "}
+                          to start recording, speak your text, then press{" "}
+                          <kbd className="mx-1 rounded border border-neutral-300 bg-neutral-100 px-1.5 py-0.5 font-mono text-[11px] font-semibold text-neutral-700 shadow-sm">
+                            {hotkey}
+                          </kbd>{" "}
+                          again to stop.
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 </div>
               ) : (
-                <div className="max-h-96 space-y-2 overflow-y-auto">
-                  {history.map((item, index) => (
-                    <TranscriptionItem
-                      key={item.id}
-                      item={item}
-                      index={index}
-                      total={history.length}
-                      onCopy={copyToClipboard}
-                      onDelete={deleteTranscription}
-                    />
-                  ))}
+                <div className="space-y-3 pt-4">
+                  <div className="mb-1 flex items-center justify-between">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
+                      {history.length} {history.length === 1 ? 'transcription' : 'transcriptions'}
+                    </p>
+                  </div>
+                  <div className="max-h-[500px] space-y-3 overflow-y-auto pr-1">
+                    {history.map((item, index) => (
+                      <TranscriptionItem
+                        key={item.id}
+                        item={item}
+                        index={index}
+                        total={history.length}
+                        onCopy={copyToClipboard}
+                        onDelete={deleteTranscription}
+                      />
+                    ))}
+                  </div>
                 </div>
               )}
             </CardContent>
