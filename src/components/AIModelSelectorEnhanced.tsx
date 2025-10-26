@@ -8,6 +8,13 @@ import { UnifiedModelPickerCompact } from "./UnifiedModelPicker";
 import { API_ENDPOINTS, buildApiUrl, normalizeBaseUrl } from "../config/constants";
 import { REASONING_PROVIDERS } from "../utils/languages";
 import { modelRegistry } from "../models/ModelRegistry";
+import openaiIcon from "../assets/icons/providers/openai.svg";
+import anthropicIcon from "../assets/icons/providers/anthropic.svg";
+import geminiIcon from "../assets/icons/providers/gemini.svg";
+import llamaIcon from "../assets/icons/providers/llama.svg";
+import mistralIcon from "../assets/icons/providers/mistral.svg";
+import qwenIcon from "../assets/icons/providers/qwen.svg";
+import openaiOssIcon from "../assets/icons/providers/openai-oss.svg";
 
 type CloudModelOption = {
   value: string;
@@ -17,32 +24,30 @@ type CloudModelOption = {
   ownedBy?: string;
 };
 
-const ICON_BASE_PATH = "/assets/icons/providers";
-
-const PROVIDER_ICON_MAP: Record<string, string> = {
-  openai: "openai",
-  anthropic: "anthropic",
-  gemini: "gemini",
-  llama: "llama",
-  mistral: "mistral",
-  qwen: "qwen",
-  "openai-oss": "openai-oss",
+// Provider icon mapping
+const PROVIDER_ICONS: Record<string, string> = {
+  openai: openaiIcon,
+  anthropic: anthropicIcon,
+  gemini: geminiIcon,
+  llama: llamaIcon,
+  mistral: mistralIcon,
+  qwen: qwenIcon,
+  "openai-oss": openaiOssIcon,
 };
 
-const OWNED_BY_ICON_RULES: Array<{ match: RegExp; icon: string }> = [
-  { match: /(openai|system|default|gpt|davinci)/, icon: "openai" },
-  { match: /(azure)/, icon: "openai" },
-  { match: /(anthropic|claude)/, icon: "anthropic" },
-  { match: /(google|gemini)/, icon: "gemini" },
-  { match: /(meta|llama)/, icon: "llama" },
-  { match: /(mistral)/, icon: "mistral" },
-  { match: /(qwen|ali|tongyi)/, icon: "qwen" },
-  { match: /(openrouter|oss)/, icon: "openai-oss" },
+const OWNED_BY_ICON_RULES: Array<{ match: RegExp; iconKey: string }> = [
+  { match: /(openai|system|default|gpt|davinci)/, iconKey: "openai" },
+  { match: /(azure)/, iconKey: "openai" },
+  { match: /(anthropic|claude)/, iconKey: "anthropic" },
+  { match: /(google|gemini)/, iconKey: "gemini" },
+  { match: /(meta|llama)/, iconKey: "llama" },
+  { match: /(mistral)/, iconKey: "mistral" },
+  { match: /(qwen|ali|tongyi)/, iconKey: "qwen" },
+  { match: /(openrouter|oss)/, iconKey: "openai-oss" },
 ];
 
-const getProviderIconPath = (providerId: string): string => {
-  const iconId = PROVIDER_ICON_MAP[providerId] || "openai";
-  return `${ICON_BASE_PATH}/${iconId}.svg`;
+const getProviderIcon = (providerId: string): string | undefined => {
+  return PROVIDER_ICONS[providerId];
 };
 
 const resolveOwnedByIcon = (ownedBy?: string): string | undefined => {
@@ -50,7 +55,7 @@ const resolveOwnedByIcon = (ownedBy?: string): string | undefined => {
   const normalized = ownedBy.toLowerCase();
   const rule = OWNED_BY_ICON_RULES.find(({ match }) => match.test(normalized));
   if (rule) {
-    return `${ICON_BASE_PATH}/${rule.icon}.svg`;
+    return PROVIDER_ICONS[rule.iconKey];
   }
   return undefined;
 };
@@ -77,11 +82,6 @@ interface AIModelSelectorEnhancedProps {
 // Provider Icon Component
 const ProviderIcon = ({ provider }: { provider: string }) => {
   const iconClass = "w-5 h-5";
-  const [svgError, setSvgError] = React.useState(false);
-
-  if (provider === "custom") {
-    return <Wrench className={iconClass} />;
-  }
 
   // Default fallback icons for each provider
   const getFallbackIcon = () => {
@@ -109,22 +109,19 @@ const ProviderIcon = ({ provider }: { provider: string }) => {
     }
   };
 
-  // Try to load SVG if it exists and we haven't had an error
-  if (!svgError) {
+  // Try to load imported SVG icon
+  const iconSrc = getProviderIcon(provider);
+  if (iconSrc) {
     return (
-      <>
-        <img
-          src={`/assets/icons/providers/${provider}.svg`}
-          alt={`${provider} icon`}
-          className={iconClass}
-          onError={() => setSvgError(true)}
-          style={{ display: svgError ? "none" : "block" }}
-        />
-        {svgError && getFallbackIcon()}
-      </>
+      <img
+        src={iconSrc}
+        alt={`${provider} icon`}
+        className={iconClass}
+      />
     );
   }
 
+  // Fallback to lucide icon
   return getFallbackIcon();
 };
 
@@ -339,7 +336,7 @@ export default function AIModelSelectorEnhanced({
   const localProviders = modelRegistry.getAllProviders().map((p) => p.id);
 
   const openaiModelOptions = useMemo<CloudModelOption[]>(() => {
-    const iconPath = getProviderIconPath("openai");
+    const iconPath = getProviderIcon("openai");
     return REASONING_PROVIDERS.openai.models.map((model) => ({
       ...model,
       icon: iconPath,
@@ -360,7 +357,7 @@ export default function AIModelSelectorEnhanced({
       return [];
     }
 
-    const iconPath = getProviderIconPath(selectedCloudProvider);
+    const iconPath = getProviderIcon(selectedCloudProvider);
     return provider.models.map((model) => ({
       ...model,
       icon: iconPath,
