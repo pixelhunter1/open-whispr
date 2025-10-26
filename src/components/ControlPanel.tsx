@@ -232,69 +232,69 @@ export default function ControlPanel() {
       <div className="p-6">
         <div className="mx-auto max-w-4xl space-y-6">
           {/* Transcriptions - Modern Clean Design */}
-          <Card className="border border-neutral-200 shadow-none">
-            <CardHeader className="border-b border-neutral-100 bg-neutral-50/50 pb-4">
+          <Card className="overflow-hidden border border-primary-200 bg-gradient-to-b from-white to-primary-50/30 shadow-sm">
+            <CardHeader className="border-b border-primary-100 bg-gradient-to-r from-primary-50 to-white pb-5">
               <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="text-lg font-semibold text-neutral-900">
+                <div className="flex-1">
+                  <CardTitle className="text-xl font-semibold tracking-tight text-primary-900">
                     Recent Transcriptions
                   </CardTitle>
-                  <p className="mt-0.5 text-xs text-neutral-500">
-                    Your dictation history
+                  <p className="mt-1.5 text-sm text-primary-700/70">
+                    Your dictation history {history.length > 0 && `• ${history.length} ${history.length === 1 ? 'item' : 'items'}`}
                   </p>
                 </div>
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-2">
                   <Button
                     onClick={refreshHistory}
                     variant="ghost"
                     size="sm"
-                    className="h-8 w-8 p-0 text-neutral-500 hover:bg-neutral-100 hover:text-neutral-700"
+                    className="h-9 w-9 rounded-lg p-0 text-primary-600 hover:bg-primary-100 hover:text-primary-700"
                     title="Refresh"
                   >
-                    <RefreshCw size={16} />
+                    <RefreshCw size={18} />
                   </Button>
                   {history.length > 0 && (
                     <Button
                       onClick={clearHistory}
                       variant="ghost"
                       size="sm"
-                      className="h-8 w-8 p-0 text-neutral-500 hover:bg-error-50 hover:text-error-600"
+                      className="h-9 w-9 rounded-lg p-0 text-neutral-500 hover:bg-error-50 hover:text-error-600"
                       title="Clear all"
                     >
-                      <Trash2 size={16} />
+                      <Trash2 size={18} />
                     </Button>
                   )}
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="bg-neutral-50/30 px-6 pb-6">
+            <CardContent className="bg-white/50 px-6 pb-6">
               {isLoading ? (
-                <div className="py-12 text-center">
-                  <div className="loader mx-auto mb-3 h-8 w-8 animate-spin rounded-full border-2 border-neutral-200 border-t-primary-600" />
-                  <p className="text-sm text-neutral-500">Loading transcriptions...</p>
+                <div className="py-16 text-center">
+                  <div className="loader mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-3 border-primary-200 border-t-primary-600" />
+                  <p className="text-sm font-medium text-primary-700/70">Loading transcriptions...</p>
                 </div>
               ) : history.length === 0 ? (
-                <div className="py-12 text-center">
-                  <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-primary-500 to-primary-700">
-                    <Mic className="h-8 w-8 text-white" />
+                <div className="py-16 text-center">
+                  <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-500 via-primary-600 to-primary-700 shadow-lg">
+                    <Mic className="h-10 w-10 text-white" />
                   </div>
-                  <h4 className="mb-2 text-base font-semibold text-neutral-900">
+                  <h4 className="mb-2 text-lg font-semibold text-primary-900">
                     No transcriptions yet
                   </h4>
-                  <p className="mb-6 text-sm text-neutral-500">
+                  <p className="mb-8 text-sm text-primary-700/70">
                     Start recording to see your transcriptions here
                   </p>
 
                   {/* Quick Start - Clean Card */}
-                  <div className="mx-auto max-w-md rounded-xl border border-neutral-200 bg-white p-5 text-left shadow-sm">
-                    <p className="mb-2 text-sm font-semibold text-neutral-900">Quick Start</p>
-                    <p className="text-xs leading-relaxed text-neutral-600">
+                  <div className="mx-auto max-w-md rounded-2xl border border-primary-200 bg-gradient-to-br from-white to-primary-50/30 p-6 text-left shadow-sm">
+                    <p className="mb-3 text-sm font-semibold text-primary-900">Quick Start Guide</p>
+                    <p className="text-sm leading-relaxed text-primary-800/80">
                       Press{" "}
-                      <kbd className="mx-0.5 rounded border border-neutral-300 bg-neutral-100 px-1.5 py-0.5 font-mono text-[11px] font-semibold text-neutral-700 shadow-sm">
+                      <kbd className="mx-1 rounded-lg border border-primary-300 bg-primary-100 px-2 py-1 font-mono text-xs font-semibold text-primary-700 shadow-sm">
                         {hotkey}
                       </kbd>{" "}
                       to start recording, speak your text, then press{" "}
-                      <kbd className="mx-0.5 rounded border border-neutral-300 bg-neutral-100 px-1.5 py-0.5 font-mono text-[11px] font-semibold text-neutral-700 shadow-sm">
+                      <kbd className="mx-1 rounded-lg border border-primary-300 bg-primary-100 px-2 py-1 font-mono text-xs font-semibold text-primary-700 shadow-sm">
                         {hotkey}
                       </kbd>{" "}
                       again to stop.
@@ -302,13 +302,8 @@ export default function ControlPanel() {
                   </div>
                 </div>
               ) : (
-                <div className="space-y-3 pt-4">
-                  <div className="mb-1 flex items-center justify-between">
-                    <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
-                      {history.length} {history.length === 1 ? 'transcription' : 'transcriptions'}
-                    </p>
-                  </div>
-                  <div className="max-h-[500px] space-y-3 overflow-y-auto pr-1">
+                <div className="space-y-4 pt-6">
+                  <div className="max-h-[520px] space-y-3 overflow-y-auto pr-2">
                     {history.map((item, index) => (
                       <TranscriptionItem
                         key={item.id}
