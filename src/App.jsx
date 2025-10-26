@@ -4,6 +4,7 @@ import { useToast } from "./components/ui/Toast";
 import { LoadingDots } from "./components/ui/LoadingDots";
 import { useHotkey } from "./hooks/useHotkey";
 import { useWindowDrag } from "./hooks/useWindowDrag";
+import { useAudioLevel } from "./hooks/useAudioLevel";
 import AudioManager from "./helpers/audioManager";
 import { useSettings } from "./hooks/useSettings";
 import TranslationService from "./services/TranslationService";
@@ -46,6 +47,83 @@ const VoiceWaveIndicator = ({ isListening }) => {
   );
 };
 
+// Volume Meter Component - displays audio level visually
+const VolumeMeter = ({ level }) => {
+  return (
+    <div className="flex items-center justify-center gap-0.5">
+      {[...Array(5)].map((_, i) => {
+        const barThreshold = (i + 1) * 20; // 20, 40, 60, 80, 100
+        const isActive = level >= barThreshold;
+        const height = 4 + (i * 3); // Progressive heights: 4, 7, 10, 13, 16
+
+        return (
+          <div
+            key={i}
+            className={`w-1 rounded-full transition-all duration-100 ${
+              isActive ? 'bg-white' : 'bg-white/30'
+            }`}
+            style={{ height: `${height}px` }}
+          />
+        );
+      })}
+    </div>
+  );
+};
+
+// Recording Timer Component
+const RecordingTimer = ({ startTime }) => {
+  const [elapsed, setElapsed] = useState(0);
+
+  useEffect(() => {
+    if (!startTime) return;
+
+    const interval = setInterval(() => {
+      setElapsed(Math.floor((Date.now() - startTime) / 1000));
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [startTime]);
+
+  const minutes = Math.floor(elapsed / 60);
+  const seconds = elapsed % 60;
+
+  return (
+    <div className="text-xs font-mono text-white/90">
+      {minutes}:{seconds.toString().padStart(2, '0')}
+    </div>
+  );
+};
+
+// State Badge Component - shows current state with text
+const StateBadge = ({ state, className = "" }) => {
+  const stateConfig = {
+    idle: { text: "Ready", color: "bg-neutral-600/80" },
+    hover: { text: "Click to speak", color: "bg-neutral-600/90" },
+    recording: { text: "Recording", color: "bg-green-600/90" },
+    processing: { text: "Processing", color: "bg-orange-600/90" },
+  };
+
+  const config = stateConfig[state] || stateConfig.idle;
+
+  return (
+    <div className={`absolute -top-8 left-1/2 -translate-x-1/2 ${className}`}>
+      <div className={`px-2 py-1 rounded-md ${config.color} backdrop-blur-sm text-white text-xs font-medium whitespace-nowrap`}>
+        {config.text}
+      </div>
+    </div>
+  );
+};
+
+// Ripple Effect Component for recording state
+const RippleEffect = () => {
+  return (
+    <>
+      <div className="absolute inset-0 rounded-full bg-green-400/30 animate-ping" style={{ animationDuration: '1.5s' }}></div>
+      <div className="absolute inset-0 rounded-full bg-green-400/20 animate-ping" style={{ animationDuration: '2s', animationDelay: '0.5s' }}></div>
+    </>
+  );
+};
+
 // Enhanced Tooltip Component
 const Tooltip = ({ children, content, emoji }) => {
   const [isVisible, setIsVisible] = useState(false);
@@ -76,6 +154,8 @@ export default function App() {
   const [error, setError] = useState("");
   const [isHovered, setIsHovered] = useState(false);
   const [isCommandMenuOpen, setIsCommandMenuOpen] = useState(false);
+  const [audioStream, setAudioStream] = useState(null);
+  const [recordingStartTime, setRecordingStartTime] = useState(null);
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
   const commandMenuRef = useRef(null);
@@ -85,6 +165,9 @@ export default function App() {
   const { isDragging, handleMouseDown, handleMouseUp } = useWindowDrag();
   const [dragStartPos, setDragStartPos] = useState(null);
   const [hasDragged, setHasDragged] = useState(false);
+
+  // Monitor audio level while recording
+  const audioLevel = useAudioLevel(audioStream, isRecording);
 
   // Translation settings
   const {
@@ -119,6 +202,8 @@ export default function App() {
     try {
       setError("");
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      setAudioStream(stream);
+      setRecordingStartTime(Date.now());
 
       mediaRecorderRef.current = new window.MediaRecorder(stream);
       audioChunksRef.current = [];
@@ -129,6 +214,8 @@ export default function App() {
 
       mediaRecorderRef.current.onstop = async () => {
         setIsProcessing(true);
+        setAudioStream(null);
+        setRecordingStartTime(null);
         const audioBlob = new Blob(audioChunksRef.current, {
           type: "audio/wav",
         });
@@ -141,6 +228,8 @@ export default function App() {
       setIsRecording(true);
     } catch (err) {
       console.error("Recording error:", err);
+      setAudioStream(null);
+      setRecordingStartTime(null);
       toast({
         title: "Recording Error",
         description: "Failed to access microphone: " + err.message,
@@ -401,32 +490,32 @@ export default function App() {
   // Get microphone button properties based on state
   const getMicButtonProps = () => {
     const baseClasses =
-      "rounded-full w-10 h-10 flex items-center justify-center relative overflow-hidden border-2 border-white/70 cursor-pointer";
+      "rounded-full w-14 h-14 flex items-center justify-center relative overflow-hidden border-2 border-white/70 cursor-pointer transition-all duration-300";
 
     switch (micState) {
       case "idle":
         return {
-          className: `${baseClasses} bg-black/50 cursor-pointer`,
+          className: `${baseClasses} bg-neutral-700/80 cursor-pointer hover:bg-neutral-600/80`,
           tooltip: `Press [${hotkey}] to speak`,
         };
       case "hover":
         return {
-          className: `${baseClasses} bg-black/50 cursor-pointer`,
+          className: `${baseClasses} bg-neutral-600/80 cursor-pointer scale-105`,
           tooltip: `Press [${hotkey}] to speak`,
         };
       case "recording":
         return {
-          className: `${baseClasses} bg-blue-600 cursor-pointer`,
+          className: `${baseClasses} bg-green-600 cursor-pointer`,
           tooltip: "Recording...",
         };
       case "processing":
         return {
-          className: `${baseClasses} bg-purple-600 cursor-not-allowed`,
+          className: `${baseClasses} bg-orange-600 cursor-not-allowed`,
           tooltip: "Processing...",
         };
       default:
         return {
-          className: `${baseClasses} bg-black/50 cursor-pointer`,
+          className: `${baseClasses} bg-neutral-700/80 cursor-pointer`,
           style: { transform: "scale(0.8)" },
           tooltip: "Click to speak",
         };
@@ -440,6 +529,16 @@ export default function App() {
       {/* Fixed bottom-right voice button */}
       <div className="fixed right-6 bottom-6 z-50">
         <div className="relative">
+          {/* State Badge - shows above button */}
+          {(isRecording || isProcessing) && <StateBadge state={micState} />}
+
+          {/* Recording Timer - shows above badge */}
+          {isRecording && recordingStartTime && (
+            <div className="absolute -top-16 left-1/2 -translate-x-1/2">
+              <RecordingTimer startTime={recordingStartTime} />
+            </div>
+          )}
+
           <Tooltip content={micProps.tooltip}>
             <button
               ref={buttonRef}
@@ -501,38 +600,38 @@ export default function App() {
                       ? "grabbing !important"
                       : "pointer !important",
                 transition:
-                  "transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.25s ease-out",
+                  "transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s ease-out",
               }}
             >
+              {/* Ripple effect for recording */}
+              {micState === "recording" && <RippleEffect />}
+
               {/* Background effects */}
               <div
-                className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent transition-opacity duration-150"
+                className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent transition-opacity duration-300"
                 style={{ opacity: micState === "hover" ? 0.8 : 0 }}
-              ></div>
-              <div
-                className="absolute inset-0 transition-colors duration-150"
-                style={{
-                  backgroundColor: micState === "hover" ? "rgba(0,0,0,0.1)" : "transparent",
-                }}
               ></div>
 
               {/* Dynamic content based on state */}
               {micState === "idle" || micState === "hover" ? (
-                <SoundWaveIcon size={micState === "idle" ? 12 : 14} />
+                <SoundWaveIcon size={micState === "idle" ? 14 : 16} />
               ) : micState === "recording" ? (
-                <LoadingDots />
+                <VolumeMeter level={audioLevel} />
               ) : micState === "processing" ? (
                 <VoiceWaveIndicator isListening={true} />
               ) : null}
 
-              {/* State indicator ring for recording */}
+              {/* Volume ring indicator for recording */}
               {micState === "recording" && (
-                <div className="absolute inset-0 animate-pulse rounded-full border-2 border-blue-300"></div>
+                <div
+                  className="absolute inset-0 rounded-full border-2 border-green-300 transition-opacity duration-100"
+                  style={{ opacity: audioLevel / 200 }}
+                ></div>
               )}
 
-              {/* State indicator ring for processing */}
+              {/* Processing indicator ring */}
               {micState === "processing" && (
-                <div className="absolute inset-0 rounded-full border-2 border-purple-300 opacity-50"></div>
+                <div className="absolute inset-0 rounded-full border-2 border-orange-300 opacity-50 animate-pulse"></div>
               )}
             </button>
           </Tooltip>
